@@ -3,17 +3,58 @@
     <head>
         @include('partials.head')
     </head>
-    <body class="min-h-screen bg-white antialiased dark:bg-linear-to-b dark:from-neutral-950 dark:to-neutral-900">
-        <div class="bg-background flex min-h-svh flex-col items-center justify-center gap-6 p-6 md:p-10">
-            <div class="flex w-full max-w-sm flex-col gap-2">
-                <a href="{{ route('home') }}" class="flex flex-col items-center gap-2 font-medium" wire:navigate>
-                    <span class="flex h-9 w-9 mb-1 items-center justify-center rounded-md">
-                        <x-app-logo-icon class="size-9 fill-current text-black dark:text-white" />
-                    </span>
-                    <span class="sr-only">{{ config('app.name', 'Laravel') }}</span>
-                </a>
-                <div class="flex flex-col gap-6">
-                    {{ $slot }}
+    <body class="min-h-screen bg-white antialiased dark:bg-neutral-950 font-sans">
+        <div class="flex min-h-screen w-full flex-col md:flex-row">
+            <!-- Left Side: Background Image & Branding -->
+            <div class="relative hidden w-1/2 flex-col justify-between overflow-hidden bg-neutral-900 p-12 text-white md:flex">
+                <!-- Background Image with Overlay -->
+                <div class="absolute inset-0 z-0 overflow-hidden">
+                    <img src="{{ asset('images/auth-bg.png') }}" alt="FitControl Background" class="h-full w-full object-cover opacity-60 brightness-75 transition-all duration-700 hover:scale-105" />
+                    <div class="absolute inset-0 bg-linear-to-t from-neutral-950/80 to-transparent"></div>
+                </div>
+
+                <!-- Branding -->
+                <div class="relative z-10">
+                    <a href="{{ route('home') }}" class="flex items-center gap-3 transition-transform hover:scale-105" wire:navigate>
+                        <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-white/10 backdrop-blur-md border border-white/20 shadow-xl">
+                             <!-- <x-app-logo-icon class="h-8 w-8 fill-current text-white" />-->
+                        </div>
+                        <span class="text-2xl font-bold tracking-tight">FitControl</span>
+                    </a>
+                </div>
+
+                <!-- Quote / Motivation -->
+                <div class="relative z-10 max-w-md">
+                    <h2 class="text-3xl font-bold leading-tight tracking-tight">
+                        Eleva tu entrenamiento al siguiente nivel con <span class="text-indigo-400">FitControl</span>.
+                    </h2>
+                    <p class="mt-4 text-lg text-neutral-300">
+                        Gestiona tus entrenamientos, sigue tu progreso y alcanza tus objetivos de forma inteligente.
+                    </p>
+                </div>
+
+                <!-- Footer / Feedback -->
+                <div class="relative z-10 text-sm text-neutral-400">
+                    &copy; {{ date('Y') }} FitControl. Todos los derechos reservados.
+                </div>
+            </div>
+
+            <!-- Right Side: Login Form -->
+            <div class="flex flex-1 flex-col items-center justify-center bg-white p-6 dark:bg-neutral-950 md:p-12 lg:p-24">
+                <div class="w-full max-w-sm">
+                    <!-- Mobile Branding -->
+                    <div class="mb-10 flex flex-col items-center gap-4 text-center md:hidden">
+                        <a href="{{ route('home') }}" class="flex flex-col items-center gap-4" wire:navigate>
+                            <div class="flex h-16 w-16 items-center justify-center rounded-2xl bg-indigo-600 shadow-indigo-200 shadow-2xl">
+                                <x-app-logo-icon class="h-10 w-10 fill-current text-white" />
+                            </div>
+                            <span class="text-3xl font-black text-neutral-900 dark:text-white">FitControl</span>
+                        </a>
+                    </div>
+
+                    <div class="flex flex-col gap-8">
+                        {{ $slot }}
+                    </div>
                 </div>
             </div>
         </div>

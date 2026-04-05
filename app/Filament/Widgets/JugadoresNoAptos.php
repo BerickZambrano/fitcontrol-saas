@@ -26,9 +26,9 @@ class JugadoresNoAptos extends ApexChartWidget
                 'type' => 'donut',
             ],
             'colors' => [
-                '#F8A712',
-                '#FF3F07',
-                '#FECE45',
+                '#2563eb',
+                '#3b82f6',
+                '#93c5fd',
             ],
             'series' => [(int) $aptos, (int) $noAptos],
             'labels' => ['Aptos', 'No aptos'],

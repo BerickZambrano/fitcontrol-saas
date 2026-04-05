@@ -34,7 +34,7 @@ Route::get('/test-mail', function () {
 
 Route::get('/', function () {
     return Inertia::render('Landing');
-});
+})->name('home');
 
 require __DIR__.'/settings.php';
 

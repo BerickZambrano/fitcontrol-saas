@@ -31,6 +31,15 @@
 
             <div>
                 <label class="block text-sm font-medium text-gray-600 mb-1">
+                    Correo electrónico
+                </label>
+                <input type="email" name="email" required
+                    value="{{ $tenant->email_corporativo }}"
+                    class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-600 focus:border-blue-600 focus:outline-none transition">
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-600 mb-1">
                     Contraseña
                 </label>
                 <input type="password" name="password" required

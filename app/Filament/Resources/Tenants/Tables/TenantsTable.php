@@ -2,11 +2,16 @@
 
 namespace App\Filament\Resources\Tenants\Tables;
 
+use App\Mail\TenantApprovedMail;
+use App\Mail\TenantRejectedMail;
+use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 
 class TenantsTable
 {
@@ -66,6 +71,39 @@ class TenantsTable
                 //
             ])
             ->recordActions([
+                Action::make('aprobar')
+                    ->label('Aprobar')
+                    ->icon('heroicon-m-check-circle')
+                    ->color('success')
+                    ->visible(fn ($record) => $record->estado === 'pendiente')
+                    ->requiresConfirmation()
+                    ->modalHeading('Aprobar solicitud')
+                    ->modalDescription('¿Estás seguro de que deseas aprobar esta solicitud de club?')
+                    ->modalSubmitActionLabel('Sí, aprobar')
+                    ->action(function ($record) {
+                        $record->update([
+                            'estado'         => 'activo',
+                            'register_token' => Str::uuid(),
+                        ]);
+                        Mail::to($record->encargado_email)
+                            ->send(new TenantApprovedMail($record));
+                    }),
+
+                Action::make('rechazar')
+                    ->label('Rechazar')
+                    ->icon('heroicon-m-x-circle')
+                    ->color('danger')
+                    ->visible(fn ($record) => $record->estado === 'pendiente')
+                    ->requiresConfirmation()
+                    ->modalHeading('Rechazar solicitud')
+                    ->modalDescription('¿Estás seguro de que deseas rechazar esta solicitud de club?')
+                    ->modalSubmitActionLabel('Sí, rechazar')
+                    ->action(function ($record) {
+                        $record->update(['estado' => 'rechazado']);
+                        Mail::to($record->encargado_email)
+                            ->send(new TenantRejectedMail($record));
+                    }),
+
                 EditAction::make(),
             ])
             ->toolbarActions([
@@ -74,4 +112,4 @@ class TenantsTable
                 ]),
             ]);
     }
-}
+}   

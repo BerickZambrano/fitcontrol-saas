@@ -63,7 +63,7 @@ class AsistenciaPorMes extends ApexChartWidget
             'xaxis' => [
                 'categories' => $labels,
             ],
-            'colors' => ['#F8A712', '#FF3F07'],
+            'colors' => ['#3b82f6', '#93c5fd'],
             'plotOptions' => [
                 'bar' => [
                     'horizontal' => false,

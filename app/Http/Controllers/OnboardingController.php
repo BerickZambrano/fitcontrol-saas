@@ -29,9 +29,10 @@ class OnboardingController extends Controller
             'ciudad'            => 'required|string',
             'pais'              => 'required|string',
             'encargado_nombre'  => 'required|string',
-            'encargado_email'   => 'required|email',
+            'email_corporativo'   => 'required|email',
             'encargado_telefono'=> 'required|string',
             'plan'              => 'required|in:mensual,anual',
+            'tipo_club'         => 'required|in:formativo,amateur,profesional',
             'rut_document'      => 'required|file|mimes:pdf,jpg,jpeg,png|max:5120',
             'camara_comercio'   => 'required|file|mimes:pdf,jpg,jpeg,png|max:5120',
             'escudo_url'        => 'nullable|image|max:2048',
@@ -40,7 +41,7 @@ class OnboardingController extends Controller
         $data = $request->only([
             'nombre', 'nombre_corto', 'nit', 'telefono',
             'direccion', 'ciudad', 'pais', 'encargado_nombre',
-            'encargado_email', 'encargado_telefono', 'plan',
+            'encargado_email', 'encargado_telefono', 'plan', 'tipo_club',
         ]);
 
         // Subir archivos
@@ -60,8 +61,12 @@ class OnboardingController extends Controller
 
         $tenant = Tenant::create($data);
 
-        // Notificar al admin
-        app(\App\Services\ApprovalService::class)->notifyAdmin($tenant);
+        // Notificar al admin (no bloquea el flujo si falla)
+        try {
+            app(\App\Services\ApprovalService::class)->notifyAdmin($tenant);
+        } catch (\Throwable $e) {
+            \Log::warning('No se pudo notificar al admin: ' . $e->getMessage());
+        }
 
         return redirect()->route('onboarding.success');
     }

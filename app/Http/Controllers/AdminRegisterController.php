@@ -12,7 +12,6 @@ class AdminRegisterController extends Controller
     public function show($token)
     {
         $tenant = Tenant::where('register_token', $token)->firstOrFail();
-
         return view('auth.register-admin', compact('tenant'));
     }
 
@@ -21,27 +20,25 @@ class AdminRegisterController extends Controller
         $tenant = Tenant::where('register_token', $token)->firstOrFail();
 
         $request->validate([
-            'name' => 'required',
-            'password' => 'required|min:8|confirmed'
+            'name'     => 'required',
+            'email'    => 'required|email|unique:users,email',
+            'password' => 'required|min:8|confirmed',
         ]);
 
-        // Evita crear más de un admin
         if (User::where('tenant_id', $tenant->id)->exists()) {
             abort(403, 'Este tenant ya tiene administrador.');
         }
 
         $user = User::create([
             'tenant_id' => $tenant->id,
-            'name' => $request->name,
-            'email' => $tenant->email_corporativo,
-            'password' => Hash::make($request->password),
+            'name'      => $request->name,
+            'email'     => $request->email,
+            'password'  => Hash::make($request->password),
         ]);
 
-        $user->assignRole('Administrador'); 
+        $user->assignRole('Administrador');
 
-        $tenant->update([
-            'register_token' => null
-        ]);
+        $tenant->update(['register_token' => null]);
 
         auth()->login($user);
 

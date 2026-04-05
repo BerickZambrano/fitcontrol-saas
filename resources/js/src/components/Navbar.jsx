@@ -43,7 +43,7 @@ function Navbar() {
 
       {/* CTA Buttons */}
       <a
-        href="/admin/login"
+        href="/login"
         className="h-11 px-6 text-black font-bold tracking-wider rounded-lg flex items-center hover:bg-[#ffff] duration-150 border-2 border-[#121c4c] active:scale-95 transition-all max-[950px]:hidden"
       >
         <img src={candado} width={"30px"} alt="" />
@@ -74,7 +74,7 @@ function Navbar() {
         <div className="min-h-[100%] w-full bg-[#d3cae0] absolute top-[80px] left-0 min-[950px]:hidden">
           <ul className="flex flex-col items-center gap-8 text-2xl font-bold text-[#12092a] tracking-wider mt-16 pb-20">
             <li className="hover:text-[#121c4c]" onClick={handleNavButtonClick}>
-              <a href="/admin/login">INICIAR SESIÓN</a>
+              <a href="/login">INICIAR SESIÓN</a>
             </li>
             <li className="hover:text-[#121c4c]" onClick={handleNavButtonClick}>
               <a href="/solicitar-acceso">SOLICITAR ACCESO</a>

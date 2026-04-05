@@ -46,7 +46,7 @@ class EntrenamientosPorMes extends ApexChartWidget
             'stroke' => [
                 'curve' => 'smooth', 
             ],
-            'colors' => ['#F8A712'],
+            'colors' => ['#2563eb'],
         ];
     }
 

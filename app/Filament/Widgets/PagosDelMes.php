@@ -28,7 +28,7 @@ class PagosDelMes extends StatsOverviewWidget
             Stat::make('Pagos este mes', $query->sum('monto'))
                 ->description('Total recaudado este mes')
                 ->icon('heroicon-o-currency-dollar')
-                ->color('success'),
+                ->color('info'),
         ];
     }
 }

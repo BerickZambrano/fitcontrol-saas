@@ -1,32 +1,27 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Cuenta Aprobada</title>
 </head>
-<body style="font-family: Arial; background-color:#f4f6f9; padding:20px;">
+<body style="font-family: Arial, sans-serif; color: #333; padding: 20px;">
 
-    <div style="max-width:600px; margin:auto; background:white; padding:30px; border-radius:10px;">
+    <h2>¡Felicitaciones, {{ $tenant->encargado_nombre }}!</h2>
 
-        <h2 style="color:#16a34a;">🎉 ¡Bienvenido a FitControl SaaS!</h2>
+    <p>La solicitud de registro del club <strong>{{ $tenant->nombre }}</strong> ha sido <span style="color: green;"><strong>aprobada</strong></span>.</p>
 
-        <p>Hola <strong>{{ $tenant->encargado_nombre }}</strong>,</p>
+    <p>Para acceder al sistema, primero debes crear tu cuenta de administrador haciendo clic en el siguiente enlace:</p>
 
-        <p>Tu solicitud ha sido aprobada correctamente.</p>
+    <p style="text-align: center; margin: 30px 0;">
+        <a href="{{ $url }}"
+           style="background-color: #16a34a; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-size: 16px;">
+            Crear mi cuenta
+        </a>
+    </p>
 
-        <p>Ya puedes iniciar sesión en tu plataforma.</p>
+    <p style="color: #888; font-size: 13px;">Este enlace es de un solo uso. Una vez que crees tu cuenta, dejará de funcionar.</p>
 
-        <div style="margin:20px 0;">
-           <a href="{{ $url }}">
-    Completar registro como Administrador
-</a>
-        </div>
-
-        <p style="font-size:12px; color:gray;">
-            © {{ date('Y') }} FitControl SaaS
-        </p>
-
-    </div>
+    <br>
+    <p>Saludos,<br><strong>El equipo de FitControl</strong></p>
 
 </body>
 </html>

@@ -48,9 +48,9 @@ class TotalEquipos extends ApexChartWidget
             ],
 
             'colors' => [
-                 '#F8A712',
-                '#FF3F07',
-                '#FECE45',
+                '#2563eb',
+                '#3b82f6',
+                '#93c5fd',
             ],
 
             'legend' => [

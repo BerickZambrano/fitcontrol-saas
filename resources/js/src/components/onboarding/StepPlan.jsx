@@ -24,72 +24,92 @@ export default function StepPlan({ data, onChange, onBack, onSubmit, loading, er
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <h2 className="text-xl font-semibold text-gray-800 mb-6">Elige tu plan</h2>
+    <form onSubmit={handleSubmit} className="space-y-6">
+      <div className="space-y-1">
+        <h2 className="text-2xl font-bold text-gray-900 leading-tight">Elige tu plan</h2>
+        <p className="text-gray-500 text-sm">Selecciona la opción que mejor se adapte a tu club.</p>
+      </div>
 
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {PLANES.map(plan => (
           <div
             key={plan.id}
             onClick={() => onChange({ plan: plan.id })}
-            className={`relative border-2 rounded-xl p-4 cursor-pointer transition
-              ${data.plan === plan.id ? 'border-blue-600 bg-blue-50' : 'border-gray-200 hover:border-gray-300'}`}>
+            className={`relative border-2 rounded-2xl p-5 cursor-pointer transition-all duration-300 group
+              ${data.plan === plan.id ? 'border-blue-600 bg-blue-50/50 shadow-lg shadow-blue-500/10' : 'border-gray-100 hover:border-blue-200 hover:bg-gray-50'}`}>
 
             {plan.badge && (
-              <span className="absolute -top-2.5 left-1/2 -translate-x-1/2 bg-green-500 text-white text-xs px-2 py-0.5 rounded-full whitespace-nowrap">
+              <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-green-500 text-white text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full shadow-sm z-10">
                 {plan.badge}
               </span>
             )}
 
-            <p className="font-semibold text-gray-800">{plan.nombre}</p>
-            <p className="text-2xl font-bold text-blue-600 mt-1">{plan.precio}</p>
-            <p className="text-xs text-gray-400 mb-3">{plan.periodo}</p>
+            <div className="space-y-1 mb-4">
+              <p className={`font-black uppercase tracking-widest text-xs ${data.plan === plan.id ? 'text-blue-600' : 'text-gray-400'}`}>
+                {plan.nombre}
+              </p>
+              <div className="flex items-baseline gap-1">
+                <span className="text-2xl font-black text-gray-900">{plan.precio}</span>
+                <span className="text-xs text-gray-400 font-medium">{plan.periodo}</span>
+              </div>
+            </div>
 
-            <ul className="space-y-1">
+            <ul className="space-y-2 mb-4">
               {plan.features.map((f, i) => (
-                <li key={i} className="text-xs text-gray-500 flex items-center gap-1">
-                  <span className="text-green-500">✓</span> {f}
+                <li key={i} className="text-[11px] text-gray-600 flex items-center gap-2">
+                  <div className="w-4 h-4 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+                    <span className="text-blue-600 text-[10px]">✓</span>
+                  </div>
+                  <span className="font-medium">{f}</span>
                 </li>
               ))}
             </ul>
 
-            {data.plan === plan.id && (
-              <div className="absolute top-2 right-2 w-5 h-5 bg-blue-600 rounded-full flex items-center justify-center">
-                <span className="text-white text-xs">✓</span>
-              </div>
-            )}
+            <div className={`mt-auto w-full h-1 rounded-full transition-all duration-300 ${data.plan === plan.id ? 'bg-blue-600 shadow-lg shadow-blue-500/50' : 'bg-gray-100'}`} />
           </div>
         ))}
       </div>
 
-      {errors.plan && <p className="text-red-500 text-xs mt-1">{errors.plan}</p>}
+      {errors.plan && <p className="text-red-500 text-xs font-medium mt-1">{errors.plan}</p>}
 
       {data.plan && (
-        <div className="bg-gray-50 rounded-lg p-4 text-sm text-gray-600 space-y-1 border border-gray-100">
-          <p className="font-medium text-gray-800 mb-2">Resumen de tu solicitud</p>
-          <p><span className="text-gray-400">Club:</span> {data.nombre}</p>
-          <p><span className="text-gray-400">NIT:</span> {data.nit}</p>
-          <p><span className="text-gray-400">Encargado:</span> {data.encargado_nombre}</p>
-          <p><span className="text-gray-400">Email:</span> {data.encargado_email}</p>
-          <p><span className="text-gray-400">Plan:</span> {data.plan === 'mensual' ? 'Mensual — $150.000/mes' : 'Anual — $1.500.000/año'}</p>
+        <div className="bg-gray-900 rounded-2xl p-6 text-sm text-gray-300 space-y-3 relative overflow-hidden">
+          <div className="absolute top-0 right-0 p-4 opacity-10">
+            <span className="text-4xl font-black italic">FC</span>
+          </div>
+          
+          <p className="font-black uppercase tracking-widest text-xs text-blue-500">Resumen de solicitud</p>
+          
+          <div className="grid grid-cols-2 gap-y-2 text-xs">
+            <span className="text-gray-500">Club:</span>
+            <span className="font-bold text-white truncate">{data.nombre}</span>
+            
+            <span className="text-gray-500">Encargado:</span>
+            <span className="font-bold text-white truncate">{data.encargado_nombre}</span>
+            
+            <span className="text-gray-500">Plan:</span>
+            <span className="font-bold text-blue-400">
+              {data.plan === 'mensual' ? 'Mensual — $150.000/mes' : 'Anual — $1.500.000/año'}
+            </span>
+          </div>
         </div>
       )}
 
-      <p className="text-xs text-gray-400 text-center">
-        Al enviar aceptas nuestros{' '}
+      <p className="text-[10px] text-gray-400 text-center px-4 leading-relaxed uppercase tracking-wider font-bold">
+        Al hacer clic en "Enviar solicitud" aceptas nuestros{' '}
         <a href="/terminos" className="text-blue-600 hover:underline">términos y condiciones</a>
       </p>
 
-      <div className="flex gap-3">
+      <div className="flex gap-4">
         <button type="button" onClick={onBack}
-          className="flex-1 border border-gray-200 text-gray-600 py-2.5 rounded-lg font-medium hover:bg-gray-50 transition">
-          ← Atrás
+          className="flex-1 bg-gray-50 text-gray-500 py-4 rounded-xl font-black uppercase tracking-widest hover:bg-gray-100 hover:text-gray-700 transition-all active:scale-[0.98]">
+          Atrás
         </button>
         <button
           type="submit"
           disabled={!data.plan || loading}
-          className="flex-1 bg-blue-600 text-white py-2.5 rounded-lg font-medium hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed">
-          {loading ? 'Enviando...' : 'Enviar solicitud'}
+          className="flex-1 bg-blue-600 text-white py-4 rounded-xl font-black uppercase tracking-widest hover:bg-blue-700 transition-all shadow-lg shadow-blue-500/25 disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98]">
+          {loading ? 'Procesando...' : 'Enviar solicitud'}
         </button>
       </div>
     </form>
