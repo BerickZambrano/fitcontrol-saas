@@ -95,13 +95,11 @@ return [
             'prefix' => '',
             'prefix_indexes' => true,
             'search_path' => 'public',
-            'sslmode' => 'require',
-            'options' => extension_loaded('pdo_pgsql') ? [
-            PDO::ATTR_TIMEOUT => 5,
-                 ] : [],
-                 'options' => [
-    PDO::ATTR_EMULATE_PREPARES => true,
-],
+            'sslmode' => 'prefer',
+            'options' => extension_loaded('pdo_pgsql') ? array_filter([
+                PDO::ATTR_TIMEOUT => 5,
+                PDO::ATTR_EMULATE_PREPARES => false,
+            ]) : [],
         ],
 
         'sqlsrv' => [

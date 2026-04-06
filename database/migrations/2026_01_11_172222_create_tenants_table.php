@@ -31,7 +31,7 @@ return new class extends Migration {
             $table->string('pais');
 
             // Contacto
-            $table->string('email_corporativo')->unique();
+            $table->string('email_corporativo')->unique()->nullable();
             $table->string('telefono')->nullable();
             $table->string('sitio_web')->nullable();
 
