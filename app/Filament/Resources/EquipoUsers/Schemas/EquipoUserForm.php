@@ -15,9 +15,7 @@ class EquipoUserForm
             Forms\Components\Select::make('equipo_id')
                 ->label('Equipo')
                 ->required()
-                ->options(function () {
-                    return Equipo::all()->pluck('nombre', 'id');
-                })
+                ->options(fn () => Equipo::pluck('nombre', 'id'))
                 ->searchable(),
 
            Forms\Components\Select::make('user_id')

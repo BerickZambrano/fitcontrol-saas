@@ -20,13 +20,13 @@ class PartidoForm
 Forms\Components\Select::make('equipo_local_id')
     ->label('Equipo Local')
     ->required()
-    ->options(fn () => \App\Models\Equipo::all()->pluck('nombre', 'id'))
+    ->options(fn () => \App\Models\Equipo::pluck('nombre', 'id'))
     ->searchable(),
 
 Forms\Components\Select::make('equipo_visitante_id')
     ->label('Equipo Visitante')
     ->required()
-    ->options(fn () => \App\Models\Equipo::all()->pluck('nombre', 'id'))
+    ->options(fn () => \App\Models\Equipo::pluck('nombre', 'id'))
     ->searchable(),
 
 Forms\Components\TextInput::make('resultado')
@@ -36,7 +36,7 @@ Forms\Components\TextInput::make('resultado')
  Forms\Components\Select::make('torneo_id')
      ->label('Torneo')
      ->required()
-     ->options(fn () => \App\Models\Torneo::all()->pluck('nombre', 'id'))
+     ->options(fn () => \App\Models\Torneo::pluck('nombre', 'id'))
      ->searchable(),
      
 Forms\Components\Hidden::make('tenant_id')

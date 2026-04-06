@@ -14,8 +14,6 @@ use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use UnitEnum;
-use Illuminate\Database\Eloquent\Builder;
-use Filament\Facades\Filament;
 
 class EntrenamientoResource extends Resource
 {
@@ -27,26 +25,6 @@ class EntrenamientoResource extends Resource
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedCalendarDays;
 
     protected static ?string $recordTitleAttribute = 'nombre';
-
-   /**
-     * Multi-tenant: super-admin ve todo, usuarios normales solo su tenant
-     */
-    public static function getEloquentQuery(): Builder
-    {
-        $query = parent::getEloquentQuery()->withoutGlobalScopes();
-
-        $user = Filament::auth()->user();
-
-        if ($user && $user->hasRole('super_admin')) {
-            return $query;
-        }
-
-        if ($user && $user->tenant_id) {
-            return $query->where('tenant_id', $user->tenant_id);
-        }
-
-        return $query;
-    }
 
     // FORMULARIO
     public static function form(Schema $schema): Schema

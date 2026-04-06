@@ -8,7 +8,6 @@ use App\Models\User;
 use Filament\Resources\Resource;
 use Filament\Tables\Table;
 use Filament\Schemas\Schema;
-use Illuminate\Database\Eloquent\Builder;
 use BackedEnum;
 use UnitEnum;
 use Filament\Support\Icons\Heroicon;
@@ -22,30 +21,6 @@ class UserResource extends Resource
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedUserCircle;
 
     protected static string|UnitEnum|null $navigationGroup = 'Administración';
-
-
-    public static function getEloquentQuery(): Builder
-    {
-        $query = parent::getEloquentQuery();
-
-        // 🔥 SUPER ADMIN VE TODO
-        if (
-            auth()->check()
-            && auth()->user()->hasRole('super_admin')
-        ) {
-            return $query;
-        }
-
-        // 👥 RESTO DE USUARIOS → SOLO SU TENANT
-        if (auth()->check()) {
-            return $query->where(
-                'tenant_id',
-                auth()->user()->tenant_id
-            );
-        }
-
-        return $query;
-    }
 
     public static function form(Schema $schema): Schema
     {
