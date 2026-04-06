@@ -3,6 +3,8 @@
 namespace App\Filament\Widgets;
 
 use App\Models\HistorialMedico;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 use Leandrocfe\FilamentApexCharts\Widgets\ApexChartWidget;
 
 class JugadoresNoAptos extends ApexChartWidget
@@ -13,13 +15,21 @@ class JugadoresNoAptos extends ApexChartWidget
 
     protected function getOptions(): array
     {
-        $noAptos = HistorialMedico::whereRaw('"apto" = false')
-            ->selectRaw('COUNT(DISTINCT user_id) as total')
-            ->value('total');
+        $cacheKey = 'widget_jugadores_estado';
 
-        $aptos = HistorialMedico::whereRaw('"apto" = true')
-            ->selectRaw('COUNT(DISTINCT user_id) as total')
-            ->value('total');
+        $data = Cache::remember($cacheKey, now()->addMinutes(10), function () {
+            $results = HistorialMedico::selectRaw('
+                apto,
+                COUNT(DISTINCT user_id) as total
+            ')
+            ->groupBy('apto')
+            ->pluck('total', 'apto');
+
+            return [
+                'aptos' => (int) ($results[true] ?? 0),
+                'no_aptos' => (int) ($results[false] ?? 0),
+            ];
+        });
 
         return [
             'chart' => [
@@ -30,7 +40,7 @@ class JugadoresNoAptos extends ApexChartWidget
                 '#3b82f6',
                 '#93c5fd',
             ],
-            'series' => [(int) $aptos, (int) $noAptos],
+            'series' => [$data['aptos'], $data['no_aptos']],
             'labels' => ['Aptos', 'No aptos'],
         ];
     }

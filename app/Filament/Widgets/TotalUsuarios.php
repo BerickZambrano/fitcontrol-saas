@@ -3,6 +3,8 @@
 namespace App\Filament\Widgets;
 
 use App\Models\User;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 use Leandrocfe\FilamentApexCharts\Widgets\ApexChartWidget;
 use BezhanSalleh\FilamentShield\Traits\HasWidgetShield;
 
@@ -17,27 +19,32 @@ class TotalUsuarios extends ApexChartWidget
 
     protected function getOptions(): array
     {
-        $query = User::query();
+        $user = auth()->user();
+        $isSuperAdmin = $user->hasRole('super_admin');
+        $cacheKey = $isSuperAdmin 
+            ? 'widget_total_usuarios_super_admin' 
+            : "widget_total_usuarios_tenant_{$user->tenant_id}";
 
-        //para que filtre por tenant en caso de no ser super_admin
-        if (auth()->check() && auth()->user()->hasRole('super_admin')) {
-            $baseQuery = $query;
-        } else {
-            $baseQuery = $query->where('tenant_id', auth()->user()->tenant_id);
-        }
+        $data = Cache::remember($cacheKey, now()->addMinutes(10), function () use ($isSuperAdmin, $user) {
+            $query = User::query()
+                ->join('model_has_roles', 'users.id', '=', 'model_has_roles.model_id')
+                ->join('roles', 'model_has_roles.role_id', '=', 'roles.id');
 
-        //cuenta los usuarios que tiene en la bd y suma 
-        $jugadores = (clone $baseQuery)
-            ->whereHas('roles', fn($q) => $q->where('name', 'Jugador'))
-            ->count();
+            if (!$isSuperAdmin) {
+                $query->where('users.tenant_id', $user->tenant_id);
+            }
 
-        $entrenadores = (clone $baseQuery)
-            ->whereHas('roles', fn($q) => $q->where('name', 'Entrenador'))
-            ->count();
+            $results = $query
+                ->select('roles.name', DB::raw('COUNT(DISTINCT users.id) as total'))
+                ->groupBy('roles.name')
+                ->pluck('total', 'roles.name');
 
-        $admins = (clone $baseQuery)
-            ->whereHas('roles', fn($q) => $q->where('name', 'Administrador'))
-            ->count();
+            return [
+                'Jugador' => (int) ($results['Jugador'] ?? 0),
+                'Entrenador' => (int) ($results['Entrenador'] ?? 0),
+                'Administrador' => (int) ($results['Administrador'] ?? 0),
+            ];
+        });
 
         return [
             'chart' => [
@@ -46,9 +53,9 @@ class TotalUsuarios extends ApexChartWidget
             ],
 
             'series' => [
-                $jugadores ?? 0,
-                $entrenadores ?? 0,
-                $admins ?? 0,
+                $data['Jugador'],
+                $data['Entrenador'],
+                $data['Administrador'],
             ],
 
             'labels' => [

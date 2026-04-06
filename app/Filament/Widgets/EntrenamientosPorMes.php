@@ -3,6 +3,8 @@
 namespace App\Filament\Widgets;
 
 use App\Models\Entrenamiento;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Leandrocfe\FilamentApexCharts\Widgets\ApexChartWidget;
 use BezhanSalleh\FilamentShield\Traits\HasWidgetShield;
@@ -18,16 +20,39 @@ class EntrenamientosPorMes extends ApexChartWidget
 
     protected function getOptions(): array
     {
-        $data = Entrenamiento::selectRaw("
-        TO_CHAR(fecha, 'YYYY-MM') as periodo,
-        COUNT(*) as total
-    ")
-    ->groupBy('periodo')
-    ->orderBy('periodo')
-    ->get();
+        $user = auth()->user();
+        $isSuperAdmin = $user->hasRole('super_admin');
+        $cacheKey = $isSuperAdmin 
+            ? 'widget_entrenamientos_12meses' 
+            : "widget_entrenamientos_tenant_{$user->tenant_id}_12meses";
 
-        $labels = $data->pluck('periodo')->map(fn ($p) => $this->formatearPeriodo($p))->toArray();
-        $series = $data->pluck('total')->map(fn ($v) => (int) $v)->toArray();
+        $data = Cache::remember($cacheKey, now()->addMinutes(15), function () use ($isSuperAdmin, $user) {
+            $query = Entrenamiento::selectRaw("
+                TO_CHAR(fecha, 'YYYY-MM') as periodo,
+                COUNT(*) as total
+            ");
+
+            // Limitar a últimos 12 meses
+            $fechaLimite = Carbon::now()->subMonths(12);
+            $query->where('fecha', '>=', $fechaLimite);
+
+            if (!$isSuperAdmin) {
+                $query->where('tenant_id', $user->tenant_id);
+            }
+
+            $results = $query
+                ->groupBy('periodo')
+                ->orderBy('periodo')
+                ->get();
+
+            $labels = $results->pluck('periodo')->map(fn ($p) => $this->formatearPeriodo($p))->toArray();
+            $series = $results->pluck('total')->map(fn ($v) => (int) $v)->toArray();
+
+            return [
+                'labels' => $labels,
+                'series' => $series,
+            ];
+        });
 
         return [
             'chart' => [
@@ -37,14 +62,14 @@ class EntrenamientosPorMes extends ApexChartWidget
             'series' => [
                 [
                     'name' => 'Entrenamientos',
-                    'data' => $series,
+                    'data' => $data['series'],
                 ],
             ],
             'xaxis' => [
-                'categories' => $labels,
+                'categories' => $data['labels'],
             ],
             'stroke' => [
-                'curve' => 'smooth', 
+                'curve' => 'smooth',
             ],
             'colors' => ['#2563eb'],
         ];

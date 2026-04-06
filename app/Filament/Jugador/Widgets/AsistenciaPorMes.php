@@ -3,6 +3,8 @@
 namespace App\Filament\Jugador\Widgets;
 
 use App\Models\AsistenciaEntrenamiento;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Leandrocfe\FilamentApexCharts\Widgets\ApexChartWidget;
 use BezhanSalleh\FilamentShield\Traits\HasWidgetShield;
@@ -16,34 +18,49 @@ class AsistenciaPorMes extends ApexChartWidget
 
     protected int | string | array $columnSpan = 'full';
 
-   protected function getOptions(): array
-{
-   $data = AsistenciaEntrenamiento::selectRaw('
-        EXTRACT(MONTH FROM created_at) as mes,
-        SUM(CASE WHEN presente = true THEN 1 ELSE 0 END) as presentes,
-        SUM(CASE WHEN presente = false THEN 1 ELSE 0 END) as ausentes
-    ')
-    ->groupBy('mes')
-    ->get()
-    ->keyBy('mes');
+    protected function getOptions(): array
+    {
+        $user = auth()->user();
+        $cacheKey = "widget_asistencia_jugador_{$user->id}";
 
-        $meses = [
-            1 => 'Enero', 2 => 'Febrero', 3 => 'Marzo',
-            4 => 'Abril', 5 => 'Mayo', 6 => 'Junio',
-            7 => 'Julio', 8 => 'Agosto', 9 => 'Septiembre',
-            10 => 'Octubre', 11 => 'Noviembre', 12 => 'Diciembre',
-        ];
+        $data = Cache::remember($cacheKey, now()->addMinutes(15), function () use ($user) {
+            $meses = [
+                1 => 'Enero', 2 => 'Febrero', 3 => 'Marzo',
+                4 => 'Abril', 5 => 'Mayo', 6 => 'Junio',
+                7 => 'Julio', 8 => 'Agosto', 9 => 'Septiembre',
+                10 => 'Octubre', 11 => 'Noviembre', 12 => 'Diciembre',
+            ];
 
-        $presentes = [];
-        $ausentes = [];
-        $labels = [];
+            // Limitar a últimos 12 meses y filtrar por jugador
+            $fechaLimite = Carbon::now()->subMonths(12);
+            
+            $results = AsistenciaEntrenamiento::selectRaw('
+                EXTRACT(MONTH FROM created_at) as mes,
+                SUM(CASE WHEN presente = true THEN 1 ELSE 0 END) as presentes,
+                SUM(CASE WHEN presente = false THEN 1 ELSE 0 END) as ausentes
+            ')
+            ->where('user_id', $user->id)
+            ->where('created_at', '>=', $fechaLimite)
+            ->groupBy('mes')
+            ->get()
+            ->keyBy('mes');
 
-        foreach ($meses as $num => $nombre) {
-            $labels[] = $nombre;
+            $presentes = [];
+            $ausentes = [];
+            $labels = [];
 
-            $presentes[] = (int) ($data[$num]->presentes ?? 0);
-            $ausentes[]  = (int) ($data[$num]->ausentes ?? 0);
-        }
+            foreach ($meses as $num => $nombre) {
+                $labels[] = $nombre;
+                $presentes[] = (int) ($results[$num]->presentes ?? 0);
+                $ausentes[] = (int) ($results[$num]->ausentes ?? 0);
+            }
+
+            return [
+                'presentes' => $presentes,
+                'ausentes' => $ausentes,
+                'labels' => $labels,
+            ];
+        });
 
         return [
             'chart' => [
@@ -53,15 +70,15 @@ class AsistenciaPorMes extends ApexChartWidget
             'series' => [
                 [
                     'name' => 'Presentes',
-                    'data' => $presentes,
+                    'data' => $data['presentes'],
                 ],
                 [
                     'name' => 'Ausentes',
-                    'data' => $ausentes,
+                    'data' => $data['ausentes'],
                 ],
             ],
             'xaxis' => [
-                'categories' => $labels,
+                'categories' => $data['labels'],
             ],
             'colors' => ['#3b82f6', '#93c5fd'],
             'plotOptions' => [

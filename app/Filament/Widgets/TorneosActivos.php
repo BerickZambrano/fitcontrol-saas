@@ -3,6 +3,8 @@
 namespace App\Filament\Widgets;
 
 use App\Models\Torneo;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 use Leandrocfe\FilamentApexCharts\Widgets\ApexChartWidget;
 use BezhanSalleh\FilamentShield\Traits\HasWidgetShield;
 
@@ -21,15 +23,30 @@ class TorneosActivos extends ApexChartWidget
 
     protected function getOptions(): array
     {
-        $query = Torneo::query();
+        $user = auth()->user();
+        $isSuperAdmin = $user->hasRole('super_admin');
+        $cacheKey = $isSuperAdmin 
+            ? 'widget_torneos_super_admin' 
+            : "widget_torneos_tenant_{$user->tenant_id}";
 
-        if (!auth()->user()->hasRole('super_admin')) {
-            $query->where('tenant_id', auth()->user()->tenant_id);
-        }
+        $data = Cache::remember($cacheKey, now()->addMinutes(10), function () use ($isSuperAdmin, $user) {
+            $query = Torneo::query();
 
-        $activos = (clone $query)->where('estado', 'activo')->count();
-        $finalizados = (clone $query)->where('estado', 'finalizado')->count();
-        $progreso = (clone $query)->where('estado', 'en_progreso')->count();
+            if (!$isSuperAdmin) {
+                $query->where('tenant_id', $user->tenant_id);
+            }
+
+            $results = $query
+                ->select('estado', DB::raw('COUNT(*) as total'))
+                ->groupBy('estado')
+                ->pluck('total', 'estado');
+
+            return [
+                'activo' => (int) ($results['activo'] ?? 0),
+                'finalizado' => (int) ($results['finalizado'] ?? 0),
+                'en_progreso' => (int) ($results['en_progreso'] ?? 0),
+            ];
+        });
 
         return [
             'chart' => [
@@ -38,9 +55,9 @@ class TorneosActivos extends ApexChartWidget
             ],
 
             'series' => [
-                $activos ?? 0,
-                $finalizados ?? 0,
-                $progreso ?? 0,
+                $data['activo'],
+                $data['finalizado'],
+                $data['en_progreso'],
             ],
 
             'labels' => [

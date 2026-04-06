@@ -3,6 +3,8 @@
 namespace App\Filament\Widgets;
 
 use App\Models\Equipo;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 use Leandrocfe\FilamentApexCharts\Widgets\ApexChartWidget;
 use BezhanSalleh\FilamentShield\Traits\HasWidgetShield;
 
@@ -17,17 +19,30 @@ class TotalEquipos extends ApexChartWidget
 
     protected function getOptions(): array
     {
-        $query = Equipo::query();
+        $user = auth()->user();
+        $isSuperAdmin = $user->hasRole('super_admin');
+        $cacheKey = $isSuperAdmin 
+            ? 'widget_total_equipos_super_admin' 
+            : "widget_total_equipos_tenant_{$user->tenant_id}";
 
-        // 🔐 Multi-tenant
-        if (!auth()->user()->hasRole('super_admin')) {
-            $query->where('tenant_id', auth()->user()->tenant_id);
-        }
+        $data = Cache::remember($cacheKey, now()->addMinutes(10), function () use ($isSuperAdmin, $user) {
+            $query = Equipo::query();
 
-        // 🔥 Conteo real según tu ENUM
-        $profesional = (clone $query)->where('categoria', 'profesional')->count();
-        $amateur = (clone $query)->where('categoria', 'amateur')->count();
-        $formativo = (clone $query)->where('categoria', 'formativo')->count();
+            if (!$isSuperAdmin) {
+                $query->where('tenant_id', $user->tenant_id);
+            }
+
+            $results = $query
+                ->select('categoria', DB::raw('COUNT(*) as total'))
+                ->groupBy('categoria')
+                ->pluck('total', 'categoria');
+
+            return [
+                'profesional' => (int) ($results['profesional'] ?? 0),
+                'amateur' => (int) ($results['amateur'] ?? 0),
+                'formativo' => (int) ($results['formativo'] ?? 0),
+            ];
+        });
 
         return [
             'chart' => [
@@ -36,9 +51,9 @@ class TotalEquipos extends ApexChartWidget
             ],
 
             'series' => [
-                $profesional ?? 0,
-                $amateur ?? 0,
-                $formativo ?? 0,
+                $data['profesional'],
+                $data['amateur'],
+                $data['formativo'],
             ],
 
             'labels' => [
