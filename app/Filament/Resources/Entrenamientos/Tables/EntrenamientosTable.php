@@ -16,6 +16,7 @@ class EntrenamientosTable
     public static function configure(Table $table): Table
     {
         return $table
+            ->modifyQueryUsing(fn ($query) => $query->with('equipo'))
             ->columns([
                 TextColumn::make('nombre')->label('Nombre')->searchable()->sortable(),
                 TextColumn::make('fecha')->label('Fecha')->date()->sortable(),

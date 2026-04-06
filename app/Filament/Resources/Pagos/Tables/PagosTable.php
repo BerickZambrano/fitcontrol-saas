@@ -20,6 +20,7 @@ class PagosTable
     public static function configure(Table $table): Table
     {
         return $table
+            ->modifyQueryUsing(fn ($query) => $query->with('usuario'))
             ->columns([
                 Tables\Columns\TextColumn::make('usuario.name')
                     ->label('Usuario')

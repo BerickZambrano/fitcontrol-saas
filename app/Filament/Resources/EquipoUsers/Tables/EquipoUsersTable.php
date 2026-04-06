@@ -19,6 +19,7 @@ class EquipoUsersTable
     public static function configure(Table $table): Table
     {
         return $table
+            ->modifyQueryUsing(fn ($query) => $query->with(['equipo', 'jugador']))
             ->columns([
                 Tables\Columns\TextColumn::make('equipo.nombre')
                     ->label('Equipo')

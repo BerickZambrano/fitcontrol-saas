@@ -19,6 +19,7 @@ class PartidosTable
     public static function configure(Table $table): Table
     {
         return $table
+            ->modifyQueryUsing(fn ($query) => $query->with(['local', 'visitante']))
             ->columns([
                 Tables\Columns\TextColumn::make('local.nombre')
                     ->label('Local')

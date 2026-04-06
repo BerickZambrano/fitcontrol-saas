@@ -19,6 +19,7 @@ class UsersTable
     public static function configure(Table $table): Table
     {
         return $table
+            ->modifyQueryUsing(fn ($query) => $query->with('roles'))
             ->columns([
                 Tables\Columns\TextColumn::make('name')
                     ->label('Nombre')

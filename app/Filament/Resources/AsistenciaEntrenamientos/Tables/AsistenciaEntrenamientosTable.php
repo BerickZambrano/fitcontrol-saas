@@ -20,6 +20,7 @@ class AsistenciaEntrenamientosTable
     public static function configure(Table $table): Table
     {
         return $table
+            ->modifyQueryUsing(fn ($query) => $query->with(['entrenamiento', 'jugador']))
             ->columns([
                 TextColumn::make('entrenamiento.fecha')
                     ->label('Fecha')
