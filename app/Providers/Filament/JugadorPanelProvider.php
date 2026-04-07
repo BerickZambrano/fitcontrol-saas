@@ -40,6 +40,8 @@ class JugadorPanelProvider extends PanelProvider
                 Dashboard::class,
                 \App\Filament\Jugador\Pages\PlayerProfile::class,
             ])
+            ->databaseNotifications()
+            ->databaseNotificationsPolling(30)
             ->discoverWidgets(in: app_path('Filament/Jugador/Widgets'), for: 'App\Filament\Jugador\Widgets')
             ->widgets([
                 AccountWidget::class,

@@ -3,27 +3,36 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Rendimiento extends Model
 {
     protected $fillable = [
-        'id',
+        'tenant_id',
         'user_id',
+        'partido_id',
         'minutos_jugados',
         'goles',
         'asistencias',
         'tarjetas_amarillas',
         'tarjetas_rojas',
-        'evaluacion',
     ];
 
-    public function user()
+    protected $casts = [
+        'minutos_jugados' => 'integer',
+        'goles' => 'integer',
+        'asistencias' => 'integer',
+        'tarjetas_amarillas' => 'integer',
+        'tarjetas_rojas' => 'integer',
+    ];
+
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id');
     }
 
-    public function partido()
+    public function partido(): BelongsTo
     {
-        return $this->belongsTo(Partido::class);
+        return $this->belongsTo(Partido::class, 'partido_id');
     }
 }

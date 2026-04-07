@@ -27,6 +27,7 @@ use Illuminate\View\Middleware\ShareErrorsFromSession;
 use App\Filament\Widgets\TotalUsuarios;
 use App\Models\Entrenamiento;
 use App\Filament\Pages\Calendario;
+use App\Filament\Admin\Pages\Reportes\GenerarReporte;
 use Leandrocfe\FilamentApexCharts\FilamentApexChartsPlugin;
 
 class AdminPanelProvider extends PanelProvider
@@ -50,8 +51,7 @@ class AdminPanelProvider extends PanelProvider
                  \App\Filament\Admin\Pages\Dashboard::class,
                  \App\Filament\Admin\Pages\Calendario::class,
                  \App\Filament\Admin\Pages\TenantRequests::class,
-
-                 
+                 GenerarReporte::class,
             ])
            ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\Filament\Widgets')
             /*  ->widgets([

@@ -36,6 +36,12 @@ Route::get('/', function () {
     return Inertia::render('Landing');
 })->name('home');
 
+// Reportes - Descargar
+Route::get('/reportes/descargar/{report}', function (\App\Models\GeneratedReport $report) {
+    $service = new \App\Services\ReportService();
+    return $service->descargar($report);
+})->middleware('auth')->name('reportes.descargar');
+
 require __DIR__.'/settings.php';
 
 
