@@ -86,7 +86,7 @@ class TenantsTable
                             'register_token' => Str::uuid(),
                         ]);
                         Mail::to($record->encargado_email)
-                            ->send(new TenantApprovedMail($record));
+                            ->queue(new TenantApprovedMail($record));
                     }),
 
                 Action::make('rechazar')
@@ -101,7 +101,7 @@ class TenantsTable
                     ->action(function ($record) {
                         $record->update(['estado' => 'rechazado']);
                         Mail::to($record->encargado_email)
-                            ->send(new TenantRejectedMail($record));
+                            ->queue(new TenantRejectedMail($record));
                     }),
 
                 EditAction::make(),

@@ -61,10 +61,10 @@ class TenantRequests extends Page implements HasTable
                             $record->update([
                                 'estado' => 'activo',
                                 'register_token' => $token,
-                            ]); 
+                            ]);
 
                             Mail::to($record->email_corporativo)
-                                ->send(new TenantApprovedMail($record));
+                                ->queue(new TenantApprovedMail($record));
                         }),
 
                 Action::make('reject')
@@ -77,7 +77,7 @@ class TenantRequests extends Page implements HasTable
                         ]);
 
                         Mail::to($record->email_corporativo)
-                            ->send(new TenantRejectedMail($record));
+                            ->queue(new TenantRejectedMail($record));
                     }),
             ]);
     }

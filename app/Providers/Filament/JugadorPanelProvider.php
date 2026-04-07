@@ -29,7 +29,7 @@ class JugadorPanelProvider extends PanelProvider
             ->id('jugador')
             ->path('jugador')
             ->colors([
-                'primary' => Color::Blue,
+                'primary' => Color::Red,
             ])
             ->plugins([
                 FilamentApexChartsPlugin::make()

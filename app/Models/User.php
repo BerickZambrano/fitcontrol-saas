@@ -5,11 +5,10 @@ namespace App\Models;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
-use App\Models\Traits\BelongsToTenant;
 
 class User extends Authenticatable
 {
-    use Notifiable, HasRoles, BelongsToTenant;
+    use Notifiable, HasRoles;
 
     protected $fillable = [
         'tenant_id',
