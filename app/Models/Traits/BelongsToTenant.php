@@ -40,15 +40,32 @@ trait BelongsToTenant
 
         // 🧩 ASIGNAR tenant_id SIEMPRE AL CREAR (INCLUSO super_admin)
         static::creating(function ($model) {
+            // Si ya tiene tenant_id definido (ej. por mutateFormDataBeforeCreate), no sobrescribir
+            if (!empty($model->tenant_id)) {
+                return;
+            }
+
             $userId = auth()->id();
-            
+
             if ($userId) {
                 $userInfo = Cache::remember("user_info_{$userId}", 300, function () use ($userId) {
                     return DB::table('users')->where('id', $userId)->first(['id', 'tenant_id']);
                 });
-                
+
                 if ($userInfo) {
-                    $model->tenant_id = $userInfo->tenant_id;
+                    $isSuperAdmin = Cache::remember("user_roles_{$userId}", 300, function () use ($userId) {
+                        $roles = DB::table('model_has_roles')
+                            ->join('roles', 'model_has_roles.role_id', '=', 'roles.id')
+                            ->where('model_has_roles.model_id', $userId)
+                            ->pluck('name')
+                            ->toArray();
+                        return in_array('super_admin', $roles);
+                    });
+
+                    // Solo asignar tenant_id automáticamente si NO es super_admin
+                    if (!$isSuperAdmin && empty($model->tenant_id)) {
+                        $model->tenant_id = $userInfo->tenant_id;
+                    }
                 }
             }
         });

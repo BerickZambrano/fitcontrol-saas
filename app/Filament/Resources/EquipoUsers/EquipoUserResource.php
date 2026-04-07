@@ -7,6 +7,7 @@ use App\Filament\Resources\EquipoUsers\Pages\EditEquipoUser;
 use App\Filament\Resources\EquipoUsers\Pages\ListEquipoUsers;
 use App\Filament\Resources\EquipoUsers\Schemas\EquipoUserForm;
 use App\Filament\Resources\EquipoUsers\Tables\EquipoUsersTable;
+use App\Models\Equipo;
 use App\Models\EquipoUser;
 use BackedEnum;
 use Filament\Resources\Resource;

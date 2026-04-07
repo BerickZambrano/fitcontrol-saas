@@ -15,26 +15,31 @@ class EquipoUserForm
             Forms\Components\Select::make('equipo_id')
                 ->label('Equipo')
                 ->required()
-                ->options(fn () => Equipo::pluck('nombre', 'id'))
+                ->options(function () {
+                    $query = Equipo::query()->withoutGlobalScopes();
+                    if (!auth()->user()->hasRole('super_admin')) {
+                        $query->where('tenant_id', auth()->user()->tenant_id);
+                    }
+                    return $query->pluck('nombre', 'id');
+                })
                 ->searchable(),
 
-           Forms\Components\Select::make('user_id')
-    ->label('Jugador')
-    ->required()
-    ->options(function () {
-        $query = User::query()
-            ->whereHas('roles', function ($q) {
-                $q->where('name', 'jugador');
-            });
+            Forms\Components\Select::make('user_id')
+                ->label('Jugador')
+                ->required()
+                ->options(function () {
+                    $query = User::query()
+                        ->whereHas('roles', function ($q) {
+                            $q->where('name', 'jugador');
+                        });
 
-        // Filtrar por tenant solo si no eres super-admin
-        if (!auth()->user()->hasRole('super_admin')) {
-            $query->where('tenant_id', auth()->user()->tenant_id);
-        }
+                    if (!auth()->user()->hasRole('super_admin')) {
+                        $query->where('tenant_id', auth()->user()->tenant_id);
+                    }
 
-        return $query->pluck('name', 'id');
-    })
-    ->searchable(),
+                    return $query->pluck('name', 'id');
+                })
+                ->searchable(),
 
             Forms\Components\DatePicker::make('fecha_inicio')
                 ->label('Fecha de Inicio')
@@ -42,12 +47,7 @@ class EquipoUserForm
 
             Forms\Components\DatePicker::make('fecha_fin')
                 ->label('Fecha de Fin')
-                ->required(),
-
-            // tenant_id se asigna automáticamente
-            Forms\Components\Hidden::make('tenant_id')
-                ->default(fn () => auth()->user()->tenant_id)
-                ->required(),
+                ->nullable(),
         ]);
     }
 }
