@@ -56,7 +56,7 @@
         @if (Route::has('register'))
             <div class="pt-4 border-t border-neutral-100 dark:border-neutral-900 text-sm text-center text-neutral-600 dark:text-neutral-400">
                 <span>{{ __('¿No tienes una cuenta?') }}</span>
-                <flux:link class="font-bold text-indigo-600 dark:text-indigo-400 hover:underline" :href="route('register')" wire:navigate>{{ __('Regístrate aquí') }}</flux:link>
+                <flux:link class="font-bold text-indigo-600 dark:text-indigo-400 hover:underline" :href="route('onboarding.index')">{{ __('Solicita acceso') }}</flux:link>
             </div>
         @endif
     </div>

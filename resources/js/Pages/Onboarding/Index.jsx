@@ -68,9 +68,9 @@ export default function OnboardingIndex() {
     <div className="min-h-screen grid lg:grid-cols-2 font-['Outfit',_sans-serif]">
       {/* Left Side: Image & Branding */}
       <div className="hidden lg:flex relative items-center justify-center bg-gray-900 overflow-hidden">
-        <img 
-          src="/images/auth-bg.png" 
-          alt="FitControl Training" 
+        <img
+          src="/images/auth-bg.png"
+          alt="FitControl Training"
           className="absolute inset-0 w-full h-full object-cover opacity-40 scale-105"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />

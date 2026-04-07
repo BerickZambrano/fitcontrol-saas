@@ -19,6 +19,7 @@ use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 
+use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
 use Leandrocfe\FilamentApexCharts\FilamentApexChartsPlugin;
 
 class JugadorPanelProvider extends PanelProvider
@@ -32,7 +33,8 @@ class JugadorPanelProvider extends PanelProvider
                 'primary' => Color::Red,
             ])
             ->plugins([
-                FilamentApexChartsPlugin::make()
+                FilamentApexChartsPlugin::make(),
+                FilamentShieldPlugin::make(),
             ])
             ->discoverResources(in: app_path('Filament/Jugador/Resources'), for: 'App\Filament\Jugador\Resources')
             ->discoverPages(in: app_path('Filament/Jugador/Pages'), for: 'App\Filament\Jugador\Pages')
@@ -44,7 +46,6 @@ class JugadorPanelProvider extends PanelProvider
             ->databaseNotificationsPolling(30)
             ->discoverWidgets(in: app_path('Filament/Jugador/Widgets'), for: 'App\Filament\Jugador\Widgets')
             ->widgets([
-                AccountWidget::class,
             ])
             ->middleware([
                 EncryptCookies::class,

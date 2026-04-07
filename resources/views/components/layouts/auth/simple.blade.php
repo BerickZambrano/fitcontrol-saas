@@ -13,29 +13,18 @@
                     <div class="absolute inset-0 bg-linear-to-t from-neutral-950/80 to-transparent"></div>
                 </div>
 
-                <!-- Branding -->
-                <div class="relative z-10">
-                    <a href="{{ route('home') }}" class="flex items-center gap-3 transition-transform hover:scale-105" wire:navigate>
-                        <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-white/10 backdrop-blur-md border border-white/20 shadow-xl">
-                             <!-- <x-app-logo-icon class="h-8 w-8 fill-current text-white" />-->
-                        </div>
-                        <span class="text-2xl font-bold tracking-tight">FitControl</span>
-                    </a>
-                </div>
+                <!-- Logo centrado -->
+                <div class="relative z-10 flex flex-col items-center gap-8 text-center">
+                    <img src="{{ asset('images/logosf.png') }}" alt="FitControl Logo" class="h-48 w-48 object-contain drop-shadow-2xl" />
 
-                <!-- Quote / Motivation -->
-                <div class="relative z-10 max-w-md">
-                    <h2 class="text-3xl font-bold leading-tight tracking-tight">
-                        Eleva tu entrenamiento al siguiente nivel con <span class="text-indigo-400">FitControl</span>.
-                    </h2>
-                    <p class="mt-4 text-lg text-neutral-300">
-                        Gestiona tus entrenamientos, sigue tu progreso y alcanza tus objetivos de forma inteligente.
-                    </p>
-                </div>
-
-                <!-- Footer / Feedback -->
-                <div class="relative z-10 text-sm text-neutral-400">
-                    &copy; {{ date('Y') }} FitControl. Todos los derechos reservados.
+                    <div>
+                        <h2 class="text-3xl font-bold leading-tight tracking-tight">
+                            Eleva tu entrenamiento al siguiente nivel con <span class="text-indigo-400">FitControl</span>.
+                        </h2>
+                        <p class="mt-4 text-lg text-neutral-300">
+                            Gestiona tus entrenamientos, sigue tu progreso y alcanza tus objetivos de forma inteligente.
+                        </p>
+                    </div>
                 </div>
             </div>
 

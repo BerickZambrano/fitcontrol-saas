@@ -13,26 +13,36 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        //seeder de tenants
-       $this->call([
-        TenantSeeder::class,
-        RoleSeeder::class,
-    ]);
-        // Crear usuario administrador por defecto
+        // Orden respetando llaves foráneas
+        $this->call([
+            TenantSeeder::class,
+            RoleSeeder::class,
+            UserSeeder::class,
+            EquipoSeeder::class,
+            TorneoSeeder::class,
+            JugadorPerfilSeeder::class,
+            EquipoUserSeeder::class,
+            EntrenamientoSeeder::class,
+            PartidoSeeder::class,
+            AsistenciaEntrenamientoSeeder::class,
+            PagoSeeder::class,
+            HistorialMedicoSeeder::class,
+            RendimientoSeeder::class,
+        ]);
+
+        // Crear usuarios administradores DESPUÉS de tenants
         User::create([
             'name' => 'Administrador',
             'email' => 'administrador@fitcontrol.com',
             'password' => Hash::make('password123'),
             'tenant_id' => 1,
         ]);
-          // Crear usuario administrador por defecto
+        
         User::create([
             'name' => 'Berick',
             'email' => 'administradordos@fitcontrol.com',
             'password' => Hash::make('16112007'),
             'tenant_id' => 2,
         ]);
-
-        
     }
 }

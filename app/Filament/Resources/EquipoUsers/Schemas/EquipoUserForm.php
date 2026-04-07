@@ -24,7 +24,7 @@ class EquipoUserForm
     ->options(function () {
         $query = User::query()
             ->whereHas('roles', function ($q) {
-                $q->where('name', 'Jugador');
+                $q->where('name', 'jugador');
             });
 
         // Filtrar por tenant solo si no eres super-admin
