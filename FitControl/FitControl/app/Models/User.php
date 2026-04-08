@@ -2,13 +2,15 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Laravel\Scout\Searchable;
 use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable
 {
-    use Notifiable, HasRoles;
+    use Notifiable, HasRoles, Searchable;
 
     protected $fillable = [
         'tenant_id',
@@ -16,6 +18,43 @@ class User extends Authenticatable
         'email',
         'password',
     ];
+
+    /**
+     * Get the indexable data array for the model.
+     */
+    public function toSearchableArray(): array
+    {
+        return [
+            'name' => $this->name,
+            'email' => $this->email,
+            'roles' => $this->roles->pluck('name')->join(', '),
+            'tenant_id' => $this->tenant_id,
+        ];
+    }
+
+    /**
+     * Determine if the model should be searchable.
+     */
+    public function shouldBeSearchable(): bool
+    {
+        return true;
+    }
+
+    /**
+     * Get the value used to index the model in Algolia.
+     */
+    public function getScoutKey(): mixed
+    {
+        return $this->getKey();
+    }
+
+    /**
+     * Get the key name used to index the model.
+     */
+    public function getScoutKeyName(): mixed
+    {
+        return $this->getKeyName();
+    }
 
     public function tenant()
     {

@@ -1,14 +1,14 @@
 <?php
 
 namespace App\Models;
-namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Traits\BelongsToTenant;
+use Laravel\Scout\Searchable;
 
 class Equipo extends Model
 {
-    use BelongsToTenant;
+    use BelongsToTenant, Searchable;
 
     protected $fillable = [
         'tenant_id',
@@ -18,6 +18,37 @@ class Equipo extends Model
         'contacto_equipo',
         'categoria',
     ];
+
+    /**
+     * Get the indexable data array for the model.
+     */
+    public function toSearchableArray(): array
+    {
+        return [
+            'nombre' => $this->nombre,
+            'categoria' => $this->categoria,
+            'ubicacion' => $this->ubi_equipo,
+            'tenant_id' => $this->tenant_id,
+        ];
+    }
+
+    /**
+     * Determine if the model should be searchable.
+     */
+    public function shouldBeSearchable(): bool
+    {
+        return true;
+    }
+
+    public function getScoutKey(): mixed
+    {
+        return $this->getKey();
+    }
+
+    public function getScoutKeyName(): mixed
+    {
+        return $this->getKeyName();
+    }
 
     // Scope global para filtrar por tenant
     protected static function booted()

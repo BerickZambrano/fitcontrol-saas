@@ -4,9 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Laravel\Scout\Searchable;
 
 class Rendimiento extends Model
 {
+    use Searchable;
+
     protected $fillable = [
         'tenant_id',
         'user_id',
@@ -25,6 +28,35 @@ class Rendimiento extends Model
         'tarjetas_amarillas' => 'integer',
         'tarjetas_rojas' => 'integer',
     ];
+
+    /**
+     * Get the indexable data array for the model.
+     */
+    public function toSearchableArray(): array
+    {
+        return [
+            'jugador' => $this->user ? $this->user->name : '',
+            'goles' => (string) $this->goles,
+            'asistencias' => (string) $this->asistencias,
+            'minutos' => (string) $this->minutos_jugados,
+            'tenant_id' => $this->tenant_id,
+        ];
+    }
+
+    public function shouldBeSearchable(): bool
+    {
+        return true;
+    }
+
+    public function getScoutKey(): mixed
+    {
+        return $this->getKey();
+    }
+
+    public function getScoutKeyName(): mixed
+    {
+        return $this->getKeyName();
+    }
 
     public function user(): BelongsTo
     {

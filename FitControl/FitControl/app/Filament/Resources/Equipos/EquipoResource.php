@@ -7,6 +7,7 @@ use App\Filament\Resources\Equipos\Pages\EditEquipo;
 use App\Filament\Resources\Equipos\Pages\ListEquipos;
 use App\Filament\Resources\Equipos\Schemas\EquipoForm;
 use App\Filament\Resources\Equipos\Tables\EquiposTable;
+use App\Filament\Traits\HasTenantGlobalSearch;
 use App\Models\Equipo;
 use Filament\Resources\Resource;
 use Filament\Tables\Table;
@@ -17,6 +18,7 @@ use UnitEnum;
 
 class EquipoResource extends Resource
 {
+    use HasTenantGlobalSearch;
     protected static ?string $model = Equipo::class;
 
 
@@ -50,5 +52,28 @@ class EquipoResource extends Resource
             'create' => CreateEquipo::route('/create'),
             'edit' => EditEquipo::route('/{record}/edit'),
         ];
+    }
+
+    public static function getGloballySearchableAttributes(): array
+    {
+        return ['nombre', 'categoria', 'ubi_equipo'];
+    }
+
+    public static function getGlobalSearchResultTitle(\Illuminate\Database\Eloquent\Model $record): string|\Illuminate\Contracts\Support\Htmlable
+    {
+        return $record->nombre;
+    }
+
+    public static function getGlobalSearchResultDetails(\Illuminate\Database\Eloquent\Model $record): array
+    {
+        return [
+            'Categoría' => $record->categoria,
+            'Ubicación' => $record->ubi_equipo,
+        ];
+    }
+
+    public static function getGlobalSearchResultUrl($record): string
+    {
+        return static::getUrl('edit', ['record' => $record]);
     }
 }

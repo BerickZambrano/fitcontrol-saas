@@ -7,6 +7,7 @@ use App\Filament\Resources\Torneos\Pages\EditTorneo;
 use App\Filament\Resources\Torneos\Pages\ListTorneos;
 use App\Filament\Resources\Torneos\Schemas\TorneoForm;
 use App\Filament\Resources\Torneos\Tables\TorneosTable;
+use App\Filament\Traits\HasTenantGlobalSearch;
 use App\Models\Torneo;
 use BackedEnum;
 use Filament\Resources\Resource;
@@ -17,11 +18,12 @@ use UnitEnum;
 
 class TorneoResource extends Resource
 {
+    use HasTenantGlobalSearch;
     protected static ?string $model = Torneo::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
-    protected static ?string $recordTitleAttribute = 'torneo_id';
+    protected static ?string $recordTitleAttribute = 'nombre';
 
     protected static string|UnitEnum|null $navigationGroup = 'Competencias';
 
@@ -49,5 +51,28 @@ class TorneoResource extends Resource
             'create' => CreateTorneo::route('/create'),
             'edit' => EditTorneo::route('/{record}/edit'),
         ];
+    }
+
+    public static function getGloballySearchableAttributes(): array
+    {
+        return ['nombre', 'categoria', 'estado'];
+    }
+
+    public static function getGlobalSearchResultTitle(\Illuminate\Database\Eloquent\Model $record): string|\Illuminate\Contracts\Support\Htmlable
+    {
+        return $record->nombre;
+    }
+
+    public static function getGlobalSearchResultDetails(\Illuminate\Database\Eloquent\Model $record): array
+    {
+        return [
+            'Categoría' => $record->categoria,
+            'Estado' => $record->estado,
+        ];
+    }
+
+    public static function getGlobalSearchResultUrl($record): string
+    {
+        return static::getUrl('edit', ['record' => $record]);
     }
 }

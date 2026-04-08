@@ -4,6 +4,7 @@ namespace App\Filament\Resources\Users;
 
 use App\Filament\Resources\Users\Schemas\UserForm;
 use App\Filament\Resources\Users\Tables\UsersTable;
+use App\Filament\Traits\HasTenantGlobalSearch;
 use App\Models\User;
 use Filament\Resources\Resource;
 use Filament\Tables\Table;
@@ -14,6 +15,8 @@ use Filament\Support\Icons\Heroicon;
 
 class UserResource extends Resource
 {
+    use HasTenantGlobalSearch;
+
     protected static ?string $model = User::class;
 
     protected static ?string $recordTitleAttribute = 'name';
@@ -39,5 +42,39 @@ class UserResource extends Resource
             'create' => Pages\CreateUser::route('/create'),
             'edit'   => Pages\EditUser::route('/{record}/edit'),
         ];
+    }
+
+    /**
+     * Enable global search for this resource.
+     */
+    public static function getGloballySearchableAttributes(): array
+    {
+        return ['name', 'email', 'roles.name'];
+    }
+
+    /**
+     * Get the global search result title.
+     */
+    public static function getGlobalSearchResultTitle(\Illuminate\Database\Eloquent\Model $record): string|\Illuminate\Contracts\Support\Htmlable
+    {
+        return $record->email;
+    }
+
+    /**
+     * Get the global search result details (subtitle).
+     */
+    public static function getGlobalSearchResultDetails(\Illuminate\Database\Eloquent\Model $record): array
+    {
+        return [
+            'Rol' => $record->roles->pluck('name')->join(', '),
+        ];
+    }
+
+    /**
+     * Get the global search result URL.
+     */
+    public static function getGlobalSearchResultUrl($record): string
+    {
+        return static::getUrl('edit', ['record' => $record]);
     }
 }

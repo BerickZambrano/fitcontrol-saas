@@ -21,7 +21,7 @@ class PagoResource extends Resource
 
     protected static string|UnitEnum|null $navigationGroup = 'Finanzas';
 
-    protected static ?string $recordTitleAttribute = 'id_usu_fk';
+    protected static ?string $recordTitleAttribute = 'user_id';
 
     public static function form(Schema $schema): Schema
     {

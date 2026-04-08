@@ -7,6 +7,7 @@ use App\Filament\Resources\Rendimientos\Pages\EditRendimiento;
 use App\Filament\Resources\Rendimientos\Pages\ListRendimientos;
 use App\Filament\Resources\Rendimientos\Schemas\RendimientoForm;
 use App\Filament\Resources\Rendimientos\Tables\RendimientosTable;
+use App\Filament\Traits\HasTenantGlobalSearch;
 use App\Models\Rendimiento;
 use BackedEnum;
 use Filament\Resources\Resource;
@@ -17,6 +18,7 @@ use UnitEnum;
 
 class RendimientoResource extends Resource
 {
+    use HasTenantGlobalSearch;
     protected static ?string $model = Rendimiento::class;
 
     protected static string|UnitEnum|null $navigationGroup = 'Jugadores';
@@ -49,5 +51,28 @@ class RendimientoResource extends Resource
             'create' => CreateRendimiento::route('/create'),
             'edit' => EditRendimiento::route('/{record}/edit'),
         ];
+    }
+
+    public static function getGloballySearchableAttributes(): array
+    {
+        return ['user.name', 'goles', 'asistencias'];
+    }
+
+    public static function getGlobalSearchResultTitle(\Illuminate\Database\Eloquent\Model $record): string|\Illuminate\Contracts\Support\Htmlable
+    {
+        return $record->user ? $record->user->name : 'Rendimiento';
+    }
+
+    public static function getGlobalSearchResultDetails(\Illuminate\Database\Eloquent\Model $record): array
+    {
+        return [
+            'Goles' => $record->goles,
+            'Asistencias' => $record->asistencias,
+        ];
+    }
+
+    public static function getGlobalSearchResultUrl($record): string
+    {
+        return static::getUrl('edit', ['record' => $record]);
     }
 }

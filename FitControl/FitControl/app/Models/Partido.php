@@ -4,20 +4,51 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Traits\BelongsToTenant;
+use Laravel\Scout\Searchable;
 
 class Partido extends Model
 {
-    use BelongsToTenant;
+    use BelongsToTenant, Searchable;
 
     protected $fillable = [
         'tenant_id',
         'fecha',
         'hora',
-        'equipo_local_id',    
-        'equipo_visitante_id', 
+        'equipo_local_id',
+        'equipo_visitante_id',
         'resultado',
         'torneo_id',
     ];
+
+    /**
+     * Get the indexable data array for the model.
+     */
+    public function toSearchableArray(): array
+    {
+        return [
+            'local' => $this->local ? $this->local->nombre : '',
+            'visitante' => $this->visitante ? $this->visitante->nombre : '',
+            'torneo' => $this->torneo ? $this->torneo->nombre : '',
+            'fecha' => $this->fecha,
+            'resultado' => $this->resultado ?? '',
+            'tenant_id' => $this->tenant_id,
+        ];
+    }
+
+    public function shouldBeSearchable(): bool
+    {
+        return true;
+    }
+
+    public function getScoutKey(): mixed
+    {
+        return $this->getKey();
+    }
+
+    public function getScoutKeyName(): mixed
+    {
+        return $this->getKeyName();
+    }
 
     // Asignar tenant automáticamente
     protected static function booted()

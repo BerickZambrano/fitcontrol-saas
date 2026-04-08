@@ -3,9 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Laravel\Scout\Searchable;
 
 class Torneo extends Model
 {
+    use Searchable;
+
     protected $fillable = [
         'nombre',
         'categoria',
@@ -14,6 +17,34 @@ class Torneo extends Model
         'estado',
         'tenant_id',
     ];
+
+    /**
+     * Get the indexable data array for the model.
+     */
+    public function toSearchableArray(): array
+    {
+        return [
+            'nombre' => $this->nombre,
+            'categoria' => $this->categoria,
+            'estado' => $this->estado,
+            'tenant_id' => $this->tenant_id,
+        ];
+    }
+
+    public function shouldBeSearchable(): bool
+    {
+        return true;
+    }
+
+    public function getScoutKey(): mixed
+    {
+        return $this->getKey();
+    }
+
+    public function getScoutKeyName(): mixed
+    {
+        return $this->getKeyName();
+    }
 
     protected static function booted()
     {

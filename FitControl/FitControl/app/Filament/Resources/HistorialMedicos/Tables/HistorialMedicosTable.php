@@ -78,7 +78,7 @@ class HistorialMedicosTable
                     ->searchable()
                     ->preload(),
 
-                SelectFilter::make('tipo')
+                SelectFilter::make('tipo_lesion')
                     ->label('Tipo')
                     ->options([
                         'lesion' => 'Lesión',

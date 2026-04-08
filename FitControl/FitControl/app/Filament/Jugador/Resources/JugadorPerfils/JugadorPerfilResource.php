@@ -7,6 +7,7 @@ use App\Filament\Jugador\Resources\JugadorPerfils\Pages\EditJugadorPerfil;
 use App\Filament\Jugador\Resources\JugadorPerfils\Pages\ListJugadorPerfils;
 use App\Filament\Jugador\Resources\JugadorPerfils\Schemas\JugadorPerfilForm;
 use App\Filament\Jugador\Resources\JugadorPerfils\Tables\JugadorPerfilsTable;
+use App\Filament\Traits\HasTenantGlobalSearch;
 use App\Models\JugadorPerfil;
 use BackedEnum;
 use UnitEnum;
@@ -17,6 +18,7 @@ use Filament\Tables\Table;
 
 class JugadorPerfilResource extends Resource
 {
+    use HasTenantGlobalSearch;
     protected static ?string $model = JugadorPerfil::class;
     
     protected static ?string $navigationLabel = 'Perfiles de Jugadores';
@@ -51,5 +53,28 @@ class JugadorPerfilResource extends Resource
             'create' => CreateJugadorPerfil::route('/create'),
             'edit' => EditJugadorPerfil::route('/{record}/edit'),
         ];
+    }
+
+    public static function getGloballySearchableAttributes(): array
+    {
+        return ['user.name', 'posicion', 'dorsal'];
+    }
+
+    public static function getGlobalSearchResultTitle(\Illuminate\Database\Eloquent\Model $record): string|\Illuminate\Contracts\Support\Htmlable
+    {
+        return $record->user ? $record->user->name : 'Jugador';
+    }
+
+    public static function getGlobalSearchResultDetails(\Illuminate\Database\Eloquent\Model $record): array
+    {
+        return [
+            'Posición' => $record->posicion,
+            'Dorsal' => $record->dorsal,
+        ];
+    }
+
+    public static function getGlobalSearchResultUrl($record): string
+    {
+        return static::getUrl('edit', ['record' => $record]);
     }
 }
