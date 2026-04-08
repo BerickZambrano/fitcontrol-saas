@@ -4,6 +4,7 @@ namespace App\Filament\Pages;
 use Filament\Pages\Page;
 use Filament\Forms;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\ToggleButtons;
@@ -28,6 +29,7 @@ class SendEmails extends Page implements Forms\Contracts\HasForms
     {
         $this->form->fill([
             'mode' => 'masivo',
+            'recipients' => [],
         ]);
     }
 
@@ -54,14 +56,21 @@ class SendEmails extends Page implements Forms\Contracts\HasForms
                     ->visible(fn (Get $get) => $get('mode') === 'masivo')
                     ->required(fn (Get $get) => $get('mode') === 'masivo'),
 
-                TextInput::make('email_individual')
-                    ->label('Correo destinatario')
-                    ->email()
+                Repeater::make('recipients')
+                    ->label('Destinatarios')
+                    ->schema([
+                        TextInput::make('email')
+                            ->label('Correo')
+                            ->email()
+                            ->required(),
+                        TextInput::make('nombre')
+                            ->label('Nombre')
+                            ->required(),
+                    ])
+                    ->columns(2)
                     ->visible(fn (Get $get) => $get('mode') === 'individual')
-                    ->required(fn (Get $get) => $get('mode') === 'individual'),
-
-                TextInput::make('nombre_individual')
-                    ->label('Nombre del destinatario')
+                    ->default(fn () => [['email' => '', 'nombre' => '']])
+                    ->addActionLabel('Agregar otro destinatario')
                     ->visible(fn (Get $get) => $get('mode') === 'individual')
                     ->required(fn (Get $get) => $get('mode') === 'individual'),
 
@@ -87,12 +96,21 @@ class SendEmails extends Page implements Forms\Contracts\HasForms
             $client = new Client();
 
             if ($mode === 'individual') {
-                $client->post(env('SPRING_MAIL_SERVICE_URL') . '/api/mail/send-single', [
+                $recipients = $formData['recipients'] ?? [];
+
+                if (empty($recipients)) {
+                    Notification::make()
+                        ->title('Agrega al menos un destinatario')
+                        ->danger()
+                        ->send();
+                    return;
+                }
+
+                $client->post(env('SPRING_MAIL_SERVICE_URL') . '/api/mail/send-multiple', [
                     'json' => [
-                        'email'   => $formData['email_individual'],
-                        'nombre'  => $formData['nombre_individual'],
-                        'subject' => $formData['subject'],
-                        'body'    => $formData['body'],
+                        'recipients' => array_values($recipients),
+                        'subject'    => $formData['subject'],
+                        'body'       => $formData['body'],
                     ],
                 ]);
             } else {

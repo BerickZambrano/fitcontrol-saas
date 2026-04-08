@@ -44,9 +44,6 @@ class EquiposTable
                     ->label('Contacto')
                     ->sortable(),
 
-                TextColumn::make('categoria_equipo')
-                    ->label('Subcategoría')
-                    ->sortable(),
 
                 TextColumn::make('created_at')
                     ->label('Creado')
