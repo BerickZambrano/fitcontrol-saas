@@ -1,0 +1,5 @@
+{
+    "require": {
+        "leandrocfe/filament-apex-charts": "^5.0"
+    }
+}

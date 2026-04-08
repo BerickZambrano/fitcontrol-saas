@@ -1,0 +1,44 @@
+# Examples
+
+You may copy the file and paste it into **app\Filament\Widgets** folder. Once you have pasted the widget file, check out your widget on the **dashboard** page.
+
+-   Area
+    -   [Basic Area Chart](Area/BasicAreaChart.php)
+-   Bar
+    -   [Basic Bar Chart](Bar/BasicBarChart.php)
+-   Boxplot
+    -   [Basic Boxplot Chart](Boxplot/BasicBloxPlotChart.php)
+-   Bubble
+    -   [Basic Bubble Chart](Bubble/BasicBubbleChart.php)
+-   Candlestick
+    -   [Basic Candlestick Chart](Candlestick/BasicCandlestickChart.php)
+-   Column
+    -   [Basic Column Chart](Column/BasicColumnChart.php)
+    -   [Column + Line Chart](Mixed/LineColumnChart.php)
+    -   [Gradient Column Chart](Column/GradientColumnChart.php)
+    -   [Column Chart with Annotations](Column/ColumnChartWithAnnotations.php)
+-   Heatmap
+    -   [Basic Heatmap Chart](Heatmap/BasicHeatmapChart.php)
+-   Line
+    -   [Basic Line Chart](Line/BasicLineChart.php)
+    -   [Line + Column Chart](Mixed/LineColumnChart.php)
+-   Mixed
+    -   [Line + Column Chart](Mixed/LineColumnChart.php)
+-   Pie
+    -   [Basic Pie Chart](Pie/BasicPieChart.php)
+    -   [Donut Chart](Pie/DonutChart.php)
+-   Polar Area
+    -   [Basic Polar Area Chart](PolarArea/BasicPolarAreaChart.php)
+-   Radar
+    -   [Basic Radar Chart](Radar/BasicRadarChart.php)
+-   Radialbar
+    -   [Basic Radialbar Chart](Radialbar/BasicRadialBarChart.php)
+    -   [Gradient Circle Chart](Radialbar/GradientCircleChart.php)
+-   Range Area
+    -   [Range Area Chart](RangeArea/BasicRangeAreaChart.php)
+-   Scatter
+    -   [Basic Scatter Chart](Scatter/BasicScatterChart.php)
+-   Timeline Range-bars
+    -   [Timeline Bar Chart](TimelineRangeBars/BasicTimelineRangeBarsChart.php)
+-   Treemap
+    -   [Basic Treemap Chart](Treemap/BasicTreemapChart.php)

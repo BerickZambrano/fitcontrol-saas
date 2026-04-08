@@ -1,0 +1,22 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(php *)",
+      "Bash(lsof *)",
+      "Bash(ss *)",
+      "Bash(composer *)",
+      "Bash(sleep *)",
+      "Bash(mvn *)",
+      "Bash(java *)",
+      "Bash(cp *)",
+      "Bash(true)",
+      "Bash(rm *)",
+      "Bash(tail *)",
+      "Bash(truncate *)",
+      "Bash(./mvnw *)",
+      "Bash(curl *)",
+      "Bash(pkill *)"
+    ]
+  },
+  "$version": 3
+}
