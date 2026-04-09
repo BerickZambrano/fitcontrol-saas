@@ -21,9 +21,10 @@ class RendimientoResource extends Resource
     use HasTenantGlobalSearch;
     protected static ?string $model = Rendimiento::class;
 
+    protected static ?string $navigationLabel = 'Rendimiento';
+    protected static ?string $modelLabel = 'Rendimiento';
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedChartBar;
     protected static string|UnitEnum|null $navigationGroup = 'Jugadores';
-
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
     protected static ?string $recordTitleAttribute = 'user_id';
 

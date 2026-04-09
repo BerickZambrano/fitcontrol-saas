@@ -7,6 +7,7 @@ use App\Filament\Resources\EquipoUsers\Pages\EditEquipoUser;
 use App\Filament\Resources\EquipoUsers\Pages\ListEquipoUsers;
 use App\Filament\Resources\EquipoUsers\Schemas\EquipoUserForm;
 use App\Filament\Resources\EquipoUsers\Tables\EquipoUsersTable;
+use App\Filament\Traits\HasTenantGlobalSearch;
 use App\Models\Equipo;
 use App\Models\EquipoUser;
 use BackedEnum;
@@ -18,9 +19,11 @@ use UnitEnum;
 
 class EquipoUserResource extends Resource
 {
+    use HasTenantGlobalSearch;
     protected static ?string $model = EquipoUser::class;
 
-      protected static ?string $navigationLabel = 'Equipo->Usuarios';
+      protected static ?string $navigationLabel = 'Jugadores por Equipo';
+    protected static ?string $modelLabel = 'Jugador en Equipo';
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedUsers;
 

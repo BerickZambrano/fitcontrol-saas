@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Mail;
 use App\Mail\TenantApprovedMail;
 use App\Mail\TenantRejectedMail;
 use Illuminate\Support\Str;
+use UnitEnum;
 
 class TenantRequests extends Page implements HasTable
 {
@@ -21,6 +22,7 @@ class TenantRequests extends Page implements HasTable
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-clock';
     protected static ?string $navigationLabel = 'Solicitudes';
+    protected static string|UnitEnum|null $navigationGroup = 'Administración';
     protected static ?string $title = 'Solicitudes de Acceso';
 
     protected string $view = 'filament.pages.tenant-requests';

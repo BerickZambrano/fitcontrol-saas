@@ -21,6 +21,9 @@ class EntrenamientoResource extends Resource
     use HasTenantGlobalSearch;
     protected static ?string $model = Entrenamiento::class;
 
+    protected static ?string $navigationLabel = 'Entrenamientos';
+    protected static ?string $modelLabel = 'Entrenamiento';
+
     protected static string|UnitEnum|null $navigationGroup = 'Entrenamientos';
 
 

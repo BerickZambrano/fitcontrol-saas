@@ -7,6 +7,7 @@ use App\Filament\Resources\AsistenciaEntrenamientos\Pages\EditAsistenciaEntrenam
 use App\Filament\Resources\AsistenciaEntrenamientos\Pages\ListAsistenciaEntrenamientos;
 use App\Filament\Resources\AsistenciaEntrenamientos\Schemas\AsistenciaEntrenamientoForm;
 use App\Filament\Resources\AsistenciaEntrenamientos\Tables\AsistenciaEntrenamientosTable;
+use App\Filament\Traits\HasTenantGlobalSearch;
 use App\Models\AsistenciaEntrenamiento;
 use BackedEnum;
 use Filament\Resources\Resource;
@@ -17,9 +18,12 @@ use UnitEnum;
 
 class AsistenciaEntrenamientoResource extends Resource
 {
+    use HasTenantGlobalSearch;
     protected static ?string $model = AsistenciaEntrenamiento::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedCheckCircle;
+    protected static ?string $navigationLabel = 'Asistencia';
+    protected static ?string $modelLabel = 'Asistencia';
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedClipboardDocumentCheck;
 
     protected static string|UnitEnum|null $navigationGroup = 'Entrenamientos';
    

@@ -21,6 +21,8 @@ class PartidoResource extends Resource
     use HasTenantGlobalSearch;
     protected static ?string $model = Partido::class;
 
+    protected static ?string $navigationLabel = 'Partidos';
+    protected static ?string $modelLabel = 'Partido';
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedTrophy;
 
     protected static string|UnitEnum|null $navigationGroup = 'Competencias';

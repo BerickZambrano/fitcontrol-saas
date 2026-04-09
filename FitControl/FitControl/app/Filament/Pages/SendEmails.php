@@ -14,6 +14,7 @@ use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Storage;
 use Filament\Notifications\Notification;
 use BackedEnum;
+use UnitEnum;
 
 class SendEmails extends Page implements Forms\Contracts\HasForms
 {
@@ -21,6 +22,7 @@ class SendEmails extends Page implements Forms\Contracts\HasForms
 
     protected static ?string $navigationLabel = 'Enviar Correos';
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-envelope';
+    protected static string|UnitEnum|null $navigationGroup = 'Comunicación';
     protected  string $view = 'filament.pages.send-emails';
     protected static ?string $title = 'Enviar Correos';
     public ?array $data = [];

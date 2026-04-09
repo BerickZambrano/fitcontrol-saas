@@ -12,6 +12,7 @@ use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Notifications\Notification;
 use Illuminate\Support\Facades\Auth;
+use UnitEnum;
 
 class GenerarReporte extends Page implements HasForms
 {
@@ -19,6 +20,7 @@ class GenerarReporte extends Page implements HasForms
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-chart-bar-square';
     protected static ?string $navigationLabel = 'Generar Reporte';
+    protected static string|UnitEnum|null $navigationGroup = 'Reportes';
 
     public ?array $data = [];
 

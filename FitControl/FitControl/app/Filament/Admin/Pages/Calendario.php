@@ -7,11 +7,13 @@ use Filament\Pages\Page;
 use Filament\Support\Icons\Heroicon;
 use App\Models\Entrenamiento;
 use App\Models\Partido;
+use UnitEnum;
 
 class Calendario extends Page
 {
     protected static BackedEnum|string|null $navigationIcon = Heroicon::Calendar;
     protected static ?string $navigationLabel = 'Calendario';
+    protected static string|UnitEnum|null $navigationGroup = 'Panel Principal';
     protected static ?string $title = 'Calendario';
 
     protected string $view = 'filament.pages.calendario';

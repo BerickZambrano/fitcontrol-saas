@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Pagos;
 use App\Filament\Resources\Pagos\Pages;
 use App\Filament\Resources\Pagos\Schemas\PagoForm;
 use App\Filament\Resources\Pagos\Tables\PagosTable;
+use App\Filament\Traits\HasTenantGlobalSearch;
 use App\Models\Pago;
 use Filament\Resources\Resource;
 use Filament\Tables\Table;
@@ -15,8 +16,11 @@ use Filament\Support\Icons\Heroicon;
 
 class PagoResource extends Resource
 {
+    use HasTenantGlobalSearch;
     protected static ?string $model = Pago::class;
 
+    protected static ?string $navigationLabel = 'Pagos';
+    protected static ?string $modelLabel = 'Pago';
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedCreditCard;
 
     protected static string|UnitEnum|null $navigationGroup = 'Finanzas';

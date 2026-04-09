@@ -21,6 +21,8 @@ class EquipoResource extends Resource
     use HasTenantGlobalSearch;
     protected static ?string $model = Equipo::class;
 
+    protected static ?string $navigationLabel = 'Equipos';
+    protected static ?string $modelLabel = 'Equipo';
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedUserGroup;
 

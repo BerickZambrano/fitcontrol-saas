@@ -21,9 +21,10 @@ class HistorialMedicoResource extends Resource
     use HasTenantGlobalSearch;
     protected static ?string $model = HistorialMedico::class;
 
+    protected static ?string $navigationLabel = 'Historial Médico';
+    protected static ?string $modelLabel = 'Historial Médico';
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedHeart;
     protected static string|UnitEnum|null $navigationGroup = 'Jugadores';
-
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
     protected static ?string $recordTitleAttribute = 'tipo_lesion';
 

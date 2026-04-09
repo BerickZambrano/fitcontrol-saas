@@ -21,7 +21,9 @@ class TorneoResource extends Resource
     use HasTenantGlobalSearch;
     protected static ?string $model = Torneo::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static ?string $navigationLabel = 'Torneos';
+    protected static ?string $modelLabel = 'Torneo';
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedFlag;
 
     protected static ?string $recordTitleAttribute = 'nombre';
 

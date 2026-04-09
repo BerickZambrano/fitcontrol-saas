@@ -7,6 +7,7 @@ use App\Filament\Resources\Tenants\Pages\EditTenant;
 use App\Filament\Resources\Tenants\Pages\ListTenants;
 use App\Filament\Resources\Tenants\Schemas\TenantForm;
 use App\Filament\Resources\Tenants\Tables\TenantsTable;
+use App\Filament\Traits\HasTenantGlobalSearch;
 use App\Models\Tenant;
 use BackedEnum;
 use Filament\Resources\Resource;
@@ -17,10 +18,12 @@ use UnitEnum;
 
 class TenantResource extends Resource
 {
+    use HasTenantGlobalSearch;
     protected static ?string $model = Tenant::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
-
+    protected static ?string $navigationLabel = 'Clubes';
+    protected static ?string $modelLabel = 'Club';
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedBuildingOffice;
     protected static ?string $recordTitleAttribute = 'nombre';
     protected static string|UnitEnum|null $navigationGroup = 'Administración';
 

@@ -2,13 +2,12 @@
 
 namespace App\Filament\Pages;
 
+use BackedEnum;
 use Filament\Forms;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Pages\Page;
 use Illuminate\Support\Facades\Auth;
-use App\Enums\NavigationGroup;
 use UnitEnum;
-use BackedEnum;
 
 class PlayerProfile extends Page
 {
@@ -16,6 +15,7 @@ class PlayerProfile extends Page
 
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-user';
     protected static ?string $navigationLabel = 'Mi Perfil';
+    protected static string|UnitEnum|null $navigationGroup = 'Panel Principal';
     protected static ?string $title = 'Mi Perfil';
 
     protected string $view = 'filament.pages.player-profile';
