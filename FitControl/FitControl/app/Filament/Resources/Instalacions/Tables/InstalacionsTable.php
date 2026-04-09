@@ -2,10 +2,16 @@
 
 namespace App\Filament\Resources\Instalacions\Tables;
 
+use App\Filament\Imports\InstalacionImporter;
+use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\DeleteAction;
+use Filament\Actions\ImportAction;
+use Filament\Forms\Components\FileUpload;
+use Filament\Notifications\Notification;
+use Illuminate\Support\Facades\Storage;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Forms\Components\DatePicker;
@@ -90,6 +96,72 @@ class InstalacionsTable
             ])
 
             ->headerActions([
+                Action::make('import')
+                    ->label('Importar CSV')
+                    ->icon('heroicon-o-arrow-up-tray')
+                    ->form([
+                        FileUpload::make('file')
+                            ->label('Archivo CSV')
+                            ->acceptedFileTypes(['text/csv', 'text/plain'])
+                            ->disk('local')
+                            ->directory('imports')
+                            ->required(),
+                    ])
+                    ->action(function (array $data) {
+                        $filePath = Storage::disk('local')->path($data['file']);
+
+                        if (!file_exists($filePath)) {
+                            Notification::make()
+                                ->title('❌ Archivo no encontrado')
+                                ->danger()
+                                ->send();
+                            return;
+                        }
+
+                        $file = fopen($filePath, 'r');
+                        if ($file === false) {
+                            Notification::make()
+                                ->title('❌ Error al leer el archivo')
+                                ->danger()
+                                ->send();
+                            return;
+                        }
+
+                        fgetcsv($file); // Saltar encabezados
+
+                        $importados = 0;
+                        $errores = 0;
+
+                        while (($row = fgetcsv($file)) !== false) {
+                            if (count($row) < 5) {
+                                $errores++;
+                                continue;
+                            }
+
+                            try {
+                                \App\Models\Instalacion::create([
+                                    'nombre' => trim($row[0]),
+                                    'tipo' => strtolower(trim($row[1])),
+                                    'ubicacion' => trim($row[2]),
+                                    'capacidad' => (int) $row[3],
+                                    'estado' => strtolower(trim($row[4])),
+                                    'tenant_id' => auth()->user()->tenant_id,
+                                ]);
+                                $importados++;
+                            } catch (\Exception $e) {
+                                $errores++;
+                            }
+                        }
+
+                        fclose($file);
+
+                        Notification::make()
+                            ->title('✅ Importación completada')
+                            ->body("{$importados} importados, {$errores} errores.")
+                            ->success()
+                            ->send();
+                    }),
+
                 FilamentExportHeaderAction::make('export')
                     ->label('Exportar')
                     ->defaultFormat('pdf')
