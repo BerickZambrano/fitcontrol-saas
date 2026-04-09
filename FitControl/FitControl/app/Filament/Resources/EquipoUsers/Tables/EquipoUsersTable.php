@@ -19,7 +19,14 @@ class EquipoUsersTable
     public static function configure(Table $table): Table
     {
         return $table
-            ->modifyQueryUsing(fn ($query) => $query->with(['equipo', 'jugador']))
+            ->modifyQueryUsing(fn ($query) => $query->withoutGlobalScopes()->with([
+                'equipo' => function ($q) {
+                    $q->withoutGlobalScopes();
+                },
+                'jugador' => function ($q) {
+                    $q->withoutGlobalScopes();
+                },
+            ]))
             ->columns([
                 Tables\Columns\TextColumn::make('equipo.nombre')
                     ->label('Equipo')

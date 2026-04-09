@@ -21,9 +21,12 @@ class MiEquipo extends BaseWidget
     {
         $user = auth()->user();
 
-        $equipoUser = EquipoUser::where('user_id', $user->id)
-            ->where('tenant_id', $user->tenant_id)
-            ->with('equipo')
+        $equipoUser = EquipoUser::withoutGlobalScopes()
+            ->where('user_id', $user->id)
+            ->with(['equipo' => function ($q) {
+                $q->withoutGlobalScopes();
+            }])
+            ->whereNull('fecha_fin') // Solo activos
             ->first();
 
         if (!$equipoUser || !$equipoUser->equipo) {

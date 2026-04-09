@@ -6,6 +6,7 @@ use Filament\Forms;
 use Filament\Schemas\Schema;
 use App\Models\Equipo;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Builder;
 
 class EquipoUserForm
 {
@@ -22,13 +23,20 @@ class EquipoUserForm
                     }
                     return $query->pluck('nombre', 'id');
                 })
-                ->searchable(),
+                ->searchable()
+                ->preload()
+                ->relationship(
+                    'equipo',
+                    'nombre',
+                    modifyQueryUsing: fn (Builder $query) => $query->withoutGlobalScopes()
+                ),
 
             Forms\Components\Select::make('user_id')
                 ->label('Jugador')
                 ->required()
                 ->options(function () {
                     $query = User::query()
+                        ->withoutGlobalScopes()
                         ->whereHas('roles', function ($q) {
                             $q->where('name', 'jugador');
                         });
@@ -39,7 +47,13 @@ class EquipoUserForm
 
                     return $query->pluck('name', 'id');
                 })
-                ->searchable(),
+                ->searchable()
+                ->preload()
+                ->relationship(
+                    'jugador',
+                    'name',
+                    modifyQueryUsing: fn (Builder $query) => $query->withoutGlobalScopes()
+                ),
 
             Forms\Components\DatePicker::make('fecha_inicio')
                 ->label('Fecha de Inicio')
