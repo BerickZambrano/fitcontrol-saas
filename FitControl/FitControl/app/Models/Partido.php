@@ -50,23 +50,6 @@ class Partido extends Model
         return $this->getKeyName();
     }
 
-    // Asignar tenant automáticamente
-    protected static function booted()
-    {
-        static::creating(function ($model) {
-            if (auth()->check()) {
-                $model->tenant_id = auth()->user()->tenant_id;
-            }
-        });
-
-        // Global scope por tenant
-        static::addGlobalScope('tenant', function ($query) {
-            if (auth()->check()) {
-                $query->where('tenant_id', auth()->user()->tenant_id);
-            }
-        });
-    }
-
     public function local()
     {
         return $this->belongsTo(Equipo::class, 'equipo_local_id');

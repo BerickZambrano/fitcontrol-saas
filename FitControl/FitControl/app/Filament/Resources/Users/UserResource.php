@@ -12,6 +12,7 @@ use Filament\Schemas\Schema;
 use BackedEnum;
 use UnitEnum;
 use Filament\Support\Icons\Heroicon;
+use Illuminate\Database\Eloquent\Builder;
 
 class UserResource extends Resource
 {
@@ -35,6 +36,17 @@ class UserResource extends Resource
     public static function table(Table $table): Table
     {
         return UsersTable::configure($table);
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        $query = parent::getEloquentQuery();
+
+        if (auth()->check() && !auth()->user()->hasRole('super_admin')) {
+            $query->where('tenant_id', auth()->user()->tenant_id);
+        }
+
+        return $query;
     }
 
     public static function getPages(): array

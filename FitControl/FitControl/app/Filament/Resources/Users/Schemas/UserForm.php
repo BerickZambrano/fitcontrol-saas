@@ -11,6 +11,8 @@ class UserForm
 {
     public static function configure(Schema $schema): Schema
     {
+        $isSuperAdmin = auth()->check() && auth()->user()->hasRole('super_admin');
+
         return $schema->schema([
 
             Forms\Components\TextInput::make('name')
@@ -43,10 +45,13 @@ class UserForm
 
             Forms\Components\Select::make('tenant_id')
                 ->label('Tenant')
-                ->required()
+                ->visible(fn () => $isSuperAdmin)
+                ->required($isSuperAdmin)
                 ->options(
                     fn () => Tenant::pluck('nombre', 'id')
-                ),
+                )
+                ->default(fn () => $isSuperAdmin ? null : auth()->user()->tenant_id)
+                ->disabled(fn () => !$isSuperAdmin),
 
             Forms\Components\Select::make('roles')
                 ->label('Rol')

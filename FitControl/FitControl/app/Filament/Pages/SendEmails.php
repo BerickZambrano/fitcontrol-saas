@@ -1,6 +1,7 @@
 <?php
 namespace App\Filament\Pages;
 
+use App\Mail\FitControlMail;
 use Filament\Pages\Page;
 use Filament\Forms;
 use Filament\Forms\Components\FileUpload;
@@ -10,7 +11,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\ToggleButtons;
 use Filament\Schemas\Schema;
 use Filament\Schemas\Components\Utilities\Get;
-use GuzzleHttp\Client;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Filament\Notifications\Notification;
 use BackedEnum;
@@ -23,7 +24,7 @@ class SendEmails extends Page implements Forms\Contracts\HasForms
     protected static ?string $navigationLabel = 'Enviar Correos';
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-envelope';
     protected static string|UnitEnum|null $navigationGroup = 'Comunicación';
-    protected  string $view = 'filament.pages.send-emails';
+    protected string $view = 'filament.pages.send-emails';
     protected static ?string $title = 'Enviar Correos';
     public ?array $data = [];
 
@@ -95,8 +96,6 @@ class SendEmails extends Page implements Forms\Contracts\HasForms
         $mode = $formData['mode'] ?? 'masivo';
 
         try {
-            $client = new Client();
-
             if ($mode === 'individual') {
                 $recipients = $formData['recipients'] ?? [];
 
@@ -108,13 +107,29 @@ class SendEmails extends Page implements Forms\Contracts\HasForms
                     return;
                 }
 
-                $client->post(env('SPRING_MAIL_SERVICE_URL') . '/api/mail/send-multiple', [
-                    'json' => [
-                        'recipients' => array_values($recipients),
-                        'subject'    => $formData['subject'],
-                        'body'       => $formData['body'],
-                    ],
-                ]);
+                $successCount = 0;
+                $failCount = 0;
+                foreach ($recipients as $recipient) {
+                    try {
+                        Mail::to($recipient['email'])
+                            ->send((new FitControlMail($recipient['nombre'], $formData['body']))->subject($formData['subject']));
+                        $successCount++;
+                    } catch (\Exception $e) {
+                        $failCount++;
+                    }
+                }
+
+                if ($failCount > 0) {
+                    Notification::make()
+                        ->title("Enviados: {$successCount} | Fallidos: {$failCount}")
+                        ->warning()
+                        ->send();
+                } else {
+                    Notification::make()
+                        ->title("Correo(s) enviado(s) correctamente ({$successCount})")
+                        ->success()
+                        ->send();
+                }
             } else {
                 $filePath = Storage::disk('local')->path($formData['file']);
 
@@ -126,31 +141,49 @@ class SendEmails extends Page implements Forms\Contracts\HasForms
                     return;
                 }
 
-                $client->post(env('SPRING_MAIL_SERVICE_URL') . '/api/mail/import-csv', [
-                    'multipart' => [
-                        [
-                            'name'     => 'file',
-                            'contents' => fopen($filePath, 'r'),
-                            'filename' => basename($filePath),
-                        ],
-                        [
-                            'name'     => 'subject',
-                            'contents' => $formData['subject'],
-                        ],
-                        [
-                            'name'     => 'body',
-                            'contents' => $formData['body'],
-                        ],
-                    ],
-                ]);
+                $handle = fopen($filePath, 'r');
+                $firstLine = true;
+                $sent = 0;
+                $errors = [];
 
+                while (($line = fgetcsv($handle)) !== false) {
+                    if ($firstLine) {
+                        $firstLine = false;
+                        continue;
+                    }
+
+                    if (count($line) < 2) continue;
+
+                    $nombre = trim(str_replace("\xEF\xBB\xBF", '', $line[0]));
+                    $email  = trim($line[1]);
+
+                    if (empty($email) || !str_contains($email, '@')) continue;
+
+                    try {
+                        Mail::to($email)
+                            ->send((new FitControlMail($nombre, $formData['body']))->subject($formData['subject']));
+                        $sent++;
+                    } catch (\Exception $e) {
+                        $errors[] = "{$email}: {$e->getMessage()}";
+                    }
+                }
+
+                fclose($handle);
                 Storage::disk('local')->delete($formData['file']);
-            }
 
-            Notification::make()
-                ->title('Correo(s) enviado(s) correctamente')
-                ->success()
-                ->send();
+                if (!empty($errors)) {
+                    Notification::make()
+                        ->title("Enviados: {$sent} | Fallidos: " . count($errors))
+                        ->body(implode('; ', array_slice($errors, 0, 5)))
+                        ->warning()
+                        ->send();
+                } else {
+                    Notification::make()
+                        ->title("Correos enviados correctamente ({$sent})")
+                        ->success()
+                        ->send();
+                }
+            }
 
             $this->form->fill(['mode' => 'masivo']);
 

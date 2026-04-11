@@ -3,71 +3,73 @@
 namespace App\Services;
 
 use App\Models\GeneratedReport;
-use GuzzleHttp\Client;
-use GuzzleHttp\Exception\GuzzleException;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use PhpOffice\PhpSpreadsheet\Style\Alignment;
+use PhpOffice\PhpSpreadsheet\Style\Fill;
+use PhpOffice\PhpSpreadsheet\Style\Font as SpreadsheetFont;
+use PhpOffice\PhpSpreadsheet\Style\Border;
+use PhpOffice\PhpSpreadsheet\Cell\DataType;
 use Exception;
+use Illuminate\Support\Str;
 
 class ReportService
 {
-    protected Client $client;
-    protected string $baseUrl;
+    protected string $storagePath;
 
     public function __construct()
     {
-        $this->baseUrl = env('REPORT_SERVICE_URL', 'http://localhost:8082');
-        $this->client = new Client([
-            'base_uri' => $this->baseUrl,
-            'timeout' => 120,
-            'connect_timeout' => 10,
-        ]);
+        $this->storagePath = storage_path('app/reportes');
     }
 
     /**
-     * Generar un reporte llamando al microservicio Java
+     * Generar un reporte nativamente en Laravel
      */
     public function generar(array $params): GeneratedReport
     {
         $tenantId = Auth::user()->tenant_id ?? null;
         $userId = Auth::id();
 
-        // Si es super_admin, no tiene tenant_id, puede ver todos
         if (!$tenantId && Auth::user()->hasRole('super_admin')) {
             $tenantId = $params['tenant_id'] ?? null;
         }
 
-        $payload = array_merge($params, [
-            'tenant_id' => $tenantId,
-            'user_id' => $userId,
+        $params['tenant_id'] = $tenantId;
+        $params['user_id'] = $userId;
+
+        $reportId = Str::random(12);
+        $format = $params['format'] ?? 'pdf';
+        $extension = strtolower($format) === 'pdf' ? 'pdf' : 'xlsx';
+
+        match ($params['report_type']) {
+            'performance' => $filename = $this->generatePerformanceReport($params, $reportId, $extension),
+            'attendance'  => $filename = $this->generateAttendanceReport($params, $reportId, $extension),
+            'financial'   => $filename = $this->generateFinancialReport($params, $reportId, $extension),
+            'medical'     => $filename = $this->generateMedicalReport($params, $reportId, $extension),
+            default       => throw new Exception('Tipo de reporte desconocido: ' . $params['report_type']),
+        };
+
+        $filePath = $this->storagePath . '/' . $filename;
+        $size = file_exists($filePath) ? filesize($filePath) : 0;
+
+        $report = GeneratedReport::create([
+            'tenant_id'        => $tenantId,
+            'user_id'          => $userId,
+            'report_type'      => $params['report_type'],
+            'title'            => $this->generarTitulo($params),
+            'filename'         => $filename,
+            'file_format'      => $extension,
+            'file_size'        => $size,
+            'report_params'    => $params,
+            'report_id_external' => $reportId,
+            'status'           => 'completed',
         ]);
 
-        try {
-            $response = $this->client->post('/api/reports/generate', [
-                'json' => $payload,
-            ]);
-
-            $result = json_decode($response->getBody()->getContents(), true);
-
-            // Guardar referencia en BD
-            $report = GeneratedReport::create([
-                'tenant_id' => $tenantId,
-                'user_id' => $userId,
-                'report_type' => $params['report_type'],
-                'title' => $this->generarTitulo($params),
-                'filename' => $result['filename'],
-                'file_format' => $params['format'],
-                'file_size' => $result['size'] ?? null,
-                'report_params' => $params,
-                'report_id_external' => $result['report_id'],
-                'status' => 'completed',
-            ]);
-
-            return $report;
-
-        } catch (GuzzleException $e) {
-            throw new Exception('Error generando reporte: ' . $e->getMessage());
-        }
+        return $report;
     }
 
     /**
@@ -75,31 +77,656 @@ class ReportService
      */
     public function descargar(GeneratedReport $report)
     {
-        try {
-            $response = $this->client->get(
-                "/api/reports/{$report->report_id_external}/download",
-                ['stream' => true]
-            );
+        $filePath = $this->storagePath . '/' . $report->filename;
 
-            $contentType = match ($report->file_format) {
-                'pdf' => 'application/pdf',
-                'xlsx' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-                'csv' => 'text/csv',
-                default => 'application/octet-stream',
-            };
-
-            return response(
-                $response->getBody()->getContents(),
-                200,
-                [
-                    'Content-Type' => $contentType,
-                    'Content-Disposition' => 'attachment; filename="' . $report->filename . '"',
-                ]
-            );
-
-        } catch (GuzzleException $e) {
-            abort(500, 'Error descargando reporte: ' . $e->getMessage());
+        if (!file_exists($filePath)) {
+            abort(404, 'Reporte no encontrado');
         }
+
+        $contentType = match ($report->file_format) {
+            'pdf'  => 'application/pdf',
+            'xlsx' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            'csv'  => 'text/csv',
+            default => 'application/octet-stream',
+        };
+
+        return response()->download($filePath, $report->filename, [
+            'Content-Type' => $contentType,
+        ]);
+    }
+
+    // ================================================================
+    // REPORTE 1: RENDIMIENTO DE JUGADORES
+    // ================================================================
+    protected function generatePerformanceReport(array $req, string $reportId, string $ext): string
+    {
+        $equipoId = $req['equipo_id'];
+        $tenantId = $req['tenant_id'];
+        $fechaDesde = $req['fecha_desde'];
+        $fechaHasta = $req['fecha_hasta'];
+
+        $rows = DB::select("
+            SELECT
+                u.name as jugador,
+                jp.posicion,
+                jp.dorsal,
+                COUNT(r.id) as partidos_jugados,
+                COALESCE(SUM(r.minutos_jugados), 0) as minutos,
+                COALESCE(SUM(r.goles), 0) as goles,
+                COALESCE(SUM(r.asistencias), 0) as asistencias,
+                COALESCE(SUM(r.tarjetas_amarillas), 0) as tarjetas_amarillas,
+                COALESCE(SUM(r.tarjetas_rojas), 0) as tarjetas_rojas
+            FROM rendimientos r
+            JOIN users u ON r.user_id = u.id
+            LEFT JOIN jugador_perfiles jp ON jp.user_id = u.id
+            JOIN partidos p ON r.partido_id = p.id
+            WHERE (p.equipo_local_id = ? OR p.equipo_visitante_id = ?)
+              AND r.tenant_id = ?
+              AND p.fecha BETWEEN ?::date AND ?::date
+            GROUP BY u.id, u.name, jp.posicion, jp.dorsal
+            ORDER BY goles DESC, asistencias DESC
+        ", [$equipoId, $equipoId, $tenantId, $fechaDesde, $fechaHasta]);
+
+        $stats = DB::selectOne("
+            SELECT
+                COUNT(DISTINCT r.user_id) as total_jugadores,
+                COALESCE(SUM(r.goles), 0) as total_goles,
+                COALESCE(SUM(r.asistencias), 0) as total_asistencias,
+                COALESCE(SUM(r.minutos_jugados), 0) as total_minutos,
+                COUNT(DISTINCT p.id) as total_partidos
+            FROM rendimientos r
+            JOIN partidos p ON r.partido_id = p.id
+            WHERE (p.equipo_local_id = ? OR p.equipo_visitante_id = ?)
+              AND r.tenant_id = ?
+              AND p.fecha BETWEEN ?::date AND ?::date
+        ", [$equipoId, $equipoId, $tenantId, $fechaDesde, $fechaHasta]);
+
+        $equipoNombre = DB::scalar("SELECT nombre FROM equipos WHERE id = ?", [$equipoId]);
+        $equipoNombre = $equipoNombre ?? 'Equipo';
+
+        if ($ext === 'pdf') {
+            return $this->generatePerformancePdf($rows, $stats, $equipoNombre, $req, $reportId);
+        }
+
+        return $this->generatePerformanceExcel($rows, $stats, $equipoNombre, $req, $reportId);
+    }
+
+    protected function generatePerformanceExcel(array $rows, object $stats, string $equipoNombre, array $req, string $reportId): string
+    {
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        $sheet->setTitle('Rendimiento');
+
+        // Styles
+        $headerStyle = [
+            'font' => ['bold' => true, 'size' => 12, 'color' => ['rgb' => 'FFFFFF']],
+            'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => '0000FF']],
+            'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
+        ];
+        $titleStyle = ['font' => ['bold' => true, 'size' => 14]];
+
+        // Title
+        $sheet->setCellValue('A1', 'REPORTE DE RENDIMIENTO DE JUGADORES');
+        $sheet->getStyle('A1')->applyFromArray($titleStyle);
+        $sheet->mergeCells('A1:J1');
+
+        // Info row
+        $sheet->setCellValue('A2', 'Equipo: ' . $equipoNombre);
+        $sheet->setCellValue('D2', 'Periodo: ' . $req['fecha_desde'] . ' al ' . $req['fecha_hasta']);
+        $sheet->setCellValue('G2', 'Generado: ' . now()->format('d/m/Y'));
+
+        // Headers
+        $headers = ['#', 'Jugador', 'Posicion', 'Dorsal', 'PJ', 'Minutos', 'Goles', 'Asistencias', 'T. Amarillas', 'T. Rojas'];
+        $col = 'A';
+        foreach ($headers as $h) {
+            $sheet->setCellValue($col . '4', $h);
+            $col++;
+        }
+        $sheet->getStyle('A4:J4')->applyFromArray($headerStyle);
+
+        // Data
+        $rowNum = 5;
+        $counter = 1;
+        foreach ($rows as $row) {
+            $sheet->setCellValue('A' . $rowNum, $counter++);
+            $sheet->setCellValue('B' . $rowNum, $row->jugador);
+            $sheet->setCellValue('C' . $rowNum, $row->posicion ?? 'N/A');
+            $sheet->setCellValue('D' . $rowNum, (int) ($row->dorsal ?? 0));
+            $sheet->setCellValue('E' . $rowNum, (int) $row->partidos_jugados);
+            $sheet->setCellValue('F' . $rowNum, (int) $row->minutos);
+            $sheet->setCellValue('G' . $rowNum, (int) $row->goles);
+            $sheet->setCellValue('H' . $rowNum, (int) $row->asistencias);
+            $sheet->setCellValue('I' . $rowNum, (int) $row->tarjetas_amarillas);
+            $sheet->setCellValue('J' . $rowNum, (int) $row->tarjetas_rojas);
+            $rowNum++;
+        }
+
+        // Summary
+        $summaryRow = $rowNum + 2;
+        $sheet->setCellValue('A' . $summaryRow, 'RESUMEN DEL EQUIPO');
+        $sheet->getStyle('A' . $summaryRow)->applyFromArray($titleStyle);
+        $sheet->setCellValue('A' . ($summaryRow + 1), 'Total jugadores: ' . $stats->total_jugadores);
+        $sheet->setCellValue('A' . ($summaryRow + 2), 'Total goles: ' . $stats->total_goles);
+        $sheet->setCellValue('A' . ($summaryRow + 3), 'Total asistencias: ' . $stats->total_asistencias);
+        $sheet->setCellValue('A' . ($summaryRow + 4), 'Total partidos: ' . $stats->total_partidos);
+
+        // Auto-size
+        foreach (range('A', 'J') as $col) {
+            $sheet->getColumnDimension($col)->setAutoSize(true);
+        }
+
+        $filename = 'rendimiento_' . preg_replace('/\s+/', '_', $equipoNombre) . '_' . $reportId . '.xlsx';
+        $this->ensureStorageDir();
+        $writer = new Xlsx($spreadsheet);
+        $writer->save($this->storagePath . '/' . $filename);
+
+        return $filename;
+    }
+
+    protected function generatePerformancePdf(array $rows, object $stats, string $equipoNombre, array $req, string $reportId): string
+    {
+        $html = view('reports.performance', compact('rows', 'stats', 'equipoNombre', 'req'))->render();
+
+        $filename = 'rendimiento_' . preg_replace('/\s+/', '_', $equipoNombre) . '_' . $reportId . '.pdf';
+        $this->ensureStorageDir();
+
+        $pdf = Pdf::loadHTML($html)->setPaper('a4', 'landscape');
+        $pdf->save($this->storagePath . '/' . $filename);
+
+        return $filename;
+    }
+
+    // ================================================================
+    // REPORTE 2: ASISTENCIA
+    // ================================================================
+    protected function generateAttendanceReport(array $req, string $reportId, string $ext): string
+    {
+        $equipoId = $req['equipo_id'];
+        $tenantId = $req['tenant_id'];
+        $fechaDesde = $req['fecha_desde'];
+        $fechaHasta = $req['fecha_hasta'];
+
+        $entrenamientos = DB::select("
+            SELECT id, nombre, fecha
+            FROM entrenamientos
+            WHERE equipo_id = ? AND tenant_id = ?
+              AND fecha BETWEEN ?::date AND ?::date
+            ORDER BY fecha
+        ", [$equipoId, $tenantId, $fechaDesde, $fechaHasta]);
+
+        $jugadores = DB::select("
+            SELECT u.id, u.name, e.user_id
+            FROM equipo_user e
+            JOIN users u ON u.id = e.user_id
+            WHERE e.equipo_id = ? AND e.tenant_id = ?
+              AND e.fecha_fin IS NULL
+            ORDER BY u.name
+        ", [$equipoId, $tenantId]);
+
+        $asistencias = DB::select("
+            SELECT user_id, entrenamiento_id, presente
+            FROM asistencia_entrenamiento
+            WHERE tenant_id = ?
+              AND entrenamiento_id IN (
+                  SELECT id FROM entrenamientos WHERE equipo_id = ? AND fecha BETWEEN ?::date AND ?::date
+              )
+        ", [$tenantId, $equipoId, $fechaDesde, $fechaHasta]);
+
+        $equipoNombre = DB::scalar("SELECT nombre FROM equipos WHERE id = ?", [$equipoId]);
+        $equipoNombre = $equipoNombre ?? 'Equipo';
+
+        if ($ext === 'pdf') {
+            return $this->generateAttendancePdf($jugadores, $entrenamientos, $asistencias, $equipoNombre, $req, $reportId);
+        }
+
+        return $this->generateAttendanceExcel($jugadores, $entrenamientos, $asistencias, $equipoNombre, $req, $reportId);
+    }
+
+    protected function generateAttendanceExcel(array $jugadores, array $entrenamientos, array $asistencias, string $equipoNombre, array $req, string $reportId): string
+    {
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        $sheet->setTitle('Asistencia');
+
+        $headerStyle = [
+            'font' => ['bold' => true, 'size' => 11, 'color' => ['rgb' => 'FFFFFF']],
+            'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => '008000']],
+            'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
+        ];
+        $titleStyle = ['font' => ['bold' => true, 'size' => 14]];
+        $presentStyle = [
+            'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
+            'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => '00FF00']],
+        ];
+        $absentStyle = [
+            'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
+            'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => 'FF0000']],
+            'font' => ['color' => ['rgb' => 'FFFFFF']],
+        ];
+
+        // Title
+        $totalCols = 2 + count($entrenamientos);
+        $sheet->setCellValue('A1', 'REPORTE DE ASISTENCIA A ENTRENAMIENTOS');
+        $sheet->getStyle('A1')->applyFromArray($titleStyle);
+        $lastColLetter = $this->getColumnLetter($totalCols);
+        $sheet->mergeCells('A1:' . $lastColLetter . '1');
+
+        $sheet->setCellValue('A2', 'Equipo: ' . $equipoNombre);
+        $sheet->setCellValue('D2', 'Periodo: ' . $req['fecha_desde'] . ' al ' . $req['fecha_hasta']);
+
+        // Headers
+        $sheet->setCellValue('A4', '#');
+        $sheet->setCellValue('B4', 'Jugador');
+        $sheet->getStyle('A4')->applyFromArray($headerStyle);
+        $sheet->getStyle('B4')->applyFromArray($headerStyle);
+
+        foreach ($entrenamientos as $i => $ent) {
+            $colLetter = $this->getColumnLetter($i + 2);
+            $fecha = substr($ent->fecha, 0, 10);
+            $sheet->setCellValue($colLetter . '4', $fecha);
+            $sheet->getStyle($colLetter . '4')->applyFromArray($headerStyle);
+        }
+
+        $pctCol = $this->getColumnLetter(count($entrenamientos) + 2);
+        $sheet->setCellValue($pctCol . '4', '% Asist.');
+        $sheet->getStyle($pctCol . '4')->applyFromArray($headerStyle);
+
+        // Build asistencia map
+        $asistenciaMap = [];
+        foreach ($asistencias as $a) {
+            $key = $a->user_id . '_' . $a->entrenamiento_id;
+            $asistenciaMap[$key] = (bool) $a->presente;
+        }
+
+        // Data
+        $rowNum = 5;
+        $counter = 1;
+        foreach ($jugadores as $jugador) {
+            $userId = $jugador->id;
+            $sheet->setCellValue('A' . $rowNum, $counter++);
+            $sheet->setCellValue('B' . $rowNum, $jugador->name);
+
+            $presentes = 0;
+            foreach ($entrenamientos as $i => $ent) {
+                $colLetter = $this->getColumnLetter($i + 2);
+                $key = $userId . '_' . $ent->id;
+                $presente = $asistenciaMap[$key] ?? false;
+
+                if ($presente) {
+                    $sheet->setCellValue($colLetter . $rowNum, 'P');
+                    $sheet->getStyle($colLetter . $rowNum)->applyFromArray($presentStyle);
+                    $presentes++;
+                } else {
+                    $sheet->setCellValue($colLetter . $rowNum, 'A');
+                    $sheet->getStyle($colLetter . $rowNum)->applyFromArray($absentStyle);
+                }
+            }
+
+            $pct = count($entrenamientos) > 0 ? round(($presentes * 100.0 / count($entrenamientos))) : 0;
+            $sheet->setCellValue($pctCol . $rowNum, $pct . '%');
+            $sheet->getStyle($pctCol . $rowNum)->applyFromArray($headerStyle);
+
+            $rowNum++;
+        }
+
+        foreach (range('A', $pctCol) as $col) {
+            $sheet->getColumnDimension($col)->setAutoSize(true);
+        }
+
+        $filename = 'asistencia_' . preg_replace('/\s+/', '_', $equipoNombre) . '_' . $reportId . '.xlsx';
+        $this->ensureStorageDir();
+        $writer = new Xlsx($spreadsheet);
+        $writer->save($this->storagePath . '/' . $filename);
+
+        return $filename;
+    }
+
+    protected function generateAttendancePdf(array $jugadores, array $entrenamientos, array $asistencias, string $equipoNombre, array $req, string $reportId): string
+    {
+        $html = view('reports.attendance', compact('jugadores', 'entrenamientos', 'asistencias', 'equipoNombre', 'req'))->render();
+
+        $filename = 'asistencia_' . preg_replace('/\s+/', '_', $equipoNombre) . '_' . $reportId . '.pdf';
+        $this->ensureStorageDir();
+
+        $pdf = Pdf::loadHTML($html)->setPaper('a4', 'landscape');
+        $pdf->save($this->storagePath . '/' . $filename);
+
+        return $filename;
+    }
+
+    // ================================================================
+    // REPORTE 3: FINANCIERO
+    // ================================================================
+    protected function generateFinancialReport(array $req, string $reportId, string $ext): string
+    {
+        $tenantId = $req['tenant_id'];
+        $fechaDesde = $req['fecha_desde'];
+        $fechaHasta = $req['fecha_hasta'];
+
+        $summary = DB::select("
+            SELECT estado, COUNT(*) as cantidad, COALESCE(SUM(monto), 0) as total
+            FROM pagos
+            WHERE tenant_id = ? AND fecha BETWEEN ?::date AND ?::date
+            GROUP BY estado
+        ", [$tenantId, $fechaDesde, $fechaHasta]);
+
+        $detail = DB::select("
+            SELECT u.name as jugador, p.monto, p.estado, p.fecha, p.created_at
+            FROM pagos p
+            JOIN users u ON u.id = p.user_id
+            WHERE p.tenant_id = ? AND p.fecha BETWEEN ?::date AND ?::date
+            ORDER BY p.fecha DESC
+        ", [$tenantId, $fechaDesde, $fechaHasta]);
+
+        $tenantNombre = DB::scalar("SELECT nombre FROM tenants WHERE id = ?", [$tenantId]);
+        $tenantNombre = $tenantNombre ?? 'Club';
+
+        if ($ext === 'pdf') {
+            return $this->generateFinancialPdf($summary, $detail, $tenantNombre, $req, $reportId);
+        }
+
+        return $this->generateFinancialExcel($summary, $detail, $tenantNombre, $req, $reportId);
+    }
+
+    protected function generateFinancialExcel(array $summary, array $detail, string $tenantNombre, array $req, string $reportId): string
+    {
+        $spreadsheet = new Spreadsheet();
+
+        // Summary Sheet
+        $summarySheet = $spreadsheet->getActiveSheet();
+        $summarySheet->setTitle('Resumen Financiero');
+
+        $headerStyle = [
+            'font' => ['bold' => true, 'size' => 12, 'color' => ['rgb' => 'FFFFFF']],
+            'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => '00008B']],
+        ];
+        $titleStyle = ['font' => ['bold' => true, 'size' => 14]];
+
+        $summarySheet->setCellValue('A1', 'REPORTE FINANCIERO');
+        $summarySheet->getStyle('A1')->applyFromArray($titleStyle);
+        $summarySheet->mergeCells('A1:D1');
+
+        $summarySheet->setCellValue('A2', 'Club: ' . $tenantNombre);
+        $summarySheet->setCellValue('A3', 'Periodo: ' . $req['fecha_desde'] . ' al ' . $req['fecha_hasta']);
+
+        $summarySheet->setCellValue('A5', 'Estado');
+        $summarySheet->setCellValue('B5', 'Cantidad');
+        $summarySheet->setCellValue('C5', 'Total (COP)');
+        $summarySheet->getStyle('A5:C5')->applyFromArray($headerStyle);
+
+        $rowNum = 6;
+        $totalGeneral = 0;
+        foreach ($summary as $row) {
+            $summarySheet->setCellValue('A' . $rowNum, $row->estado);
+            $summarySheet->setCellValue('B' . $rowNum, (int) $row->cantidad);
+            $monto = (int) $row->total;
+            $summarySheet->setCellValue('C' . $rowNum, $monto);
+            $totalGeneral += $monto;
+            $rowNum++;
+        }
+
+        $summarySheet->setCellValue('A' . ($rowNum + 1), 'TOTAL GENERAL');
+        $summarySheet->getStyle('A' . ($rowNum + 1))->applyFromArray($titleStyle);
+        $summarySheet->setCellValue('C' . ($rowNum + 1), $totalGeneral);
+        $summarySheet->getStyle('C' . ($rowNum + 1))->applyFromArray($headerStyle);
+
+        // Detail Sheet
+        $detailSheet = $spreadsheet->createSheet(1);
+        $detailSheet->setTitle('Detalle de Pagos');
+
+        $detailSheet->setCellValue('A1', 'DETALLE DE PAGOS');
+        $detailSheet->getStyle('A1')->applyFromArray($titleStyle);
+
+        $detHeaders = ['#', 'Jugador', 'Monto (COP)', 'Estado', 'Fecha'];
+        foreach ($detHeaders as $i => $h) {
+            $col = $this->getColumnLetter($i);
+            $detailSheet->setCellValue($col . '3', $h);
+        }
+        $detailSheet->getStyle('A3:E3')->applyFromArray($headerStyle);
+
+        $detRowNum = 4;
+        $counter = 1;
+        foreach ($detail as $row) {
+            $detailSheet->setCellValue('A' . $detRowNum, $counter++);
+            $detailSheet->setCellValue('B' . $detRowNum, $row->jugador);
+            $detailSheet->setCellValue('C' . $detRowNum, (int) $row->monto);
+            $detailSheet->setCellValue('D' . $detRowNum, $row->estado);
+            $detailSheet->setCellValue('E' . $detRowNum, $row->fecha);
+            $detRowNum++;
+        }
+
+        foreach (range('A', 'E') as $col) {
+            $summarySheet->getColumnDimension($col)->setAutoSize(true);
+            $detailSheet->getColumnDimension($col)->setAutoSize(true);
+        }
+
+        $filename = 'financiero_' . preg_replace('/\s+/', '_', $tenantNombre) . '_' . $reportId . '.xlsx';
+        $this->ensureStorageDir();
+        $writer = new Xlsx($spreadsheet);
+        $writer->save($this->storagePath . '/' . $filename);
+
+        return $filename;
+    }
+
+    protected function generateFinancialPdf(array $summary, array $detail, string $tenantNombre, array $req, string $reportId): string
+    {
+        $html = view('reports.financial', compact('summary', 'detail', 'tenantNombre', 'req'))->render();
+
+        $filename = 'financiero_' . preg_replace('/\s+/', '_', $tenantNombre) . '_' . $reportId . '.pdf';
+        $this->ensureStorageDir();
+
+        $pdf = Pdf::loadHTML($html)->setPaper('a4', 'portrait');
+        $pdf->save($this->storagePath . '/' . $filename);
+
+        return $filename;
+    }
+
+    // ================================================================
+    // REPORTE 4: MEDICO
+    // ================================================================
+    protected function generateMedicalReport(array $req, string $reportId, string $ext): string
+    {
+        $tenantId = $req['tenant_id'];
+        $fechaDesde = $req['fecha_desde'];
+        $fechaHasta = $req['fecha_hasta'];
+
+        $detail = DB::select("
+            SELECT u.name as jugador, hm.tipo_lesion, hm.gravedad, hm.descripcion,
+                   hm.fecha_inicio, hm.fecha_fin, hm.apto
+            FROM historial_medico hm
+            JOIN users u ON u.id = hm.user_id
+            WHERE hm.tenant_id = ? AND hm.fecha_inicio BETWEEN ?::date AND ?::date
+            ORDER BY hm.fecha_inicio DESC
+        ", [$tenantId, $fechaDesde, $fechaHasta]);
+
+        $porTipo = DB::select("
+            SELECT tipo_lesion, COUNT(*) as cantidad
+            FROM historial_medico
+            WHERE tenant_id = ? AND fecha_inicio BETWEEN ?::date AND ?::date
+            GROUP BY tipo_lesion
+        ", [$tenantId, $fechaDesde, $fechaHasta]);
+
+        $porGravedad = DB::select("
+            SELECT gravedad, COUNT(*) as cantidad
+            FROM historial_medico
+            WHERE tenant_id = ? AND fecha_inicio BETWEEN ?::date AND ?::date
+            GROUP BY gravedad
+        ", [$tenantId, $fechaDesde, $fechaHasta]);
+
+        $porApto = DB::select("
+            SELECT apto, COUNT(*) as cantidad
+            FROM historial_medico
+            WHERE tenant_id = ? AND fecha_inicio BETWEEN ?::date AND ?::date
+            GROUP BY apto
+        ", [$tenantId, $fechaDesde, $fechaHasta]);
+
+        $noAptos = DB::select("
+            SELECT DISTINCT u.name, hm.tipo_lesion, hm.gravedad, hm.fecha_inicio, hm.fecha_fin
+            FROM historial_medico hm
+            JOIN users u ON u.id = hm.user_id
+            WHERE hm.tenant_id = ? AND hm.apto = false
+            ORDER BY hm.fecha_inicio DESC
+        ", [$tenantId]);
+
+        $tenantNombre = DB::scalar("SELECT nombre FROM tenants WHERE id = ?", [$tenantId]);
+        $tenantNombre = $tenantNombre ?? 'Club';
+
+        if ($ext === 'pdf') {
+            return $this->generateMedicalPdf($detail, $porTipo, $porGravedad, $porApto, $noAptos, $tenantNombre, $req, $reportId);
+        }
+
+        return $this->generateMedicalExcel($detail, $porTipo, $porGravedad, $porApto, $noAptos, $tenantNombre, $req, $reportId);
+    }
+
+    protected function generateMedicalExcel(array $detail, array $porTipo, array $porGravedad, array $porApto, array $noAptos, string $tenantNombre, array $req, string $reportId): string
+    {
+        $spreadsheet = new Spreadsheet();
+
+        $headerStyle = [
+            'font' => ['bold' => true, 'size' => 11, 'color' => ['rgb' => 'FFFFFF']],
+            'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => 'FF0000']],
+        ];
+        $titleStyle = ['font' => ['bold' => true, 'size' => 14]];
+
+        // Summary Sheet
+        $summarySheet = $spreadsheet->getActiveSheet();
+        $summarySheet->setTitle('Resumen Medico');
+
+        $summarySheet->setCellValue('A1', 'REPORTE MEDICO');
+        $summarySheet->getStyle('A1')->applyFromArray($titleStyle);
+        $summarySheet->mergeCells('A1:D1');
+
+        $summarySheet->setCellValue('A2', 'Club: ' . $tenantNombre);
+        $summarySheet->setCellValue('A3', 'Periodo: ' . $req['fecha_desde'] . ' al ' . $req['fecha_hasta']);
+
+        // Por tipo
+        $row = 5;
+        $summarySheet->setCellValue('A' . $row, 'POR TIPO DE LESION');
+        $summarySheet->getStyle('A' . $row)->applyFromArray($titleStyle);
+        $row++;
+        $summarySheet->setCellValue('A' . $row, 'Tipo');
+        $summarySheet->setCellValue('B' . $row, 'Cantidad');
+        $summarySheet->getStyle('A' . $row . ':B' . $row)->applyFromArray($headerStyle);
+        $row++;
+        foreach ($porTipo as $r) {
+            $summarySheet->setCellValue('A' . $row, $r->tipo_lesion);
+            $summarySheet->setCellValue('B' . $row, (int) $r->cantidad);
+            $row++;
+        }
+
+        // Por gravedad
+        $row += 2;
+        $summarySheet->setCellValue('A' . $row, 'POR GRAVEDAD');
+        $summarySheet->getStyle('A' . $row)->applyFromArray($titleStyle);
+        $row++;
+        $summarySheet->setCellValue('A' . $row, 'Gravedad');
+        $summarySheet->setCellValue('B' . $row, 'Cantidad');
+        $summarySheet->getStyle('A' . $row . ':B' . $row)->applyFromArray($headerStyle);
+        $row++;
+        foreach ($porGravedad as $r) {
+            $summarySheet->setCellValue('A' . $row, $r->gravedad);
+            $summarySheet->setCellValue('B' . $row, (int) $r->cantidad);
+            $row++;
+        }
+
+        // No aptos
+        $row += 2;
+        $summarySheet->setCellValue('A' . $row, 'JUGADORES NO APTOS ACTUALMENTE');
+        $summarySheet->getStyle('A' . $row)->applyFromArray($titleStyle);
+        $row++;
+
+        if (!empty($noAptos)) {
+            $noAptoHeaders = ['Jugador', 'Tipo Lesion', 'Gravedad', 'Fecha Inicio', 'Fecha Fin'];
+            foreach ($noAptoHeaders as $i => $h) {
+                $col = $this->getColumnLetter($i);
+                $summarySheet->setCellValue($col . $row, $h);
+            }
+            $summarySheet->getStyle('A' . $row . ':E' . $row)->applyFromArray($headerStyle);
+            $row++;
+            foreach ($noAptos as $r) {
+                $summarySheet->setCellValue('A' . $row, $r->jugador);
+                $summarySheet->setCellValue('B' . $row, $r->tipo_lesion);
+                $summarySheet->setCellValue('C' . $row, $r->gravedad);
+                $summarySheet->setCellValue('D' . $row, $r->fecha_inicio);
+                $summarySheet->setCellValue('E' . $row, $r->fecha_fin ?? 'N/A');
+                $row++;
+            }
+        } else {
+            $summarySheet->setCellValue('A' . $row, 'Todos los jugadores estan aptos');
+        }
+
+        // Detail Sheet
+        $detailSheet = $spreadsheet->createSheet(1);
+        $detailSheet->setTitle('Detalle Medico');
+
+        $detailSheet->setCellValue('A1', 'DETALLE DE REGISTROS MEDICOS');
+        $detailSheet->getStyle('A1')->applyFromArray($titleStyle);
+
+        $detHeaders = ['#', 'Jugador', 'Tipo Lesion', 'Gravedad', 'Descripcion', 'Fecha Inicio', 'Fecha Fin', 'Apto'];
+        foreach ($detHeaders as $i => $h) {
+            $col = $this->getColumnLetter($i);
+            $detailSheet->setCellValue($col . '3', $h);
+        }
+        $detailSheet->getStyle('A3:H3')->applyFromArray($headerStyle);
+
+        $detRowNum = 4;
+        $counter = 1;
+        foreach ($detail as $r) {
+            $detailSheet->setCellValue('A' . $detRowNum, $counter++);
+            $detailSheet->setCellValue('B' . $detRowNum, $r->jugador);
+            $detailSheet->setCellValue('C' . $detRowNum, $r->tipo_lesion);
+            $detailSheet->setCellValue('D' . $detRowNum, $r->gravedad);
+            $detailSheet->setCellValue('E' . $detRowNum, $r->descripcion ?? '');
+            $detailSheet->setCellValue('F' . $detRowNum, $r->fecha_inicio);
+            $detailSheet->setCellValue('G' . $detRowNum, $r->fecha_fin ?? 'N/A');
+            $detailSheet->setCellValue('H' . $detRowNum, (bool) $r->apto ? 'Si' : 'No');
+            $detRowNum++;
+        }
+
+        foreach (range('A', 'H') as $col) {
+            $summarySheet->getColumnDimension($col)->setAutoSize(true);
+            $detailSheet->getColumnDimension($col)->setAutoSize(true);
+        }
+
+        $filename = 'medico_' . preg_replace('/\s+/', '_', $tenantNombre) . '_' . $reportId . '.xlsx';
+        $this->ensureStorageDir();
+        $writer = new Xlsx($spreadsheet);
+        $writer->save($this->storagePath . '/' . $filename);
+
+        return $filename;
+    }
+
+    protected function generateMedicalPdf(array $detail, array $porTipo, array $porGravedad, array $porApto, array $noAptos, string $tenantNombre, array $req, string $reportId): string
+    {
+        $html = view('reports.medical', compact('detail', 'porTipo', 'porGravedad', 'porApto', 'noAptos', 'tenantNombre', 'req'))->render();
+
+        $filename = 'medico_' . preg_replace('/\s+/', '_', $tenantNombre) . '_' . $reportId . '.pdf';
+        $this->ensureStorageDir();
+
+        $pdf = Pdf::loadHTML($html)->setPaper('a4', 'landscape');
+        $pdf->save($this->storagePath . '/' . $filename);
+
+        return $filename;
+    }
+
+    // ================================================================
+    // HELPERS
+    // ================================================================
+    protected function ensureStorageDir(): void
+    {
+        if (!is_dir($this->storagePath)) {
+            mkdir($this->storagePath, 0755, true);
+        }
+    }
+
+    protected function getColumnLetter(int $index): string
+    {
+        $letter = '';
+        while ($index >= 0) {
+            $letter = chr($index % 26 + 65) . $letter;
+            $index = (int) ($index / 26) - 1;
+        }
+        return $letter;
     }
 
     /**
@@ -109,9 +736,9 @@ class ReportService
     {
         $tipos = [
             'performance' => 'Rendimiento',
-            'attendance' => 'Asistencia',
-            'financial' => 'Financiero',
-            'medical' => 'Médico',
+            'attendance'  => 'Asistencia',
+            'financial'   => 'Financiero',
+            'medical'     => 'Médico',
         ];
 
         $tipo = $tipos[$params['report_type']] ?? 'Reporte';
@@ -133,9 +760,9 @@ class ReportService
     {
         return [
             'performance' => '📈 Rendimiento de Jugadores',
-            'attendance' => '📅 Asistencia a Entrenamientos',
-            'financial' => '💰 Financiero / Pagos',
-            'medical' => '🏥 Médico / Lesiones',
+            'attendance'  => '📅 Asistencia a Entrenamientos',
+            'financial'   => '💰 Financiero / Pagos',
+            'medical'     => '🏥 Médico / Lesiones',
         ];
     }
 
@@ -145,7 +772,7 @@ class ReportService
     public static function getFormatos(): array
     {
         return [
-            'pdf' => '📄 PDF',
+            'pdf'  => '📄 PDF',
             'xlsx' => '📊 Excel (XLSX)',
         ];
     }

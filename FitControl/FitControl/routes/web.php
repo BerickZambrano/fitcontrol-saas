@@ -31,12 +31,22 @@ Route::get('/test-mail', function () {
 
 
     use Inertia\Inertia;
+use App\Http\Controllers\MailController;
 
 Route::get('/', function () {
     return Inertia::render('Landing');
 })->name('home');
 
-// Reportes - Descargar
+// ================================================================
+// Mail API Routes (replaces Java MailService microservice)
+// ================================================================
+Route::prefix('api/mail')->group(function () {
+    Route::post('/import-csv', [MailController::class, 'importCsv']);
+    Route::post('/send-single', [MailController::class, 'sendSingle']);
+    Route::post('/send-multiple', [MailController::class, 'sendMultiple']);
+});
+
+// Reportes - Descargar (existing route)
 Route::get('/reportes/descargar/{report}', function (\App\Models\GeneratedReport $report) {
     $service = new \App\Services\ReportService();
     return $service->descargar($report);

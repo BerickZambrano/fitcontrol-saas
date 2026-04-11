@@ -50,16 +50,6 @@ class Equipo extends Model
         return $this->getKeyName();
     }
 
-    // Scope global para filtrar por tenant
-    protected static function booted()
-    {
-        static::addGlobalScope('tenant', function ($query) {
-            if (auth()->check()) {
-                $query->where('tenant_id', auth()->user()->tenant_id);
-            }
-        });
-    }
-
     public function jugadores()
     {
         return $this->belongsToMany(

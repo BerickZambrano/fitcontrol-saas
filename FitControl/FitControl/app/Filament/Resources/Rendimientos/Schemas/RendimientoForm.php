@@ -29,7 +29,7 @@ class RendimientoForm
 
                         Select::make('partido_id')
                             ->label('Partido')
-                            ->relationship('partido', 'nombre')
+                            ->relationship('partido', 'fecha')
                             ->searchable()
                             ->required(),
                     ]),

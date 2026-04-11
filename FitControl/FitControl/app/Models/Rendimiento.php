@@ -5,10 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Laravel\Scout\Searchable;
+use App\Models\Traits\BelongsToTenant;
 
 class Rendimiento extends Model
 {
-    use Searchable;
+    use Searchable, BelongsToTenant;
 
     protected $fillable = [
         'tenant_id',

@@ -17,7 +17,10 @@ class NotificacionForm
             Select::make('user_id')
                 ->label('Destinatario')
                 ->options(function () {
-                    $query = User::query()->where('tenant_id', auth()->user()->tenant_id);
+                    $query = User::query();
+                    if (!auth()->user()->hasRole('super_admin')) {
+                        $query->where('tenant_id', auth()->user()->tenant_id);
+                    }
                     return $query->pluck('name', 'id');
                 })
                 ->searchable()
