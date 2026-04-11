@@ -1,267 +1,257 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FitControl</title>
-    <link rel="icon" type="image/x-icon" href="{{ asset('images/logo.ico') }}">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
-            min-height: 100vh;
+            background: #0f172a;
             display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
-            background: linear-gradient(135deg, #0f2351 0%, #1e3a8a 50%, #0f2351 100%);
+            min-height: 100vh;
             overflow: hidden;
-            font-family: system-ui, -apple-system, sans-serif;
+            font-family: 'Segoe UI', system-ui, sans-serif;
         }
 
-        /* Partículas de fondo */
-        .particles {
-            position: absolute;
-            inset: 0;
-            overflow: hidden;
+        canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
             z-index: 0;
         }
 
-        .particle {
-            position: absolute;
-            width: 4px;
-            height: 4px;
-            background: rgba(59, 130, 246, 0.3);
-            border-radius: 50%;
-            animation: float linear infinite;
-        }
-
-        @keyframes float {
-            0% {
-                transform: translateY(100vh) scale(0);
-                opacity: 0;
-            }
-
-            10% {
-                opacity: 1;
-            }
-
-            90% {
-                opacity: 1;
-            }
-
-            100% {
-                transform: translateY(-100px) scale(1);
-                opacity: 0;
-            }
-        }
-
-        /* Contenedor principal */
-        .splash-container {
+        .loader {
             position: relative;
             z-index: 1;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 2rem;
+            gap: 32px;
         }
 
-        /* Logo con animación de entrada */
         .logo-container {
             position: relative;
-            opacity: 0;
-            transform: scale(0.5);
-            animation: logoEnter 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) 0.3s forwards;
+            width: 240px;
+            height: 240px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        @keyframes logoEnter {
-            to {
-                opacity: 1;
-                transform: scale(1);
-            }
-        }
-
-        /* Anillo giratorio detrás del logo */
-        .logo-ring {
-            position: absolute;
-            inset: -20px;
-            border: 2px solid rgba(59, 130, 246, 0.3);
-            border-top-color: #3b82f6;
-            border-radius: 50%;
-            animation: spin 1.5s linear infinite;
-        }
-
-        @keyframes spin {
-            to {
-                transform: rotate(360deg);
-            }
-        }
-
-        .logo-img {
-            width: 200px;
-            height: 200px;
+        .logo-container img {
+            width: 160px;
+            height: 160px;
             object-fit: contain;
-            filter: drop-shadow(0 0 40px rgba(59, 130, 246, 0.4));
+            animation: pulse 2s ease-in-out infinite;
         }
 
-        /* Texto con fade in */
-        .splash-text {
-            text-align: center;
-            opacity: 0;
-            animation: fadeUp 0.6s ease 0.8s forwards;
+        .logo-container::before {
+            content: '';
+            position: absolute;
+            inset: -8px;
+            border-radius: 50%;
+            border: 3px solid transparent;
+            border-top-color: #3b82f6;
+            border-right-color: #3b82f6;
+            animation: spin 1s linear infinite;
         }
 
-        @keyframes fadeUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        .logo-container::after {
+            content: '';
+            position: absolute;
+            inset: -16px;
+            border-radius: 50%;
+            border: 2px solid transparent;
+            border-bottom-color: #60a5fa;
+            border-left-color: #60a5fa;
+            animation: spin 1.5s linear infinite reverse;
         }
 
-        .splash-text h1 {
-            font-size: 2.5rem;
-            font-weight: 800;
+        .brand {
             color: #ffffff;
-            letter-spacing: -0.02em;
-            margin-bottom: 0.5rem;
+            font-size: 28px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: -1px;
+            font-style: italic;
         }
 
-        .splash-text h1 span {
+        .brand span {
             color: #3b82f6;
         }
 
-        .splash-text p {
-            font-size: 1.1rem;
-            color: rgba(255, 255, 255, 0.6);
-            font-weight: 400;
+        .click-area {
+            cursor: pointer;
         }
 
-        /* Barra de progreso */
         .progress-bar {
-            position: relative;
-            width: 180px;
+            width: 200px;
             height: 3px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 999px;
+            background: rgba(59, 130, 246, 0.1);
+            border-radius: 10px;
             overflow: hidden;
-            opacity: 0;
-            animation: fadeIn 0.4s ease 1s forwards;
         }
 
-        @keyframes fadeIn {
-            to {
-                opacity: 1;
-            }
-        }
-
-        .progress-fill {
-            position: absolute;
-            left: 0;
-            top: 0;
+        .progress-bar::after {
+            content: '';
+            display: block;
+            width: 40%;
             height: 100%;
-            width: 0%;
-            background: linear-gradient(90deg, #2563eb, #3b82f6, #60a5fa);
-            border-radius: 999px;
-            animation: progressFill 2.5s cubic-bezier(0.4, 0, 0.2, 1) 1.2s forwards;
-            box-shadow: 0 0 12px rgba(59, 130, 246, 0.5);
+            background: linear-gradient(90deg, transparent, #3b82f6, transparent);
+            border-radius: 10px;
+            animation: loading 1.5s ease-in-out infinite;
         }
 
-        @keyframes progressFill {
-            to {
-                width: 100%;
-            }
+        .hint-text {
+            position: fixed;
+            bottom: 24px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            z-index: 60;
+            pointer-events: none;
         }
 
-        /* Fade out final */
-        .splash-container {
-            animation: logoEnter 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) 0.3s forwards;
+        .hint-login {
+            color: rgba(148, 163, 184, 0.5);
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 2px;
         }
 
-        .fade-out {
-            animation: fadeOut 0.5s ease forwards;
+        .hint-onboarding {
+            color: rgba(59, 130, 246, 0.7);
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
         }
 
-        @keyframes fadeOut {
-            to {
-                opacity: 0;
-            }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
 
-        /* Responsive */
-        @media (max-width: 640px) {
-            .logo-img {
-                width: 150px;
-                height: 150px;
-            }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.05); opacity: 0.8; }
+        }
 
-            .splash-text h1 {
-                font-size: 1.8rem;
-            }
-
-            .splash-text p {
-                font-size: 0.95rem;
-            }
+        @keyframes loading {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(350%); }
         }
     </style>
 </head>
-
 <body>
-    <!-- Partículas de fondo -->
-    <div class="particles" id="particles"></div>
 
-    <!-- Contenido principal -->
-    <div class="splash-container" id="splashContainer">
+    <canvas id="particles"></canvas>
+
+    <div class="loader">
         <div class="logo-container">
-            <div class="logo-ring"></div>
-            <img src="images/logo.png" alt="FitControl Logo" class="logo-img" />
+            <img src="/images/logo.png" alt="FitControl">
         </div>
-
-        <div class="splash-text">
-            <h1>Fit<span>Control</span></h1>
-            <p>Eleva tu entrenamiento al siguiente nivel</p>
-        </div>
-
-        <div class="progress-bar">
-            <div class="progress-fill"></div>
-        </div>
+        <div class="brand">Fit<span>Control</span></div>
+        <div class="progress-bar"></div>
     </div>
 
     <script>
-        // Leer destino del query parameter
+        // Read destination from URL parameter (?next=/some-url)
         const params = new URLSearchParams(window.location.search);
-        const redirectUrl = params.get('next') || 'admin/login';
+        const dest = params.get('next') || '/login';
+        const targetUrl = dest.startsWith('/') ? dest : '/' + dest;
 
-        // Generar partículas de fondo
-        const particlesContainer = document.getElementById('particles');
-        for (let i = 0; i < 30; i++) {
-            const particle = document.createElement('div');
-            particle.className = 'particle';
-            particle.style.left = Math.random() * 100 + '%';
-            particle.style.animationDuration = (Math.random() * 3 + 2) + 's';
-            particle.style.animationDelay = (Math.random() * 3) + 's';
-            particle.style.width = (Math.random() * 4 + 2) + 'px';
-            particle.style.height = particle.style.width;
-            particlesContainer.appendChild(particle);
+        // Auto-redirect after loading animation — uses replace to skip splash in history
+        setTimeout(() => {
+            window.location.replace(targetUrl);
+        }, 2000);
+
+        const canvas = document.getElementById('particles');
+        const ctx = canvas.getContext('2d');
+
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+
+        class Particle {
+            constructor() {
+                this.reset();
+            }
+
+            reset() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 2 + 0.5;
+                this.speedX = (Math.random() - 0.5) * 0.5;
+                this.speedY = (Math.random() - 0.5) * 0.5;
+                this.opacity = Math.random() * 0.5 + 0.1;
+            }
+
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+
+                if (this.x < 0 || this.x > canvas.width || this.y < 0 || this.y > canvas.height) {
+                    this.reset();
+                }
+            }
+
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(59, 130, 246, ${this.opacity})`;
+                ctx.fill();
+            }
         }
 
-        // Redirigir al destino después de la animación
-        setTimeout(() => {
-            document.getElementById('splashContainer').classList.add('fade-out');
-            setTimeout(() => {
-                window.location.replace(redirectUrl);
-            }, 500);
-        }, 3000);
+        const particles = [];
+        const particleCount = 80;
+
+        for (let i = 0; i < particleCount; i++) {
+            particles.push(new Particle());
+        }
+
+        function connectParticles() {
+            for (let i = 0; i < particles.length; i++) {
+                for (let j = i + 1; j < particles.length; j++) {
+                    const dx = particles[i].x - particles[j].x;
+                    const dy = particles[i].y - particles[j].y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+
+                    if (distance < 120) {
+                        const opacity = (1 - distance / 120) * 0.15;
+                        ctx.beginPath();
+                        ctx.strokeStyle = `rgba(59, 130, 246, ${opacity})`;
+                        ctx.lineWidth = 0.5;
+                        ctx.moveTo(particles[i].x, particles[i].y);
+                        ctx.lineTo(particles[j].x, particles[j].y);
+                        ctx.stroke();
+                    }
+                }
+            }
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            particles.forEach(p => {
+                p.update();
+                p.draw();
+            });
+
+            connectParticles();
+            requestAnimationFrame(animate);
+        }
+
+        animate();
     </script>
 </body>
-
 </html>

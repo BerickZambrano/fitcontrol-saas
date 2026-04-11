@@ -1,9 +1,0 @@
-[90m= [39m[34;4mIlluminate\Support\Collection[39;24m {#7437
-    [34mall[39m: [
-      "[32mJugador[39m",
-      "[32mEntrenador[39m",
-      "[32mAdministrador[39m",
-      "[32msuper_admin[39m",
-    ],
-  }
-

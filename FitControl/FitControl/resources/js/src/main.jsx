@@ -1,1 +1,0 @@
-// Este archivo no se usa en Laravel/Inertia
