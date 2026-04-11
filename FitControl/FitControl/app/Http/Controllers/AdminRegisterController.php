@@ -42,6 +42,7 @@ class AdminRegisterController extends Controller
 
         auth()->login($user);
 
+        // Redirect to admin — middleware will redirect to onboarding if needed
         return redirect('/admin');
     }
 }

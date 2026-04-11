@@ -29,6 +29,11 @@ class JugadorPanelProvider extends PanelProvider
         return $panel
             ->id('jugador')
             ->path('jugador')
+            ->viteTheme('resources/css/filament/jugador/theme.css')
+            ->brandName('FitControl')
+            ->brandLogo(asset('images/logo.png'))
+            ->brandLogoHeight('5rem')
+            ->favicon(asset('images/logo.ico'))
             ->colors([
                 'primary' => Color::Red,
             ])
@@ -45,6 +50,10 @@ class JugadorPanelProvider extends PanelProvider
             ->databaseNotificationsPolling(30)
             ->discoverWidgets(in: app_path('Filament/Jugador/Widgets'), for: 'App\Filament\Jugador\Widgets')
             ->widgets([
+                \App\Filament\Jugador\Widgets\ProximoEntrenamiento::class,
+                \App\Filament\Jugador\Widgets\ProximoPartido::class,
+                \App\Filament\Jugador\Widgets\MisEstadisticas::class,
+                \App\Filament\Jugador\Widgets\NotificacionesRecientes::class,
             ])
             ->middleware([
                 EncryptCookies::class,

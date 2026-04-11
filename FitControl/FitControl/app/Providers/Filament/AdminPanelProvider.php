@@ -2,11 +2,6 @@
 
 namespace App\Providers\Filament;
 
-use App\Filament\Resources\Tenants\Tables\TenantsTable;
-use App\Filament\Widgets\EntrenamientosHoy;
-use App\Filament\Widgets\PagosDelMes;
-use App\Filament\Widgets\PagosPorMes;
-use App\Filament\Widgets\TotalEquipos;
 use Filament\Http\Middleware\Authenticate;
 use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
 use Filament\Http\Middleware\AuthenticateSession;
@@ -38,7 +33,11 @@ class AdminPanelProvider extends PanelProvider
             ->default()
             ->id('admin')
             ->path('admin')
+            ->viteTheme('resources/css/filament/admin/theme.css')
             ->brandName('FitControl')
+            ->brandLogo(asset('images/logo.png'))
+            ->brandLogoHeight('5rem')
+            ->favicon(asset('images/logo.ico'))
             ->plugins([
             FilamentApexChartsPlugin::make()
                 ])
@@ -51,17 +50,16 @@ class AdminPanelProvider extends PanelProvider
                  \App\Filament\Admin\Pages\Dashboard::class,
                  \App\Filament\Admin\Pages\Calendario::class,
                  \App\Filament\Admin\Pages\TenantRequests::class,
-                 GenerarReporte::class,
+                 \App\Filament\Admin\Pages\Reportes\GenerarReporte::class,
+                 \App\Filament\Admin\Pages\Analiticas::class,
+                 \App\Filament\Admin\Pages\PostRegisterOnboarding::class,
             ])
            ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\Filament\Widgets')
-            /*  ->widgets([
-                AccountWidget::class,
-                TotalUsuarios::class,
-                TotalEquipos::class,
-                PagosDelMes::class,
-                PagosPorMes::class,
-                
-            ]) */
+            ->widgets([
+                \App\Filament\Widgets\AccionesRapidas::class,
+                \App\Filament\Widgets\ProximosEventos::class,
+                \App\Filament\Widgets\AlertasActivas::class,
+            ])
 
             
             ->middleware([
@@ -80,6 +78,7 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->authMiddleware([
                 Authenticate::class,
+                \App\Http\Middleware\RedirectIfOnboardingPending::class,
             ]);
 
     }

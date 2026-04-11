@@ -3,6 +3,7 @@ import { router } from '@inertiajs/react'
 import StepClub from '../../src/components/onboarding/StepClub'
 import StepDocumentos from '../../src/components/onboarding/StepDocumentos'
 import StepPlan from '../../src/components/onboarding/StepPlan'
+import SplashOverlay from '../../src/components/SplashOverlay'
 
 const STEPS = ['Datos del club', 'Documentos', 'Plan']
 
@@ -140,7 +141,7 @@ export default function OnboardingIndex() {
 
           <p className="text-gray-400 text-sm mt-10 text-center">
             ¿Ya tienes cuenta?{' '}
-            <a href="/login" className="text-blue-600 font-bold hover:underline">Inicia sesión</a>
+            <button onClick={() => window.location.href = '/login'} className="text-blue-600 font-bold hover:underline cursor-pointer bg-transparent border-none p-0 font-inherit">Inicia sesión</button>
           </p>
         </div>
       </div>

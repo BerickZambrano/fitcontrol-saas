@@ -16,7 +16,7 @@ function Invitation() {
         </p>
 
         <a
-          href="/solicitar-acceso"
+          href="/splash.html?next=/solicitar-acceso"
           className="h-12 px-14 mt-2 text-white text-sm font-bold tracking-wider bg-[#121c4c] rounded-lg flex items-center justify-center hover:bg-[#485179] duration-150 border-2 border-[#121c4c] active:scale-95 transition-all"
         >
           SOLICITA TU DEMO

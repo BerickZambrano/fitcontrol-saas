@@ -14,8 +14,8 @@
                 </div>
 
                 <!-- Logo centrado -->
-                <div class="relative z-10 flex flex-col items-center gap-8 text-center">
-                    <img src="{{ asset('images/logosf.png') }}" alt="FitControl Logo" class="h-48 w-48 object-contain drop-shadow-2xl" />
+                <div class="relative z-10 flex flex-col items-center gap-10 text-center mt-16">
+                    <img src="{{ asset('images/logo.png') }}" alt="FitControl Logo" class="h-72 w-72 object-contain drop-shadow-2xl" />
 
                     <div>
                         <h2 class="text-3xl font-bold leading-tight tracking-tight">

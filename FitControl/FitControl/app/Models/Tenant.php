@@ -10,6 +10,7 @@ class Tenant extends Model
     'nombre',
     'subdominio',
     'estado',
+    'onboarding_completed',
     'nombre_corto',
     'nit',
     'anio_fundacion',
@@ -33,8 +34,9 @@ class Tenant extends Model
 ];
 
     protected $casts = [
-        'anio_fundacion'   => 'integer',
-        'colores_oficiales'=> 'array',
+        'anio_fundacion'       => 'integer',
+        'colores_oficiales'    => 'array',
+        'onboarding_completed' => 'boolean',
     ];
 
   // Relaciones
@@ -51,5 +53,13 @@ class Tenant extends Model
     public function encargado()
     {
         return $this->belongsTo(User::class, 'encargado_user_id');
+    }
+
+    /**
+     * Check if the tenant needs to complete onboarding.
+     */
+    public function needsOnboarding(): bool
+    {
+        return !$this->onboarding_completed;
     }
 }
