@@ -53,6 +53,7 @@ class AdminPanelProvider extends PanelProvider
                  \App\Filament\Admin\Pages\Reportes\GenerarReporte::class,
                  \App\Filament\Admin\Pages\Analiticas::class,
                  \App\Filament\Admin\Pages\PostRegisterOnboarding::class,
+                 \App\Filament\Admin\Pages\GenerarQRAsistencia::class,
             ])
            ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\Filament\Widgets')
             ->widgets([

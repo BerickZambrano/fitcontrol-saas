@@ -50,10 +50,16 @@ class JugadorPanelProvider extends PanelProvider
             ->databaseNotificationsPolling(30)
             ->discoverWidgets(in: app_path('Filament/Jugador/Widgets'), for: 'App\Filament\Jugador\Widgets')
             ->widgets([
-                \App\Filament\Jugador\Widgets\ProximoEntrenamiento::class,
-                \App\Filament\Jugador\Widgets\ProximoPartido::class,
+                \App\Filament\Jugador\Widgets\ProximoCompromiso::class,
                 \App\Filament\Jugador\Widgets\MisEstadisticas::class,
-                \App\Filament\Jugador\Widgets\NotificacionesRecientes::class,
+                \App\Filament\Jugador\Widgets\MiAsistencia::class,
+                \App\Filament\Jugador\Widgets\MisNotificaciones::class,
+            ])
+            ->pages([
+                Dashboard::class,
+                \App\Filament\Jugador\Pages\PlayerProfile::class,
+                \App\Filament\Jugador\Pages\MiHistorial::class,
+                \App\Filament\Jugador\Pages\EscanearQR::class,
             ])
             ->middleware([
                 EncryptCookies::class,
