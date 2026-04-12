@@ -13,7 +13,16 @@ export default defineConfig({
         tailwindcss(),
     ],
     server: {
-        host: '0.0.0.0',
-        hmr: { host: '192.168.20.50' },
+        host: '192.168.20.50',
+        port: 5173,
+        strictPort: true,
+        cors: {
+            origin: ['http://192.168.20.50:8000', 'http://localhost:8000', 'http://0.0.0.0:8000'],
+            credentials: true,
+        },
+        hmr: {
+            host: '192.168.20.50',
+            protocol: 'ws',
+        },
     },
 })
