@@ -11,7 +11,9 @@ class MisEstadisticas extends StatsOverviewWidget
 {
     use HasWidgetShield;
 
-    protected static ?int $sort = 1;
+    protected static ?int $sort = 2;
+
+    protected int | string | array $columnSpan = 6;
 
     protected function getStats(): array
     {

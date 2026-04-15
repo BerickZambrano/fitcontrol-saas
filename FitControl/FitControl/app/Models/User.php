@@ -12,6 +12,21 @@ class User extends Authenticatable
 {
     use Notifiable, HasRoles, Searchable;
 
+    /**
+     * The "modelWasBooted" callback to register listeners for Spatie role events.
+     */
+    protected static function booted(): void
+    {
+        // Clear cache when roles are modified via Spatie Permission
+        static::registerModelEvent('roleAttached', function (User $user) {
+            static::clearUserInfoCache($user->id);
+        });
+
+        static::registerModelEvent('roleDetached', function (User $user) {
+            static::clearUserInfoCache($user->id);
+        });
+    }
+
     protected $fillable = [
         'tenant_id',
         'name',
@@ -72,6 +87,32 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    /**
+     * Bootstrap the model and its event listeners.
+     */
+    protected static function boot(): void
+    {
+        parent::boot();
+
+        // Clear tenant/role cache when user data changes to prevent stale scopes
+        static::saved(function (User $user) {
+            static::clearUserInfoCache($user->id);
+        });
+
+        static::deleted(function (User $user) {
+            static::clearUserInfoCache($user->id);
+        });
+    }
+
+    /**
+     * Clear cached user info and roles to force fresh lookups.
+     */
+    public static function clearUserInfoCache(int $userId): void
+    {
+        \Illuminate\Support\Facades\Cache::forget("user_info_{$userId}");
+        \Illuminate\Support\Facades\Cache::forget("user_roles_{$userId}");
     }
 
     /**

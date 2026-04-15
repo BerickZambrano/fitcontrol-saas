@@ -15,11 +15,8 @@ class TorneosActivos extends ApexChartWidget
     protected static ?string $chartId = 'torneosChart';
     protected static ?string $heading = 'Torneos';
 
-    protected array|string|int $columnSpan = [
-        'default' => 1,
-        'md' => 2,
-        'xl' => 2,
-    ];
+    protected array|string|int $columnSpan = 6;
+    protected static ?int $sort = 8;
 
     protected function getOptions(): array
     {

@@ -111,8 +111,7 @@ class SendEmails extends Page implements Forms\Contracts\HasForms
                 $failCount = 0;
                 foreach ($recipients as $recipient) {
                     try {
-                        Mail::to($recipient['email'])
-                            ->send((new FitControlMail($recipient['nombre'], $formData['body']))->subject($formData['subject']));
+                        \App\Jobs\SendBulkEmail::dispatch($recipient['email'], $recipient['nombre'], $formData['subject'], $formData['body']);
                         $successCount++;
                     } catch (\Exception $e) {
                         $failCount++;
@@ -160,8 +159,7 @@ class SendEmails extends Page implements Forms\Contracts\HasForms
                     if (empty($email) || !str_contains($email, '@')) continue;
 
                     try {
-                        Mail::to($email)
-                            ->send((new FitControlMail($nombre, $formData['body']))->subject($formData['subject']));
+                        \App\Jobs\SendBulkEmail::dispatch($email, $nombre, $formData['subject'], $formData['body']);
                         $sent++;
                     } catch (\Exception $e) {
                         $errors[] = "{$email}: {$e->getMessage()}";

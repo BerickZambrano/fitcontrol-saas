@@ -16,7 +16,8 @@ class AsistenciaPorMes extends ApexChartWidget
     protected static ?string $chartId = 'asistenciaPorMes';
     protected static ?string $heading = 'Asistencia a entrenamientos';
 
-    protected int | string | array $columnSpan = '1';
+    protected int | string | array $columnSpan = 3;
+    protected static ?int $sort = 8;
 
     protected function getOptions(): array
     {

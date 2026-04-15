@@ -11,7 +11,8 @@ class JugadoresNoAptos extends ApexChartWidget
 {
     protected static ?string $heading = 'Estado de jugadores';
 
-    protected int | string | array $columnSpan = 2;
+    protected int | string | array $columnSpan = 4;
+    protected static ?int $sort = 5;
 
     protected function getOptions(): array
     {

@@ -17,7 +17,8 @@ class AccionesRapidas extends Widget
 
     protected static ?string $heading = null;
 
-    protected static ?int $sort = 0;
+    protected static ?int $sort = 1;
+    protected int | string | array $columnSpan = 12;
 
     public function getActions(): array
     {

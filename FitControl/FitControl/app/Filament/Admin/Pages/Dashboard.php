@@ -10,6 +10,7 @@ use App\Filament\Widgets\TotalEquipos;
 use App\Filament\Widgets\TorneosActivos;
 use App\Filament\Widgets\PagosDelMes;
 use App\Filament\Widgets\JugadoresNoAptos;
+use App\Filament\Widgets\TotalUsuarios;
 
 class Dashboard extends BaseDashboard
 {
@@ -26,7 +27,7 @@ class Dashboard extends BaseDashboard
             'default' => 1,
             'sm' => 1,
             'md' => 1,
-            'lg' => 2,
+            'lg' => 12,
         ];
     }
 
@@ -40,12 +41,16 @@ class Dashboard extends BaseDashboard
     {
         return [
             AccionesRapidas::class,
-            ProximosEventos::class,
             AlertasActivas::class,
             TotalEquipos::class,
+            TotalUsuarios::class,
+            JugadoresNoAptos::class,
+            \App\Filament\Widgets\AsistenciaPorMes::class,
+            \App\Filament\Widgets\EntrenamientosPorMes::class,
             TorneosActivos::class,
             PagosDelMes::class,
-            JugadoresNoAptos::class,
+            \App\Filament\Widgets\PagosPorMes::class,
+            ProximosEventos::class,
         ];
     }
 }

@@ -15,7 +15,7 @@ class MiEquipo extends BaseWidget
 
     protected static ?int $sort = 4;
 
-    protected int | string | array $columnSpan = 4;
+    protected int | string | array $columnSpan = 6;
 
     protected function getStats(): array
     {
@@ -23,21 +23,26 @@ class MiEquipo extends BaseWidget
 
         $equipoUser = EquipoUser::withoutGlobalScopes()
             ->where('user_id', $user->id)
-            ->with(['equipo' => function ($q) {
-                $q->withoutGlobalScopes();
-            }])
-            ->whereNull('fecha_fin') // Solo activos
+            ->where(function ($q) { // Solo activos (sin fecha fin, o fin futuro)
+                $q->whereNull('fecha_fin')
+                  ->orWhere('fecha_fin', '>=', now()->toDateString());
+            })
+            ->orderByDesc('fecha_inicio')
             ->first();
 
-        if (!$equipoUser || !$equipoUser->equipo) {
+        // Cargar el equipo directamente para evitar que el global scope lo filtre
+        $equipo = null;
+        if ($equipoUser && $equipoUser->equipo_id) {
+            $equipo = Equipo::withoutGlobalScopes()->find($equipoUser->equipo_id);
+        }
+
+        if (!$equipoUser || !$equipo) {
             return [
                 Stat::make('Mi Equipo', 'Sin equipo asignado')
                     ->icon('heroicon-o-users')
                     ->color('gray'),
             ];
         }
-
-        $equipo = $equipoUser->equipo;
 
         return [
             Stat::make('Equipo', $equipo->nombre)

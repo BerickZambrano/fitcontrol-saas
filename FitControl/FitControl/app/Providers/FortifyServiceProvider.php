@@ -71,5 +71,20 @@ class FortifyServiceProvider extends ServiceProvider
 
             return Limit::perMinute(5)->by($throttleKey);
         });
+
+        // Limit tenant access requests (public form)
+        RateLimiter::for('tenant-request', function (Request $request) {
+            return Limit::perMinute(5)->by($request->ip());
+        });
+
+        // Limit onboarding submissions
+        RateLimiter::for('onboarding', function (Request $request) {
+            return Limit::perMinute(10)->by($request->ip());
+        });
+
+        // Limit admin registration per token (prevent token brute-force)
+        RateLimiter::for('admin-register', function (Request $request) {
+            return Limit::perMinute(5)->by($request->ip());
+        });
     }
 }

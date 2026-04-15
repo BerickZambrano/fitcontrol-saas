@@ -15,9 +15,9 @@ class HistorialPagos extends ApexChartWidget
     protected static ?string $chartId = 'historialPagos';
     protected static ?string $heading = 'Historial de Pagos';
 
-    protected static ?int $sort = 1;
+    protected static ?int $sort = 7;
 
-    protected int | string | array $columnSpan = 6;
+    protected int | string | array $columnSpan = 'full';
 
     protected function getOptions(): array
     {

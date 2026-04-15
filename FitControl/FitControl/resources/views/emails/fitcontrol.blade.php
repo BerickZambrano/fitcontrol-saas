@@ -20,7 +20,7 @@
                             </p>
                             <hr style="border:none; border-top:1px solid #eeeeee; margin: 20px 0;">
                             <p style="font-size:15px; color:#555555; line-height:1.7;">
-                                {!! nl2br(e($body)) !!}
+                                {{ nl2br($body) }}
                             </p>
                         </td>
                     </tr>

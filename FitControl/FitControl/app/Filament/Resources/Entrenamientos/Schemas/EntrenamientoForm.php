@@ -2,13 +2,14 @@
 
 namespace App\Filament\Resources\Entrenamientos\Schemas;
 
+use App\Models\Equipo;
 use Filament\Schemas\Schema;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\TimePicker;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Hidden;
-use App\Models\Equipo;
+use Illuminate\Database\Eloquent\Builder;
 
 class EntrenamientoForm
 {
@@ -20,7 +21,7 @@ class EntrenamientoForm
                     ->label('Nombre del Entrenamiento')
                     ->required()
                     ->maxLength(100),
-            
+
                 DatePicker::make('fecha')
                     ->label('Fecha')
                     ->required(),
@@ -36,9 +37,16 @@ class EntrenamientoForm
 
                 Select::make('equipo_id')
                     ->label('Equipo')
-                    ->relationship('equipo', 'nombre')
+                    ->options(function () {
+                        $query = Equipo::query()->withoutGlobalScopes();
+                        if (!auth()->user()->hasRole('super_admin')) {
+                            $query->where('tenant_id', auth()->user()->tenant_id);
+                        }
+                        return $query->pluck('nombre', 'id');
+                    })
                     ->searchable()
                     ->preload()
+
                     ->required(),
 
                 Hidden::make('tenant_id'),

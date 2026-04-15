@@ -42,7 +42,7 @@ class MailController extends Controller
             if (empty($email) || !str_contains($email, '@')) continue;
 
             try {
-                Mail::to($email)->send(new FitControlMail($nombre, $body));
+                \App\Jobs\SendBulkEmail::dispatch($email, $nombre, $subject, $body);
                 $sent++;
             } catch (\Exception $e) {
                 $errors[] = "{$email}: {$e->getMessage()}";
@@ -76,10 +76,9 @@ class MailController extends Controller
         $body    = $request->input('body');
 
         try {
-            Mail::to($email)
-                ->send((new FitControlMail($nombre, $body))->subject($subject));
+            \App\Jobs\SendBulkEmail::dispatch($email, $nombre, $subject, $body);
 
-            return response('Correo enviado correctamente');
+            return response('Correo enviado correctamente (encolado)');
         } catch (\Exception $e) {
             return response("Error: {$e->getMessage()}", 500);
         }
@@ -110,8 +109,7 @@ class MailController extends Controller
             try {
                 $email  = $recipient['email'];
                 $nombre = $recipient['nombre'];
-                Mail::to($email)
-                    ->send((new FitControlMail($nombre, $body))->subject($subject));
+                \App\Jobs\SendBulkEmail::dispatch($email, $nombre, $subject, $body);
                 $successCount++;
             } catch (\Exception $e) {
                 $failCount++;

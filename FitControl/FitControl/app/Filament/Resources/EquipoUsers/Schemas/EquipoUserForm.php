@@ -28,7 +28,7 @@ class EquipoUserForm
                 ->relationship(
                     'equipo',
                     'nombre',
-                    modifyQueryUsing: fn (Builder $query) => $query->withoutGlobalScopes()
+
                 ),
 
             Forms\Components\Select::make('user_id')
@@ -38,7 +38,7 @@ class EquipoUserForm
                     $query = User::query()
                         ->withoutGlobalScopes()
                         ->whereHas('roles', function ($q) {
-                            $q->where('name', 'jugador');
+                            $q->where('name', 'Jugador');
                         });
 
                     if (!auth()->user()->hasRole('super_admin')) {
@@ -52,7 +52,16 @@ class EquipoUserForm
                 ->relationship(
                     'jugador',
                     'name',
-                    modifyQueryUsing: fn (Builder $query) => $query->withoutGlobalScopes()
+                    modifyQueryUsing: function (Builder $query) {
+                        $query->withoutGlobalScopes()
+                            ->whereHas('roles', function ($q) {
+                                $q->where('name', 'Jugador');
+                            });
+                        if (!auth()->user()->hasRole('super_admin')) {
+                            $query->where('tenant_id', auth()->user()->tenant_id);
+                        }
+                        return $query;
+                    }
                 ),
 
             Forms\Components\DatePicker::make('fecha_inicio')

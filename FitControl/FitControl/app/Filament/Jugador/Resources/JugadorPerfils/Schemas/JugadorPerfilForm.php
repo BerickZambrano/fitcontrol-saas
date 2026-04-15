@@ -2,11 +2,13 @@
 
 namespace App\Filament\Jugador\Resources\JugadorPerfils\Schemas;
 
+use App\Models\User;
 use Filament\Schemas\Schema;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Section as ComponentsSection;
+use Illuminate\Database\Eloquent\Builder;
 
 class JugadorPerfilForm
 {
@@ -21,8 +23,22 @@ class JugadorPerfilForm
 
                         Select::make('user_id')
                             ->label('Jugador')
-                            ->relationship('user', 'name')
+                            ->options(function () {
+                                $query = User::query()->withoutGlobalScopes();
+                                if (!auth()->user()->hasRole('super_admin')) {
+                                    $query->where('tenant_id', auth()->user()->tenant_id);
+                                }
+                                return $query->pluck('name', 'id');
+                            })
                             ->searchable()
+                            ->preload()
+                            ->modifyQueryUsing(function (Builder $query) {
+                                $query->withoutGlobalScopes();
+                                if (!auth()->user()->hasRole('super_admin')) {
+                                    $query->where('tenant_id', auth()->user()->tenant_id);
+                                }
+                                return $query;
+                            })
                             ->required(),
 
                         TextInput::make('dorsal')

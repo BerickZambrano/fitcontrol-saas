@@ -17,6 +17,7 @@ class AsistenciaPorMes extends ApexChartWidget
     protected static ?string $heading = 'Asistencia a entrenamientos';
 
     protected int | string | array $columnSpan = 'full';
+    protected static ?int $sort = 6;
 
     protected function getOptions(): array
     {

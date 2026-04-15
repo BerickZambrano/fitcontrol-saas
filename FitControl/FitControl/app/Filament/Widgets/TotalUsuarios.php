@@ -15,7 +15,8 @@ class TotalUsuarios extends ApexChartWidget
     protected static ?string $chartId = 'totalUsuariosChart';
     protected static ?string $heading = 'Usuarios por Rol';
 
-    protected int | string | array $columnSpan = 1;
+    protected int | string | array $columnSpan = 4;
+    protected static ?int $sort = 4;
 
     protected function getOptions(): array
     {

@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\AsistenciaEntrenamientos\Schemas;
 
+use App\Models\Entrenamiento;
+use App\Models\User;
 use Filament\Schemas\Schema;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
@@ -9,6 +11,7 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Components\Hidden;
 use Filament\Facades\Filament;
+use Illuminate\Database\Eloquent\Builder;
 
 class AsistenciaEntrenamientoForm
 {
@@ -22,13 +25,30 @@ class AsistenciaEntrenamientoForm
                             ->schema([
                                 Select::make('entrenamiento_id')
                                     ->label('Entrenamiento')
-                                    ->relationship('entrenamiento', 'fecha')
+                                    ->options(function () {
+                                        $query = Entrenamiento::query()->withoutGlobalScopes();
+                                        if (!auth()->user()->hasRole('super_admin')) {
+                                            $query->where('tenant_id', auth()->user()->tenant_id);
+                                        }
+                                        return $query->pluck('fecha', 'id');
+                                    })
+                                    ->searchable()
+                                    ->preload()
+
                                     ->required(),
 
                                 Select::make('user_id')
                                     ->label('Jugador')
-                                    ->relationship('jugador', 'name')
+                                    ->options(function () {
+                                        $query = User::query()->withoutGlobalScopes();
+                                        if (!auth()->user()->hasRole('super_admin')) {
+                                            $query->where('tenant_id', auth()->user()->tenant_id);
+                                        }
+                                        return $query->pluck('name', 'id');
+                                    })
                                     ->searchable()
+                                    ->preload()
+
                                     ->required(),
 
                                 Toggle::make('presente')

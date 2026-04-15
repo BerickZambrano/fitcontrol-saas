@@ -15,7 +15,7 @@ class ProximosEventos extends Widget
 
     protected static ?string $heading = null;
 
-    protected static ?int $sort = 1;
+    protected static ?int $sort = 11;
 
     public static function canView(): bool
     {

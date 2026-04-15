@@ -3,6 +3,15 @@
 namespace App\Services;
 
 use App\Models\GeneratedReport;
+use App\Models\Rendimiento;
+use App\Models\User;
+use App\Models\Equipo;
+use App\Models\Partido;
+use App\Models\Entrenamiento;
+use App\Models\AsistenciaEntrenamiento;
+use App\Models\Pago;
+use App\Models\Tenant;
+use App\Models\HistorialMedico;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -105,43 +114,47 @@ class ReportService
         $fechaDesde = $req['fecha_desde'];
         $fechaHasta = $req['fecha_hasta'];
 
-        $rows = DB::select("
-            SELECT
-                u.name as jugador,
-                jp.posicion,
-                jp.dorsal,
-                COUNT(r.id) as partidos_jugados,
-                COALESCE(SUM(r.minutos_jugados), 0) as minutos,
-                COALESCE(SUM(r.goles), 0) as goles,
-                COALESCE(SUM(r.asistencias), 0) as asistencias,
-                COALESCE(SUM(r.tarjetas_amarillas), 0) as tarjetas_amarillas,
-                COALESCE(SUM(r.tarjetas_rojas), 0) as tarjetas_rojas
-            FROM rendimientos r
-            JOIN users u ON r.user_id = u.id
-            LEFT JOIN jugador_perfiles jp ON jp.user_id = u.id
-            JOIN partidos p ON r.partido_id = p.id
-            WHERE (p.equipo_local_id = ? OR p.equipo_visitante_id = ?)
-              AND r.tenant_id = ?
-              AND p.fecha BETWEEN ?::date AND ?::date
-            GROUP BY u.id, u.name, jp.posicion, jp.dorsal
-            ORDER BY goles DESC, asistencias DESC
-        ", [$equipoId, $equipoId, $tenantId, $fechaDesde, $fechaHasta]);
+        $rows = Rendimiento::query()
+            ->selectRaw('
+                users.name as jugador,
+                jugador_perfiles.posicion,
+                jugador_perfiles.dorsal,
+                COUNT(rendimientos.id) as partidos_jugados,
+                COALESCE(SUM(rendimientos.minutos_jugados), 0) as minutos,
+                COALESCE(SUM(rendimientos.goles), 0) as goles,
+                COALESCE(SUM(rendimientos.asistencias), 0) as asistencias,
+                COALESCE(SUM(rendimientos.tarjetas_amarillas), 0) as tarjetas_amarillas,
+                COALESCE(SUM(rendimientos.tarjetas_rojas), 0) as tarjetas_rojas
+            ')
+            ->join('users', 'rendimientos.user_id', '=', 'users.id')
+            ->leftJoin('jugador_perfiles', 'jugador_perfiles.user_id', '=', 'users.id')
+            ->join('partidos', 'rendimientos.partido_id', '=', 'partidos.id')
+            ->where(function($query) use ($equipoId) {
+                $query->where('partidos.equipo_local_id', $equipoId)
+                      ->orWhere('partidos.equipo_visitante_id', $equipoId);
+            })
+            ->whereBetween('partidos.fecha', [$fechaDesde, $fechaHasta])
+            ->groupBy('users.id', 'users.name', 'jugador_perfiles.posicion', 'jugador_perfiles.dorsal')
+            ->orderByRaw('goles DESC, asistencias DESC')
+            ->get();
 
-        $stats = DB::selectOne("
-            SELECT
-                COUNT(DISTINCT r.user_id) as total_jugadores,
-                COALESCE(SUM(r.goles), 0) as total_goles,
-                COALESCE(SUM(r.asistencias), 0) as total_asistencias,
-                COALESCE(SUM(r.minutos_jugados), 0) as total_minutos,
-                COUNT(DISTINCT p.id) as total_partidos
-            FROM rendimientos r
-            JOIN partidos p ON r.partido_id = p.id
-            WHERE (p.equipo_local_id = ? OR p.equipo_visitante_id = ?)
-              AND r.tenant_id = ?
-              AND p.fecha BETWEEN ?::date AND ?::date
-        ", [$equipoId, $equipoId, $tenantId, $fechaDesde, $fechaHasta]);
+        $stats = Rendimiento::query()
+            ->selectRaw('
+                COUNT(DISTINCT rendimientos.user_id) as total_jugadores,
+                COALESCE(SUM(rendimientos.goles), 0) as total_goles,
+                COALESCE(SUM(rendimientos.asistencias), 0) as total_asistencias,
+                COALESCE(SUM(rendimientos.minutos_jugados), 0) as total_minutos,
+                COUNT(DISTINCT partidos.id) as total_partidos
+            ')
+            ->join('partidos', 'rendimientos.partido_id', '=', 'partidos.id')
+            ->where(function($query) use ($equipoId) {
+                $query->where('partidos.equipo_local_id', $equipoId)
+                      ->orWhere('partidos.equipo_visitante_id', $equipoId);
+            })
+            ->whereBetween('partidos.fecha', [$fechaDesde, $fechaHasta])
+            ->first();
 
-        $equipoNombre = DB::scalar("SELECT nombre FROM equipos WHERE id = ?", [$equipoId]);
+        $equipoNombre = Equipo::where('id', $equipoId)->value('nombre') ?? 'Equipo';
         $equipoNombre = $equipoNombre ?? 'Equipo';
 
         if ($ext === 'pdf') {
@@ -246,33 +259,27 @@ class ReportService
         $fechaDesde = $req['fecha_desde'];
         $fechaHasta = $req['fecha_hasta'];
 
-        $entrenamientos = DB::select("
-            SELECT id, nombre, fecha
-            FROM entrenamientos
-            WHERE equipo_id = ? AND tenant_id = ?
-              AND fecha BETWEEN ?::date AND ?::date
-            ORDER BY fecha
-        ", [$equipoId, $tenantId, $fechaDesde, $fechaHasta]);
+        $entrenamientos = Entrenamiento::query()
+            ->select('id', 'nombre', 'fecha')
+            ->where('equipo_id', $equipoId)
+            ->whereBetween('fecha', [$fechaDesde, $fechaHasta])
+            ->orderBy('fecha')
+            ->get();
 
-        $jugadores = DB::select("
-            SELECT u.id, u.name, e.user_id
-            FROM equipo_user e
-            JOIN users u ON u.id = e.user_id
-            WHERE e.equipo_id = ? AND e.tenant_id = ?
-              AND e.fecha_fin IS NULL
-            ORDER BY u.name
-        ", [$equipoId, $tenantId]);
+        $jugadores = User::query()
+            ->select('users.id', 'users.name')
+            ->join('equipo_user', 'equipo_user.user_id', '=', 'users.id')
+            ->where('equipo_user.equipo_id', $equipoId)
+            ->whereNull('equipo_user.fecha_fin')
+            ->orderBy('users.name')
+            ->get();
 
-        $asistencias = DB::select("
-            SELECT user_id, entrenamiento_id, presente
-            FROM asistencia_entrenamiento
-            WHERE tenant_id = ?
-              AND entrenamiento_id IN (
-                  SELECT id FROM entrenamientos WHERE equipo_id = ? AND fecha BETWEEN ?::date AND ?::date
-              )
-        ", [$tenantId, $equipoId, $fechaDesde, $fechaHasta]);
+        $asistencias = AsistenciaEntrenamiento::query()
+            ->select('user_id', 'entrenamiento_id', 'presente')
+            ->whereIn('entrenamiento_id', $entrenamientos->pluck('id'))
+            ->get();
 
-        $equipoNombre = DB::scalar("SELECT nombre FROM equipos WHERE id = ?", [$equipoId]);
+        $equipoNombre = Equipo::where('id', $equipoId)->value('nombre') ?? 'Equipo';
         $equipoNombre = $equipoNombre ?? 'Equipo';
 
         if ($ext === 'pdf') {
@@ -403,22 +410,20 @@ class ReportService
         $fechaDesde = $req['fecha_desde'];
         $fechaHasta = $req['fecha_hasta'];
 
-        $summary = DB::select("
-            SELECT estado, COUNT(*) as cantidad, COALESCE(SUM(monto), 0) as total
-            FROM pagos
-            WHERE tenant_id = ? AND fecha BETWEEN ?::date AND ?::date
-            GROUP BY estado
-        ", [$tenantId, $fechaDesde, $fechaHasta]);
+        $summary = Pago::query()
+            ->selectRaw('estado, COUNT(*) as cantidad, COALESCE(SUM(monto), 0) as total')
+            ->whereBetween('fecha', [$fechaDesde, $fechaHasta])
+            ->groupBy('estado')
+            ->get();
 
-        $detail = DB::select("
-            SELECT u.name as jugador, p.monto, p.estado, p.fecha, p.created_at
-            FROM pagos p
-            JOIN users u ON u.id = p.user_id
-            WHERE p.tenant_id = ? AND p.fecha BETWEEN ?::date AND ?::date
-            ORDER BY p.fecha DESC
-        ", [$tenantId, $fechaDesde, $fechaHasta]);
+        $detail = Pago::query()
+            ->select('users.name as jugador', 'pagos.monto', 'pagos.estado', 'pagos.fecha', 'pagos.created_at')
+            ->join('users', 'pagos.user_id', '=', 'users.id')
+            ->whereBetween('pagos.fecha', [$fechaDesde, $fechaHasta])
+            ->orderBy('pagos.fecha', 'DESC')
+            ->get();
 
-        $tenantNombre = DB::scalar("SELECT nombre FROM tenants WHERE id = ?", [$tenantId]);
+        $tenantNombre = Tenant::where('id', $tenantId)->value('nombre') ?? 'Club';
         $tenantNombre = $tenantNombre ?? 'Club';
 
         if ($ext === 'pdf') {
@@ -530,45 +535,40 @@ class ReportService
         $fechaDesde = $req['fecha_desde'];
         $fechaHasta = $req['fecha_hasta'];
 
-        $detail = DB::select("
-            SELECT u.name as jugador, hm.tipo_lesion, hm.gravedad, hm.descripcion,
-                   hm.fecha_inicio, hm.fecha_fin, hm.apto
-            FROM historial_medico hm
-            JOIN users u ON u.id = hm.user_id
-            WHERE hm.tenant_id = ? AND hm.fecha_inicio BETWEEN ?::date AND ?::date
-            ORDER BY hm.fecha_inicio DESC
-        ", [$tenantId, $fechaDesde, $fechaHasta]);
+        $detail = HistorialMedico::query()
+            ->select('users.name as jugador', 'historial_medico.tipo_lesion', 'historial_medico.gravedad', 'historial_medico.descripcion',
+                   'historial_medico.fecha_inicio', 'historial_medico.fecha_fin', 'historial_medico.apto')
+            ->join('users', 'historial_medico.user_id', '=', 'users.id')
+            ->whereBetween('historial_medico.fecha_inicio', [$fechaDesde, $fechaHasta])
+            ->orderBy('historial_medico.fecha_inicio', 'DESC')
+            ->get();
 
-        $porTipo = DB::select("
-            SELECT tipo_lesion, COUNT(*) as cantidad
-            FROM historial_medico
-            WHERE tenant_id = ? AND fecha_inicio BETWEEN ?::date AND ?::date
-            GROUP BY tipo_lesion
-        ", [$tenantId, $fechaDesde, $fechaHasta]);
+        $porTipo = HistorialMedico::query()
+            ->selectRaw('tipo_lesion, COUNT(*) as cantidad')
+            ->whereBetween('fecha_inicio', [$fechaDesde, $fechaHasta])
+            ->groupBy('tipo_lesion')
+            ->get();
 
-        $porGravedad = DB::select("
-            SELECT gravedad, COUNT(*) as cantidad
-            FROM historial_medico
-            WHERE tenant_id = ? AND fecha_inicio BETWEEN ?::date AND ?::date
-            GROUP BY gravedad
-        ", [$tenantId, $fechaDesde, $fechaHasta]);
+        $porGravedad = HistorialMedico::query()
+            ->selectRaw('gravedad, COUNT(*) as cantidad')
+            ->whereBetween('fecha_inicio', [$fechaDesde, $fechaHasta])
+            ->groupBy('gravedad')
+            ->get();
 
-        $porApto = DB::select("
-            SELECT apto, COUNT(*) as cantidad
-            FROM historial_medico
-            WHERE tenant_id = ? AND fecha_inicio BETWEEN ?::date AND ?::date
-            GROUP BY apto
-        ", [$tenantId, $fechaDesde, $fechaHasta]);
+        $porApto = HistorialMedico::query()
+            ->selectRaw('apto, COUNT(*) as cantidad')
+            ->whereBetween('fecha_inicio', [$fechaDesde, $fechaHasta])
+            ->groupBy('apto')
+            ->get();
 
-        $noAptos = DB::select("
-            SELECT DISTINCT u.name, hm.tipo_lesion, hm.gravedad, hm.fecha_inicio, hm.fecha_fin
-            FROM historial_medico hm
-            JOIN users u ON u.id = hm.user_id
-            WHERE hm.tenant_id = ? AND hm.apto = false
-            ORDER BY hm.fecha_inicio DESC
-        ", [$tenantId]);
+        $noAptos = HistorialMedico::query()
+            ->selectRaw('DISTINCT users.name, historial_medico.tipo_lesion, historial_medico.gravedad, historial_medico.fecha_inicio, historial_medico.fecha_fin')
+            ->join('users', 'historial_medico.user_id', '=', 'users.id')
+            ->where('historial_medico.apto', false)
+            ->orderBy('historial_medico.fecha_inicio', 'DESC')
+            ->get();
 
-        $tenantNombre = DB::scalar("SELECT nombre FROM tenants WHERE id = ?", [$tenantId]);
+        $tenantNombre = Tenant::where('id', $tenantId)->value('nombre') ?? 'Club';
         $tenantNombre = $tenantNombre ?? 'Club';
 
         if ($ext === 'pdf') {

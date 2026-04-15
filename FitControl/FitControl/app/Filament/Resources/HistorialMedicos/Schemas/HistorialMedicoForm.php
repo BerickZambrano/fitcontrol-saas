@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\HistorialMedicos\Schemas;
 
+use App\Models\User;
 use Filament\Schemas\Schema;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
@@ -9,6 +10,7 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Section as ComponentsSection;
+use Illuminate\Database\Eloquent\Builder;
 
 class HistorialMedicoForm
 {
@@ -23,8 +25,16 @@ class HistorialMedicoForm
 
                         Select::make('user_id')
                             ->label('Jugador')
-                            ->relationship('usuario', 'name')
+                            ->options(function () {
+                                $query = User::query()->withoutGlobalScopes();
+                                if (!auth()->user()->hasRole('super_admin')) {
+                                    $query->where('tenant_id', auth()->user()->tenant_id);
+                                }
+                                return $query->pluck('name', 'id');
+                            })
                             ->searchable()
+                            ->preload()
+
                             ->required(),
 
                         Select::make('tipo_lesion')

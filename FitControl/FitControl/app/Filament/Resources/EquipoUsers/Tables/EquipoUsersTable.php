@@ -19,14 +19,21 @@ class EquipoUsersTable
     public static function configure(Table $table): Table
     {
         return $table
-            ->modifyQueryUsing(fn ($query) => $query->withoutGlobalScopes()->with([
-                'equipo' => function ($q) {
-                    $q->withoutGlobalScopes();
-                },
-                'jugador' => function ($q) {
-                    $q->withoutGlobalScopes();
-                },
-            ]))
+            ->modifyQueryUsing(function ($query) {
+                $user = auth()->user();
+                $query->withoutGlobalScopes()->with([
+                    'equipo' => function ($q) {
+                        $q->withoutGlobalScopes();
+                    },
+                    'jugador' => function ($q) {
+                        $q->withoutGlobalScopes();
+                    },
+                ]);
+                if (!$user->hasRole('super_admin')) {
+                    $query->where('equipo_user.tenant_id', $user->tenant_id);
+                }
+                return $query;
+            })
             ->columns([
                 Tables\Columns\TextColumn::make('equipo.nombre')
                     ->label('Equipo')

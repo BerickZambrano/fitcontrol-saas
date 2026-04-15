@@ -13,7 +13,8 @@ class PagosPorMes extends ChartWidget
 {
     use HasWidgetShield;
 
-    protected int | string | array $columnSpan = '2';
+    protected int | string | array $columnSpan = 6;
+    protected static ?int $sort = 10;
     protected ?string $heading = 'Pagos por mes';
 
     protected function getData(): array

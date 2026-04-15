@@ -9,10 +9,14 @@ use App\Http\Controllers\AdminRegisterController;
 Route::get('/register-admin/{token}', [AdminRegisterController::class, 'show'])
     ->name('register.admin');
 
-Route::post('/register-admin/{token}', [AdminRegisterController::class, 'store']);
+Route::post('/register-admin/{token}', [AdminRegisterController::class, 'store'])
+    ->middleware('throttle:admin-register')
+    ->name('register.admin.store');
 
 Route::get('/solicitar-acceso', [TenantRequestController::class, 'create'])->name('tenant.request');
-Route::post('/solicitar-acceso', [TenantRequestController::class, 'store'])->name('tenant.request.store');
+Route::post('/solicitar-acceso', [TenantRequestController::class, 'store'])
+    ->middleware('throttle:tenant-request')
+    ->name('tenant.request.store');
 
 Route::view('dashboard', 'dashboard')
     ->middleware(['auth', 'verified'])
@@ -20,14 +24,17 @@ Route::view('dashboard', 'dashboard')
 
 use Illuminate\Support\Facades\Mail;
 
-Route::get('/test-mail', function () {
-    Mail::raw('Correo de prueba desde FitControl SaaS', function ($message) {
-        $message->to('beritozambrano@gmail.com')
-                ->subject('Prueba de correo');
-    });
+// Solo disponible en entorno local (desarrollo)
+if (app()->environment('local')) {
+    Route::get('/test-mail', function () {
+        Mail::raw('Correo de prueba desde FitControl SaaS', function ($message) {
+            $message->to('beritozambrano@gmail.com')
+                    ->subject('Prueba de correo');
+        });
 
-    return 'Correo enviado';
-});
+        return 'Correo enviado';
+    });
+}
 
 
     use Inertia\Inertia;
@@ -37,17 +44,18 @@ Route::get('/', function () {
     return Inertia::render('Landing');
 })->name('home');
 
-// ================================================================
-// Mail API Routes (replaces Java MailService microservice)
-// ================================================================
-Route::prefix('api/mail')->group(function () {
-    Route::post('/import-csv', [MailController::class, 'importCsv']);
-    Route::post('/send-single', [MailController::class, 'sendSingle']);
-    Route::post('/send-multiple', [MailController::class, 'sendMultiple']);
-});
+// Las rutas de API se han movido a routes/api.php
 
-// Reportes - Descargar (existing route)
+
+// Reportes - Descargar con verificación de tenant ownership
 Route::get('/reportes/descargar/{report}', function (\App\Models\GeneratedReport $report) {
+    $user = auth()->user();
+
+    // Super admins can download any report; others only their tenant's
+    if (!$user->hasRole('super_admin') && $report->tenant_id !== $user->tenant_id) {
+        abort(403, 'No tienes permiso para descargar este reporte.');
+    }
+
     $service = new \App\Services\ReportService();
     return $service->descargar($report);
 })->middleware('auth')->name('reportes.descargar');
@@ -60,7 +68,9 @@ require __DIR__.'/settings.php';
 use App\Http\Controllers\OnboardingController;
 
 Route::get('/onboarding', [OnboardingController::class, 'index'])->name('onboarding.index');
-Route::post('/onboarding', [OnboardingController::class, 'store'])->name('onboarding.store');
+Route::post('/onboarding', [OnboardingController::class, 'store'])
+    ->middleware('throttle:onboarding')
+    ->name('onboarding.store');
 Route::get('/onboarding/success', [OnboardingController::class, 'success'])->name('onboarding.success');
 
 

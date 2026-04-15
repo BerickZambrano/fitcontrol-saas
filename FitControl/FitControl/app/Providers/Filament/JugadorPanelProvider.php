@@ -6,7 +6,6 @@ use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
-use Filament\Pages\Dashboard;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
@@ -43,7 +42,7 @@ class JugadorPanelProvider extends PanelProvider
             ->discoverResources(in: app_path('Filament/Jugador/Resources'), for: 'App\Filament\Jugador\Resources')
             ->discoverPages(in: app_path('Filament/Jugador/Pages'), for: 'App\Filament\Jugador\Pages')
             ->pages([
-                Dashboard::class,
+                \App\Filament\Jugador\Pages\Dashboard::class,
                 \App\Filament\Jugador\Pages\PlayerProfile::class,
             ])
             ->databaseNotifications()
@@ -56,7 +55,7 @@ class JugadorPanelProvider extends PanelProvider
                 \App\Filament\Jugador\Widgets\MisNotificaciones::class,
             ])
             ->pages([
-                Dashboard::class,
+                \App\Filament\Jugador\Pages\Dashboard::class,
                 \App\Filament\Jugador\Pages\PlayerProfile::class,
                 \App\Filament\Jugador\Pages\MiHistorial::class,
                 \App\Filament\Jugador\Pages\EscanearQR::class,

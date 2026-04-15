@@ -15,7 +15,8 @@ class TotalEquipos extends ApexChartWidget
     protected static ?string $chartId = 'totalEquiposChart';
     protected static ?string $heading = 'Equipos por Categoría';
 
-    protected int | string | array $columnSpan = 1;
+    protected int | string | array $columnSpan = 4;
+    protected static ?int $sort = 3;
 
     protected function getOptions(): array
     {

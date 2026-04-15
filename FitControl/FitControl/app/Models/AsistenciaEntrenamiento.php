@@ -22,11 +22,6 @@ class AsistenciaEntrenamiento extends Model
         'presente' => 'boolean',
     ];
 
-    public function setPresenteAttribute($value): void
-    {
-        $this->attributes['presente'] = filter_var($value, FILTER_VALIDATE_BOOLEAN) ? 'true' : 'false';
-    }
-
     public function entrenamiento()
     {
         return $this->belongsTo(Entrenamiento::class, 'entrenamiento_id');

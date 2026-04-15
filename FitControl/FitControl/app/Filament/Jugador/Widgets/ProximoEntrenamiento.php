@@ -13,9 +13,9 @@ class ProximoEntrenamiento extends BaseWidget
 {
     use HasWidgetShield;
 
-    protected static ?int $sort = 4;
+    protected static ?int $sort = 5;
 
-    protected int | string | array $columnSpan = 4;
+    protected int | string | array $columnSpan = 2;
 
     protected function getStats(): array
     {
@@ -53,13 +53,15 @@ class ProximoEntrenamiento extends BaseWidget
         $diasRestantes = Carbon::today()->diffInDays($entrenamiento->fecha, false);
         $textoDias = $diasRestantes == 0 ? 'Hoy' : ($diasRestantes == 1 ? 'Mañana' : "En {$diasRestantes} días");
 
+        $fechaFormateada = $entrenamiento->fecha ? Carbon::parse($entrenamiento->fecha)->format('d/m/Y') : 'N/A';
+
         return [
             Stat::make('Próximo Entrenamiento', $entrenamiento->nombre ?? 'Entrenamiento')
                 ->description($textoDias)
                 ->icon('heroicon-o-arrow-trending-up')
                 ->color('success'),
 
-            Stat::make('Fecha', $entrenamiento->fecha?->format('d/m/Y') ?? 'N/A')
+            Stat::make('Fecha', $fechaFormateada)
                 ->icon('heroicon-o-calendar')
                 ->color('info'),
 

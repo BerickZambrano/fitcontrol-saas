@@ -17,7 +17,7 @@ class ProximosCompromisos extends ApexChartWidget
     protected static ?string $chartId = 'proximosCompromisos';
     protected static ?string $heading = 'Próximos Compromisos';
 
-    protected static ?int $sort = 2;
+    protected static ?int $sort = 10;
 
     protected int | string | array $columnSpan = 'full';
 

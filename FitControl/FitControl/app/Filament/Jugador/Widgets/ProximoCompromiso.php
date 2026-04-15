@@ -15,7 +15,7 @@ class ProximoCompromiso extends Widget
 
     protected string $view = 'filament.jugador.widgets.proximo-compromiso';
 
-    protected static ?int $sort = 0;
+    protected static ?int $sort = 1;
 
     protected int|string|array $columnSpan = 'full';
 

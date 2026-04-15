@@ -14,7 +14,17 @@
         @if(count($notificaciones) > 0)
             <div class="flex flex-col gap-3">
                 @foreach($notificaciones as $notif)
-                    <div class="flex items-start gap-3 rounded-xl bg-gray-50 p-4 dark:bg-white/5 {{ isset($notif['leida']) && !$notif['leida'] ? 'border-l-4 border-blue-500' : '' }}">
+                    @php
+                        $isUnread = !$notif['leida'];
+                        $tipo = $notif['tipo'] ?? 'general';
+                        $icon = match($tipo) {
+                            'entrenamiento' => '🏋️',
+                            'partido' => '⚽',
+                            default => '📢',
+                        };
+                    @endphp
+                    <div class="flex items-start gap-3 rounded-xl bg-gray-50 p-4 dark:bg-white/5 {{ $isUnread ? 'border-l-4 border-blue-500' : '' }}">
+                        <span class="text-lg flex-shrink-0">{{ $icon }}</span>
                         <div class="flex-1 min-w-0">
                             <p class="text-sm font-bold text-gray-900 dark:text-white">
                                 {{ $notif['titulo'] ?? '' }}
@@ -24,7 +34,7 @@
                             </p>
                         </div>
                         <span class="text-xs text-gray-400 flex-shrink-0">
-                            {{ isset($notif['created_at']) ? \Carbon\Carbon::parse($notif['created_at'])->diffForHumans() : '' }}
+                            {{ \Carbon\Carbon::parse($notif['created_at'])->diffForHumans() }}
                         </span>
                     </div>
                 @endforeach

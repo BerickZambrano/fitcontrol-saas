@@ -2,14 +2,15 @@
 
 namespace App\Filament\Resources\Rendimientos\Schemas;
 
+use App\Models\User;
+use App\Models\Partido;
 use Filament\Forms;
 use Filament\Schemas\Schema;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Section;
-use App\Models\User;
-use App\Models\Partido;
 use Filament\Schemas\Components\Section as ComponentsSection;
+use Illuminate\Database\Eloquent\Builder;
 
 class RendimientoForm
 {
@@ -23,14 +24,30 @@ class RendimientoForm
 
                         Select::make('user_id')
                             ->label('Jugador')
-                            ->relationship('user', 'name')
+                            ->options(function () {
+                                $query = User::query()->withoutGlobalScopes();
+                                if (!auth()->user()->hasRole('super_admin')) {
+                                    $query->where('tenant_id', auth()->user()->tenant_id);
+                                }
+                                return $query->pluck('name', 'id');
+                            })
                             ->searchable()
+                            ->preload()
+
                             ->required(),
 
                         Select::make('partido_id')
                             ->label('Partido')
-                            ->relationship('partido', 'fecha')
+                            ->options(function () {
+                                $query = Partido::query()->withoutGlobalScopes();
+                                if (!auth()->user()->hasRole('super_admin')) {
+                                    $query->where('tenant_id', auth()->user()->tenant_id);
+                                }
+                                return $query->pluck('fecha', 'id');
+                            })
                             ->searchable()
+                            ->preload()
+
                             ->required(),
                     ]),
 

@@ -16,7 +16,8 @@ class EntrenamientosPorMes extends ApexChartWidget
     protected static ?string $chartId = 'entrenamientosPorMes';
     protected static ?string $heading = 'Entrenamientos por mes';
 
-    protected int | string | array $columnSpan = 2;
+    protected int | string | array $columnSpan = 3;
+    protected static ?int $sort = 9;
 
     protected function getOptions(): array
     {

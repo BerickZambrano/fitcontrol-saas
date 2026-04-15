@@ -1,6 +1,0 @@
-/home/berick/Escritorio/FitControl/FitControl/reportes-ms/src/main/java/com/fitcontrol/reportesms/ReportesMsApplication.java
-/home/berick/Escritorio/FitControl/FitControl/reportes-ms/src/main/java/com/fitcontrol/reportesms/config/JdbcConfig.java
-/home/berick/Escritorio/FitControl/FitControl/reportes-ms/src/main/java/com/fitcontrol/reportesms/controller/ReportController.java
-/home/berick/Escritorio/FitControl/FitControl/reportes-ms/src/main/java/com/fitcontrol/reportesms/model/ReportRequest.java
-/home/berick/Escritorio/FitControl/FitControl/reportes-ms/src/main/java/com/fitcontrol/reportesms/model/ReportResponse.java
-/home/berick/Escritorio/FitControl/FitControl/reportes-ms/src/main/java/com/fitcontrol/reportesms/service/ReportService.java
