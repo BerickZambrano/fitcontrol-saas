@@ -32,6 +32,9 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'two_factor_type',
+        'two_factor_otp',
+        'two_factor_otp_expires_at',
     ];
 
     /**
@@ -86,6 +89,7 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'two_factor_otp_expires_at' => 'datetime',
         ];
     }
 
@@ -115,14 +119,41 @@ class User extends Authenticatable
         \Illuminate\Support\Facades\Cache::forget("user_roles_{$userId}");
     }
 
-    /**
-     * Get the initials of the user's name.
-     */
     public function initials(): string
     {
         return collect(explode(' ', $this->name))
             ->map(fn (string $name) => mb_substr($name, 0, 1))
             ->take(2)
             ->join('');
+    }
+
+    /**
+     * Generate a new 2FA OTP code.
+     */
+    public function generateTwoFactorOtp(): string
+    {
+        $this->two_factor_otp = sprintf("%06d", mt_rand(1, 999999));
+        $this->two_factor_otp_expires_at = now()->addMinutes(15);
+        $this->save();
+
+        return $this->two_factor_otp;
+    }
+
+    /**
+     * Reset the 2FA OTP code.
+     */
+    public function resetTwoFactorOtp(): void
+    {
+        $this->two_factor_otp = null;
+        $this->two_factor_otp_expires_at = null;
+        $this->save();
+    }
+
+    /**
+     * Check if 2FA is enabled for the user.
+     */
+    public function hasTwoFactorEnabled(): bool
+    {
+        return $this->two_factor_type !== 'none';
     }
 }

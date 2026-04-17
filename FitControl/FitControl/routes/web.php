@@ -13,6 +13,9 @@ Route::post('/register-admin/{token}', [AdminRegisterController::class, 'store']
     ->middleware('throttle:admin-register')
     ->name('register.admin.store');
 
+Route::get('/2fa/verify', \App\Livewire\Auth\TwoFactorVerify::class)
+    ->name('2fa.verify');
+
 Route::get('/solicitar-acceso', [TenantRequestController::class, 'create'])->name('tenant.request');
 Route::post('/solicitar-acceso', [TenantRequestController::class, 'store'])
     ->middleware('throttle:tenant-request')

@@ -38,6 +38,22 @@
                 ]) }}
             </div>
 
+            <hr class="border-neutral-200 dark:border-neutral-800">
+
+            {{-- Seguridad --}}
+            <div class="space-y-4">
+                <h2 class="text-xl font-semibold">Seguridad</h2>
+                <p class="text-sm text-neutral-500">Configura la seguridad de tu cuenta</p>
+                
+                {{ $this->form->schema([
+                    \Filament\Forms\Components\Toggle::make('two_factor_enabled')
+                        ->label('Autenticación por Correo Electrónico')
+                        ->helperText('Recibe un código de seguridad en tu correo electrónico al iniciar sesión.')
+                        ->onIcon('heroicon-m-envelope')
+                        ->offIcon('heroicon-m-x-mark')
+                ]) }}
+            </div>
+
             {{-- Botón Guardar --}}
             <x-filament::button type="submit">
                 Guardar cambios

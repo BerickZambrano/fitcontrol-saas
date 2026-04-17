@@ -24,6 +24,7 @@ class PlayerProfile extends Page
     public $email;
     public $phone;
     public $avatar;
+    public $two_factor_enabled;
 
     // Inicializa el formulario
     protected function getFormSchema(): array
@@ -37,6 +38,16 @@ class PlayerProfile extends Page
                 ->image()
                 ->directory('avatars')
                 ->maxSize(1024),
+            \Filament\Schemas\Components\Section::make('Seguridad')
+                ->description('Configura la seguridad de tu cuenta')
+                ->schema([
+                    Forms\Components\Toggle::make('two_factor_enabled')
+                        ->label('Autenticación por Correo Electrónico')
+                        ->helperText('Recibe un código de seguridad en tu correo electrónico al iniciar sesión.')
+                        ->onIcon('heroicon-m-envelope')
+                        ->offIcon('heroicon-m-x-mark')
+                        ->live(),
+                ]),
         ];
     }
 
@@ -47,6 +58,7 @@ class PlayerProfile extends Page
         $this->email = $user->email;
         $this->phone = $user->phone ?? '';
         $this->avatar = $user->avatar ?? null;
+        $this->two_factor_enabled = $user->two_factor_type === 'email';
 
         // Inicializa el formulario con los datos actuales
         $this->form->fill([
@@ -54,22 +66,24 @@ class PlayerProfile extends Page
             'email' => $this->email,
             'phone' => $this->phone,
             'avatar' => $this->avatar,
+            'two_factor_enabled' => $this->two_factor_enabled,
         ]);
     }
 
     public function save(): void
     {
-        $this->validateForm();
+        $data = $this->form->getState();
 
         $user = Auth::user();
-        $user->name = $this->form->name;
-        $user->email = $this->form->email;
-        $user->phone = $this->form->phone;
-        if ($this->form->avatar) {
-            $user->avatar = $this->form->avatar;
-        }
+        $user->name = $data['name'];
+        $user->email = $data['email'];
+        // Los campos phone y avatar no existen en la tabla users en este momento
+        $user->two_factor_type = ($data['two_factor_enabled'] ?? false) ? 'email' : 'none';
         $user->save();
 
-        $this->notify('success', 'Perfil actualizado correctamente');
+        \Filament\Notifications\Notification::make()
+            ->title('Perfil actualizado correctamente')
+            ->success()
+            ->send();
     }
 }

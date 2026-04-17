@@ -58,6 +58,15 @@ class UserForm
                 ->relationship('roles', 'name')
                 ->multiple()
                 ->required(),
+
+            Forms\Components\Select::make('two_factor_type')
+                ->label('Autenticación de Dos Factores')
+                ->options([
+                    'none' => 'Desactivado',
+                    'email' => 'Correo Electrónico',
+                ])
+                ->default('none')
+                ->required(),
         ]);
     }
 }
