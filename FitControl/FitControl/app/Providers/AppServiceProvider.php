@@ -3,7 +3,7 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
-use Filament\Actions\CreateAction; // ✅ ESTE es el correcto en v3
+use Filament\Actions\CreateAction;
 
 class AppServiceProvider extends ServiceProvider
 {

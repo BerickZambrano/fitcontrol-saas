@@ -4,12 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Traits\BelongsToTenant;
-use Filament\Facades\Filament;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Laravel\Scout\Searchable;
 
 class Entrenamiento extends Model
 {
-    use BelongsToTenant, Searchable;
+    use BelongsToTenant, Searchable, SoftDeletes;
 
     protected $fillable = [
         'nombre',
