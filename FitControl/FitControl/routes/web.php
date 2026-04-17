@@ -62,6 +62,10 @@ Route::get('/reportes/descargar/{report}', function (\App\Models\GeneratedReport
 
 require __DIR__.'/settings.php';
 
+Route::fallback(function () {
+    return response()->view('errors.404', [], 404);
+});
+
 
 
 #
