@@ -1,55 +1,84 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8">
-    <style>
-        body { font-family: Arial, sans-serif; margin: 20px; color: #333; }
-        h1 { text-align: center; font-size: 20px; margin-bottom: 5px; }
-        .info { font-size: 11px; margin-bottom: 15px; color: #666; }
-        .info strong { color: #333; }
-        table { width: 100%; border-collapse: collapse; margin: 10px 0; }
-        th { background-color: #003366; color: white; font-size: 9px; padding: 6px; text-align: center; border: none; }
-        td { font-size: 8px; padding: 4px; text-align: center; border-bottom: 1px solid #eee; }
-        tr:nth-child(even) td { background-color: #e6f0fa; }
-        .goles-highlight { font-weight: bold; color: #009600; }
-        .asist-highlight { font-weight: bold; color: #0064c8; }
-        .summary-title { font-size: 14px; font-weight: bold; color: #003366; margin-top: 15px; }
-        .summary-table { width: 50%; margin: 5px 0; }
-        .summary-table td { padding: 5px; font-size: 10px; }
-        .summary-table .label { background-color: #e6f0fa; font-weight: bold; width: 40%; }
-        .footer { text-align: center; font-size: 8px; color: #999; margin-top: 20px; font-style: italic; }
-    </style>
-</head>
-<body>
-    <h1>REPORTE DE RENDIMIENTO DE JUGADORES</h1>
-    <div class="info">
-        <strong>Equipo:</strong> {{ $equipoNombre }}<br>
-        <strong>Periodo:</strong> {{ $req['fecha_desde'] }} al {{ $req['fecha_hasta'] }}<br>
-        <strong>Generado:</strong> {{ now()->format('d/m/Y') }}
-    </div>
+@extends('reports.layout')
 
+@section('title', 'Reporte de Rendimiento - ' . $equipoNombre)
+
+@section('custom-styles')
+    .goles-highlight { color: #15803d; font-weight: bold; }
+    .asist-highlight { color: #1d4ed8; font-weight: bold; }
+    .summary-box {
+        margin-top: 25px;
+        width: 100%;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+    .summary-header {
+        background-color: #f8fafc;
+        padding: 10px;
+        border-bottom: 1px solid #e2e8f0;
+        font-weight: bold;
+        color: #0f172a;
+        font-size: 12px;
+    }
+    .summary-content {
+        padding: 15px;
+    }
+    .summary-grid {
+        width: 100%;
+    }
+    .summary-item {
+        padding: 10px;
+        text-align: center;
+    }
+    .summary-value {
+        font-size: 18px;
+        font-weight: bold;
+        color: #0f172a;
+        display: block;
+    }
+    .summary-label {
+        font-size: 9px;
+        color: #64748b;
+        text-transform: uppercase;
+    }
+@endsection
+
+@section('meta')
     <table>
+        <tr>
+            <td width="50%"><strong>REPORTE:</strong> Rendimiento de Jugadores</td>
+            <td width="50%" class="text-right"><strong>EQUIPO:</strong> {{ $equipoNombre }}</td>
+        </tr>
+        <tr>
+            <td><strong>PERIODO:</strong> {{ \Carbon\Carbon::parse($req['fecha_desde'])->format('d/m/Y') }} al {{ \Carbon\Carbon::parse($req['fecha_hasta'])->format('d/m/Y') }}</td>
+            <td class="text-right"><strong>GENERADO POR:</strong> Admin FitControl</td>
+        </tr>
+    </table>
+@endsection
+
+@section('content')
+    <table class="main-table">
         <thead>
             <tr>
-                <th>#</th>
-                <th>Jugador</th>
-                <th>Posicion</th>
+                <th width="30">#</th>
+                <th class="text-left">Jugador</th>
+                <th>Pos.</th>
                 <th>Dorsal</th>
                 <th>PJ</th>
-                <th>Minutos</th>
+                <th>Min.</th>
                 <th>Goles</th>
-                <th>Asist</th>
-                <th>T. Amar</th>
-                <th>T. Roja</th>
+                <th>Asist.</th>
+                <th>T.A.</th>
+                <th>T.R.</th>
             </tr>
         </thead>
         <tbody>
             @foreach($rows as $i => $row)
             <tr>
                 <td>{{ $i + 1 }}</td>
-                <td style="text-align:left;">{{ $row->jugador }}</td>
+                <td class="text-left bold">{{ $row->jugador }}</td>
                 <td>{{ $row->posicion ?? 'N/A' }}</td>
-                <td>{{ (int)($row->dorsal ?? 0) }}</td>
+                <td><span class="badge badge-info">{{ (int)($row->dorsal ?? 0) }}</span></td>
                 <td>{{ (int)$row->partidos_jugados }}</td>
                 <td>{{ (int)$row->minutos }}</td>
                 <td class="{{ (int)$row->goles > 0 ? 'goles-highlight' : '' }}">{{ (int)$row->goles }}</td>
@@ -61,15 +90,29 @@
         </tbody>
     </table>
 
-    <div class="summary-title">RESUMEN DEL EQUIPO</div>
-    <table class="summary-table">
-        <tr><td class="label">Total Jugadores</td><td>{{ $stats->total_jugadores }}</td></tr>
-        <tr><td class="label">Total Goles</td><td>{{ $stats->total_goles }}</td></tr>
-        <tr><td class="label">Total Asistencias</td><td>{{ $stats->total_asistencias }}</td></tr>
-        <tr><td class="label">Total Minutos</td><td>{{ $stats->total_minutos }}</td></tr>
-        <tr><td class="label">Total Partidos</td><td>{{ $stats->total_partidos }}</td></tr>
-    </table>
-
-    <div class="footer">FitControl - Sistema de Gestion Deportiva</div>
-</body>
-</html>
+    <div class="summary-box">
+        <div class="summary-header">RESUMEN DEL EQUIPO</div>
+        <div class="summary-content">
+            <table class="summary-grid">
+                <tr>
+                    <td class="summary-item">
+                        <span class="summary-value">{{ $stats->total_jugadores }}</span>
+                        <span class="summary-label">Jugadores</span>
+                    </td>
+                    <td class="summary-item">
+                        <span class="summary-value">{{ $stats->total_goles }}</span>
+                        <span class="summary-label">Total Goles</span>
+                    </td>
+                    <td class="summary-item">
+                        <span class="summary-value">{{ $stats->total_asistencias }}</span>
+                        <span class="summary-label">Total Asist.</span>
+                    </td>
+                    <td class="summary-item" style="border-right: none;">
+                        <span class="summary-value">{{ $stats->total_partidos }}</span>
+                        <span class="summary-label">Partidos</span>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+@endsection

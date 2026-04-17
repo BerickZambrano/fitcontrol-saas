@@ -164,7 +164,7 @@ class ReportService
         return $this->generatePerformanceExcel($rows, $stats, $equipoNombre, $req, $reportId);
     }
 
-    protected function generatePerformanceExcel(array $rows, object $stats, string $equipoNombre, array $req, string $reportId): string
+    protected function generatePerformanceExcel($rows, object $stats, string $equipoNombre, array $req, string $reportId): string
     {
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
@@ -172,11 +172,22 @@ class ReportService
 
         // Styles
         $headerStyle = [
-            'font' => ['bold' => true, 'size' => 12, 'color' => ['rgb' => 'FFFFFF']],
-            'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => '0000FF']],
-            'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
+            'font' => ['bold' => true, 'size' => 11, 'color' => ['rgb' => 'FFFFFF']],
+            'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => '0F172A']], // Dark Navy
+            'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER, 'vertical' => Alignment::VERTICAL_CENTER],
+            'borders' => ['allBorders' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['rgb' => 'FFFFFF']]],
         ];
-        $titleStyle = ['font' => ['bold' => true, 'size' => 14]];
+        $titleStyle = [
+            'font' => ['bold' => true, 'size' => 16, 'color' => ['rgb' => '0F172A']],
+            'alignment' => ['horizontal' => Alignment::HORIZONTAL_LEFT],
+        ];
+        $infoStyle = [
+            'font' => ['size' => 10, 'color' => ['rgb' => '64748B']],
+            'alignment' => ['horizontal' => Alignment::HORIZONTAL_LEFT],
+        ];
+        $borderBottom = [
+            'borders' => ['bottom' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['rgb' => 'E2E8F0']]],
+        ];
 
         // Title
         $sheet->setCellValue('A1', 'REPORTE DE RENDIMIENTO DE JUGADORES');
@@ -189,10 +200,11 @@ class ReportService
         $sheet->setCellValue('G2', 'Generado: ' . now()->format('d/m/Y'));
 
         // Headers
-        $headers = ['#', 'Jugador', 'Posicion', 'Dorsal', 'PJ', 'Minutos', 'Goles', 'Asistencias', 'T. Amarillas', 'T. Rojas'];
+        $headers = ['#', 'Jugador', 'Posición', 'Dorsal', 'PJ', 'Minutos', 'Goles', 'Asistencias', 'T. Amarillas', 'T. Rojas'];
         $col = 'A';
         foreach ($headers as $h) {
             $sheet->setCellValue($col . '4', $h);
+            $sheet->getRowDimension(4)->setRowHeight(25);
             $col++;
         }
         $sheet->getStyle('A4:J4')->applyFromArray($headerStyle);
@@ -211,6 +223,14 @@ class ReportService
             $sheet->setCellValue('H' . $rowNum, (int) $row->asistencias);
             $sheet->setCellValue('I' . $rowNum, (int) $row->tarjetas_amarillas);
             $sheet->setCellValue('J' . $rowNum, (int) $row->tarjetas_rojas);
+            
+            // Zebra striping
+            if ($rowNum % 2 == 0) {
+                $sheet->getStyle('A' . $rowNum . ':J' . $rowNum)->getFill()
+                    ->setFillType(Fill::FILL_SOLID)
+                    ->getStartColor()->setRGB('F8FAFC');
+            }
+            $sheet->getStyle('A' . $rowNum . ':J' . $rowNum)->applyFromArray($borderBottom);
             $rowNum++;
         }
 
@@ -236,7 +256,7 @@ class ReportService
         return $filename;
     }
 
-    protected function generatePerformancePdf(array $rows, object $stats, string $equipoNombre, array $req, string $reportId): string
+    protected function generatePerformancePdf($rows, object $stats, string $equipoNombre, array $req, string $reportId): string
     {
         $html = view('reports.performance', compact('rows', 'stats', 'equipoNombre', 'req'))->render();
 
@@ -289,26 +309,29 @@ class ReportService
         return $this->generateAttendanceExcel($jugadores, $entrenamientos, $asistencias, $equipoNombre, $req, $reportId);
     }
 
-    protected function generateAttendanceExcel(array $jugadores, array $entrenamientos, array $asistencias, string $equipoNombre, array $req, string $reportId): string
+    protected function generateAttendanceExcel($jugadores, $entrenamientos, $asistencias, string $equipoNombre, array $req, string $reportId): string
     {
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
         $sheet->setTitle('Asistencia');
 
         $headerStyle = [
-            'font' => ['bold' => true, 'size' => 11, 'color' => ['rgb' => 'FFFFFF']],
-            'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => '008000']],
-            'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
+            'font' => ['bold' => true, 'size' => 10, 'color' => ['rgb' => 'FFFFFF']],
+            'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => '0F172A']],
+            'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER, 'vertical' => Alignment::VERTICAL_CENTER],
         ];
-        $titleStyle = ['font' => ['bold' => true, 'size' => 14]];
+        $titleStyle = [
+            'font' => ['bold' => true, 'size' => 16, 'color' => ['rgb' => '0F172A']],
+        ];
         $presentStyle = [
             'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
-            'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => '00FF00']],
+            'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => 'DCFCE7']],
+            'font' => ['color' => ['rgb' => '166534'], 'bold' => true],
         ];
         $absentStyle = [
             'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
-            'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => 'FF0000']],
-            'font' => ['color' => ['rgb' => 'FFFFFF']],
+            'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => 'FEE2E2']],
+            'font' => ['color' => ['rgb' => '991B1B'], 'bold' => true],
         ];
 
         // Title
@@ -388,7 +411,7 @@ class ReportService
         return $filename;
     }
 
-    protected function generateAttendancePdf(array $jugadores, array $entrenamientos, array $asistencias, string $equipoNombre, array $req, string $reportId): string
+    protected function generateAttendancePdf($jugadores, $entrenamientos, $asistencias, string $equipoNombre, array $req, string $reportId): string
     {
         $html = view('reports.attendance', compact('jugadores', 'entrenamientos', 'asistencias', 'equipoNombre', 'req'))->render();
 
@@ -433,7 +456,7 @@ class ReportService
         return $this->generateFinancialExcel($summary, $detail, $tenantNombre, $req, $reportId);
     }
 
-    protected function generateFinancialExcel(array $summary, array $detail, string $tenantNombre, array $req, string $reportId): string
+    protected function generateFinancialExcel($summary, $detail, string $tenantNombre, array $req, string $reportId): string
     {
         $spreadsheet = new Spreadsheet();
 
@@ -442,10 +465,13 @@ class ReportService
         $summarySheet->setTitle('Resumen Financiero');
 
         $headerStyle = [
-            'font' => ['bold' => true, 'size' => 12, 'color' => ['rgb' => 'FFFFFF']],
-            'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => '00008B']],
+            'font' => ['bold' => true, 'size' => 11, 'color' => ['rgb' => 'FFFFFF']],
+            'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => '0F172A']],
+            'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
         ];
-        $titleStyle = ['font' => ['bold' => true, 'size' => 14]];
+        $titleStyle = [
+            'font' => ['bold' => true, 'size' => 16, 'color' => ['rgb' => '0F172A']],
+        ];
 
         $summarySheet->setCellValue('A1', 'REPORTE FINANCIERO');
         $summarySheet->getStyle('A1')->applyFromArray($titleStyle);
@@ -466,6 +492,8 @@ class ReportService
             $summarySheet->setCellValue('B' . $rowNum, (int) $row->cantidad);
             $monto = (int) $row->total;
             $summarySheet->setCellValue('C' . $rowNum, $monto);
+            $summarySheet->getStyle('C' . $rowNum)->getNumberFormat()
+                ->setFormatCode('#,##0 "COP"');
             $totalGeneral += $monto;
             $rowNum++;
         }
@@ -473,7 +501,9 @@ class ReportService
         $summarySheet->setCellValue('A' . ($rowNum + 1), 'TOTAL GENERAL');
         $summarySheet->getStyle('A' . ($rowNum + 1))->applyFromArray($titleStyle);
         $summarySheet->setCellValue('C' . ($rowNum + 1), $totalGeneral);
-        $summarySheet->getStyle('C' . ($rowNum + 1))->applyFromArray($headerStyle);
+        $summarySheet->getStyle('C' . ($rowNum + 1))->getNumberFormat()
+            ->setFormatCode('#,##0 "COP"');
+        $summarySheet->getStyle('C' . ($rowNum + 1))->getFont()->setBold(true);
 
         // Detail Sheet
         $detailSheet = $spreadsheet->createSheet(1);
@@ -495,8 +525,16 @@ class ReportService
             $detailSheet->setCellValue('A' . $detRowNum, $counter++);
             $detailSheet->setCellValue('B' . $detRowNum, $row->jugador);
             $detailSheet->setCellValue('C' . $detRowNum, (int) $row->monto);
+            $detailSheet->getStyle('C' . $detRowNum)->getNumberFormat()
+                ->setFormatCode('#,##0 "COP"');
             $detailSheet->setCellValue('D' . $detRowNum, $row->estado);
             $detailSheet->setCellValue('E' . $detRowNum, $row->fecha);
+            
+            if ($detRowNum % 2 == 0) {
+                $detailSheet->getStyle('A' . $detRowNum . ':E' . $detRowNum)->getFill()
+                    ->setFillType(Fill::FILL_SOLID)
+                    ->getStartColor()->setRGB('F8FAFC');
+            }
             $detRowNum++;
         }
 
@@ -513,7 +551,7 @@ class ReportService
         return $filename;
     }
 
-    protected function generateFinancialPdf(array $summary, array $detail, string $tenantNombre, array $req, string $reportId): string
+    protected function generateFinancialPdf($summary, $detail, string $tenantNombre, array $req, string $reportId): string
     {
         $html = view('reports.financial', compact('summary', 'detail', 'tenantNombre', 'req'))->render();
 
@@ -578,15 +616,18 @@ class ReportService
         return $this->generateMedicalExcel($detail, $porTipo, $porGravedad, $porApto, $noAptos, $tenantNombre, $req, $reportId);
     }
 
-    protected function generateMedicalExcel(array $detail, array $porTipo, array $porGravedad, array $porApto, array $noAptos, string $tenantNombre, array $req, string $reportId): string
+    protected function generateMedicalExcel($detail, $porTipo, $porGravedad, $porApto, $noAptos, string $tenantNombre, array $req, string $reportId): string
     {
         $spreadsheet = new Spreadsheet();
 
         $headerStyle = [
             'font' => ['bold' => true, 'size' => 11, 'color' => ['rgb' => 'FFFFFF']],
-            'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => 'FF0000']],
+            'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => '0F172A']],
+            'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
         ];
-        $titleStyle = ['font' => ['bold' => true, 'size' => 14]];
+        $titleStyle = [
+            'font' => ['bold' => true, 'size' => 16, 'color' => ['rgb' => '0F172A']],
+        ];
 
         // Summary Sheet
         $summarySheet = $spreadsheet->getActiveSheet();
@@ -696,7 +737,7 @@ class ReportService
         return $filename;
     }
 
-    protected function generateMedicalPdf(array $detail, array $porTipo, array $porGravedad, array $porApto, array $noAptos, string $tenantNombre, array $req, string $reportId): string
+    protected function generateMedicalPdf($detail, $porTipo, $porGravedad, $porApto, $noAptos, string $tenantNombre, array $req, string $reportId): string
     {
         $html = view('reports.medical', compact('detail', 'porTipo', 'porGravedad', 'porApto', 'noAptos', 'tenantNombre', 'req'))->render();
 

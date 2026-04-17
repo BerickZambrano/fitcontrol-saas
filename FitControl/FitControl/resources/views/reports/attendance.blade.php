@@ -1,31 +1,34 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8">
-    <style>
-        body { font-family: Arial, sans-serif; margin: 20px; color: #333; }
-        h1 { text-align: center; font-size: 18px; margin-bottom: 5px; }
-        .info { font-size: 11px; margin-bottom: 15px; }
-        table { width: 100%; border-collapse: collapse; margin: 10px 0; }
-        th { background-color: #003366; color: white; font-size: 8px; padding: 4px; text-align: center; }
-        td { font-size: 7px; padding: 3px; text-align: center; }
-        .present { background-color: #90EE90; }
-        .absent { background-color: #FF6347; color: white; }
-    </style>
-</head>
-<body>
-    <h1>REPORTE DE ASISTENCIA A ENTRENAMIENTOS</h1>
-    <div class="info">
-        Equipo: {{ $equipoNombre }} | Periodo: {{ $req['fecha_desde'] }} al {{ $req['fecha_hasta'] }}
-    </div>
+@extends('reports.layout')
 
+@section('title', 'Reporte de Asistencia - ' . $equipoNombre)
+
+@section('custom-styles')
+    .present-cell { background-color: #dcfce7 !important; color: #166534; font-weight: bold; }
+    .absent-cell { background-color: #fee2e2 !important; color: #991b1b; font-weight: bold; }
+    .date-header { font-size: 8px !important; }
+@endsection
+
+@section('meta')
     <table>
+        <tr>
+            <td width="50%"><strong>REPORTE:</strong> Asistencia a Entrenamientos</td>
+            <td width="50%" class="text-right"><strong>EQUIPO:</strong> {{ $equipoNombre }}</td>
+        </tr>
+        <tr>
+            <td><strong>PERIODO:</strong> {{ \Carbon\Carbon::parse($req['fecha_desde'])->format('d/m/Y') }} al {{ \Carbon\Carbon::parse($req['fecha_hasta'])->format('d/m/Y') }}</td>
+            <td class="text-right"><strong>GENERADO:</strong> {{ now()->format('d/m/Y') }}</td>
+        </tr>
+    </table>
+@endsection
+
+@section('content')
+    <table class="main-table">
         <thead>
             <tr>
-                <th>#</th>
-                <th style="text-align:left;">Jugador</th>
+                <th width="20">#</th>
+                <th class="text-left">Jugador</th>
                 @foreach($entrenamientos as $ent)
-                    <th>{{ substr($ent->fecha, 0, 10) }}</th>
+                    <th class="date-header">{{ \Carbon\Carbon::parse($ent->fecha)->format('d/m') }}</th>
                 @endforeach
                 <th>%</th>
             </tr>
@@ -47,18 +50,25 @@
                 @endphp
                 <tr>
                     <td>{{ $i + 1 }}</td>
-                    <td style="text-align:left;">{{ $jugador->name }}</td>
+                    <td class="text-left bold">{{ $jugador->name }}</td>
                     @foreach($entrenamientos as $ent)
                         @php
                             $key = $jugador->id . '_' . $ent->id;
                             $presente = $asistenciaMap[$key] ?? false;
                         @endphp
-                        <td class="{{ $presente ? 'present' : 'absent' }}">{{ $presente ? 'P' : 'A' }}</td>
+                        <td class="{{ $presente ? 'present-cell' : 'absent-cell' }}">
+                            {{ $presente ? 'P' : 'A' }}
+                        </td>
                     @endforeach
-                    <td>{{ count($entrenamientos) > 0 ? round($presentes * 100 / count($entrenamientos)) : 0 }}%</td>
+                    <td class="bold">
+                        {{ count($entrenamientos) > 0 ? round($presentes * 100 / count($entrenamientos)) : 0 }}%
+                    </td>
                 </tr>
             @endforeach
         </tbody>
     </table>
-</body>
-</html>
+    
+    <div style="margin-top: 20px; font-size: 10px; color: #64748b;">
+        <strong>Leyenda:</strong> <span class="badge badge-success">P</span> Presente | <span class="badge badge-danger">A</span> Ausente
+    </div>
+@endsection
