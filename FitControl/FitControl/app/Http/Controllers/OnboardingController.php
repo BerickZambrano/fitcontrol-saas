@@ -29,7 +29,8 @@ class OnboardingController extends Controller
             'ciudad'            => 'required|string',
             'pais'              => 'required|string',
             'encargado_nombre'  => 'required|string',
-            'email_corporativo'   => 'required|email',
+            'email_corporativo' => 'required|email',
+            'encargado_email'   => 'required|email',
             'encargado_telefono'=> 'required|string',
             'plan'              => 'required|in:mensual,anual',
             'tipo_club'         => 'required|in:formativo,amateur,profesional',
@@ -41,7 +42,7 @@ class OnboardingController extends Controller
         $data = $request->only([
             'nombre', 'nombre_corto', 'nit', 'telefono',
             'direccion', 'ciudad', 'pais', 'encargado_nombre',
-            'encargado_email', 'encargado_telefono', 'plan', 'tipo_club',
+            'email_corporativo', 'encargado_email', 'encargado_telefono', 'plan', 'tipo_club',
         ]);
 
         // Subir archivos

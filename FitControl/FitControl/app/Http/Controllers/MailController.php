@@ -21,41 +21,14 @@ class MailController extends Controller
 
         $subject = $request->input('subject');
         $body    = $request->input('body');
-        $file    = $request->file('file');
+        
+        // Guardar el archivo temporalmente
+        $path = $request->file('file')->store('imports/csv', 'local');
 
-        $handle  = fopen($file->getRealPath(), 'r');
-        $firstLine = true;
-        $sent = 0;
-        $errors = [];
+        // Despachar el Job en segundo plano
+        \App\Jobs\ProcessCsvImportJob::dispatch($path, $subject, $body);
 
-        while (($line = fgetcsv($handle)) !== false) {
-            if ($firstLine) {
-                $firstLine = false;
-                continue;
-            }
-
-            if (count($line) < 2) continue;
-
-            $nombre = trim(str_replace("\xEF\xBB\xBF", '', $line[0]));
-            $email  = trim($line[1]);
-
-            if (empty($email) || !str_contains($email, '@')) continue;
-
-            try {
-                \App\Jobs\SendBulkEmail::dispatch($email, $nombre, $subject, $body);
-                $sent++;
-            } catch (\Exception $e) {
-                $errors[] = "{$email}: {$e->getMessage()}";
-            }
-        }
-
-        fclose($handle);
-
-        if (!empty($errors)) {
-            return response("Enviados: {$sent} | Fallidos: " . count($errors) . " | Errores: " . implode('; ', $errors), 500);
-        }
-
-        return response('Correos enviados correctamente');
+        return response('El archivo CSV se está procesando en segundo plano.', 202);
     }
 
     /**
