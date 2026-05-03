@@ -21,10 +21,12 @@ class JugadorPerfilResource extends Resource
     use HasTenantGlobalSearch;
     protected static ?string $model = JugadorPerfil::class;
 
-    protected static ?string $navigationLabel = 'Mi Perfil';
-    protected static ?string $modelLabel = 'Perfil del Jugador';
+    protected static ?string $navigationLabel = 'Directorio Jugadores';
+    protected static ?string $modelLabel = 'Jugador';
+    protected static ?string $pluralModelLabel = 'Directorio de Jugadores';
+    protected static ?string $slug = 'directorio-jugadores';
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedUser;
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-users';
 
 
     protected static ?string $recordTitleAttribute = 'user_id';

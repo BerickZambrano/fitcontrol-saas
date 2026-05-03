@@ -174,7 +174,7 @@ return [
             ],
         ],
         'exclude' => [
-            \App\Filament\Jugador\Resources\JugadorPerfils\JugadorPerfilResource::class,
+            //
         ],
     ],
 
