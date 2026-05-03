@@ -75,7 +75,7 @@ export default function OnboardingIndex() {
           className="absolute inset-0 w-full h-full object-cover opacity-40 scale-105"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-        
+
         <div className="relative z-10 p-12 max-w-xl">
           <div className="flex items-center gap-3 mb-8">
             <div className="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/20">
@@ -83,7 +83,7 @@ export default function OnboardingIndex() {
             </div>
             <span className="text-white text-3xl font-black tracking-tighter uppercase italic">FitControl</span>
           </div>
-          
+
           <h2 className="text-5xl font-black text-white leading-tight mb-6 uppercase italic">
             El siguiente nivel <br />
             <span className="text-blue-500">empieza aquí.</span>
@@ -142,6 +142,10 @@ export default function OnboardingIndex() {
           <p className="text-gray-400 text-sm mt-10 text-center">
             ¿Ya tienes cuenta?{' '}
             <button onClick={() => window.location.href = '/login'} className="text-blue-600 font-bold hover:underline cursor-pointer bg-transparent border-none p-0 font-inherit">Inicia sesión</button>
+          </p>
+          <p className="text-gray-400 text-sm mt-10 text-center">
+            Volver{' '}
+            <button onClick={() => window.location.href = '/'} className="text-blue-600 font-bold hover:underline cursor-pointer bg-transparent border-none p-0 font-inherit">al inicio</button>
           </p>
         </div>
       </div>
