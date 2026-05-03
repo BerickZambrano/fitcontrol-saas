@@ -108,8 +108,14 @@ class TenantsTable
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
+                    \AlperenErsoy\FilamentExport\Actions\FilamentExportBulkAction::make('export')
+                        ->label('Exportar seleccionados'),
                     DeleteBulkAction::make(),
                 ]),
+            ])
+            ->headerActions([
+                \AlperenErsoy\FilamentExport\Actions\FilamentExportHeaderAction::make('export')
+                    ->label('Exportar'),
             ]);
     }
 }   

@@ -115,8 +115,7 @@ class HistorialMedicosTable
             ->headerActions([
                 FilamentExportHeaderAction::make('export')
                     ->label('Exportar')
-                    ->defaultFormat('pdf')
-                    ->directDownload(),
+                    ->defaultFormat('pdf'),
             ])
 
             ->recordActions([

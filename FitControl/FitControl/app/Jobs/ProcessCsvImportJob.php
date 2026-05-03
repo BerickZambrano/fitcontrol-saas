@@ -42,30 +42,61 @@ class ProcessCsvImportJob implements ShouldQueue
         }
 
         $handle = fopen($fullPath, 'r');
-        $firstLine = true;
+        $headers = fgetcsv($handle);
 
-        while (($line = fgetcsv($handle)) !== false) {
-            // Ignorar la cabecera
-            if ($firstLine) {
-                $firstLine = false;
-                continue;
+        if ($headers === false) {
+            \Log::warning("CSV vacío en importación masiva: {$fullPath}");
+            fclose($handle);
+            unlink($fullPath);
+            return;
+        }
+
+        $headers = array_map(function($h) {
+            return strtolower(trim(str_replace("\xEF\xBB\xBF", '', $h)));
+        }, $headers);
+
+        $emailIndex = -1;
+        $nameIndex = -1;
+
+        foreach ($headers as $index => $header) {
+            if (str_contains($header, 'email') || str_contains($header, 'correo')) {
+                $emailIndex = $index;
             }
-
-            if (count($line) < 2) continue;
-
-            $nombre = trim(str_replace("\xEF\xBB\xBF", '', $line[0]));
-            $email  = trim($line[1]);
-
-            if (empty($email) || !str_contains($email, '@')) continue;
-
-            try {
-                // Despachar el envío individual para cada línea encontrada
-                \App\Jobs\SendBulkEmail::dispatch($email, $nombre, $this->subject, $this->body);
-            } catch (Exception $e) {
-                \Log::error("Error despachando correo a {$email}: {$e->getMessage()}");
+            if (str_contains($header, 'nombre') || str_contains($header, 'name')) {
+                $nameIndex = $index;
             }
         }
 
+        if ($emailIndex === -1) {
+            $emailIndex = 1;
+            $nameIndex = 0;
+            if (isset($headers[1]) && str_contains($headers[1], '@')) {
+                fseek($handle, 0); 
+            }
+        }
+
+        $sentCount = 0;
+        $errorCount = 0;
+
+        while (($line = fgetcsv($handle)) !== false) {
+            if (!isset($line[$emailIndex])) continue;
+
+            $email = trim($line[$emailIndex]);
+            $nombre = isset($line[$nameIndex]) ? trim(str_replace("\xEF\xBB\xBF", '', $line[$nameIndex])) : 'Usuario';
+
+            if (empty($email) || !str_contains($email, '@')) {
+                continue;
+            }
+
+            try {
+                SendBulkEmail::dispatch($email, $nombre, $this->subject, $this->body);
+                $sentCount++;
+            } catch (\Exception $e) {
+                \Log::error("Error despachando correo a {$email}: " . $e->getMessage());
+                $errorCount++;
+            }
+        }
+        
         fclose($handle);
 
         // Eliminar el archivo temporal CSV después de procesar

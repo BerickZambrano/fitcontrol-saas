@@ -141,20 +141,49 @@ class SendEmails extends Page implements Forms\Contracts\HasForms
                 }
 
                 $handle = fopen($filePath, 'r');
-                $firstLine = true;
+                $headers = fgetcsv($handle);
+
+                if ($headers === false) {
+                    Notification::make()->title('El archivo CSV está vacío')->danger()->send();
+                    fclose($handle);
+                    return;
+                }
+
+                $headers = array_map(function($h) {
+                    return strtolower(trim(str_replace("\xEF\xBB\xBF", '', $h)));
+                }, $headers);
+
+                $emailIndex = -1;
+                $nameIndex = -1;
+
+                foreach ($headers as $index => $header) {
+                    if (str_contains($header, 'email') || str_contains($header, 'correo')) {
+                        $emailIndex = $index;
+                    }
+                    if (str_contains($header, 'nombre') || str_contains($header, 'name')) {
+                        $nameIndex = $index;
+                    }
+                }
+
+                if ($emailIndex === -1) {
+                    // Fallback a estructura clásica (columna 1 email, columna 0 nombre)
+                    $emailIndex = 1;
+                    $nameIndex = 0;
+                    
+                    if (isset($headers[1]) && str_contains($headers[1], '@')) {
+                        // La primera fila no era un encabezado, era un dato real
+                        fseek($handle, 0); 
+                    }
+                }
+
                 $sent = 0;
                 $errors = [];
 
                 while (($line = fgetcsv($handle)) !== false) {
-                    if ($firstLine) {
-                        $firstLine = false;
-                        continue;
-                    }
+                    if (!isset($line[$emailIndex])) continue;
 
-                    if (count($line) < 2) continue;
-
-                    $nombre = trim(str_replace("\xEF\xBB\xBF", '', $line[0]));
-                    $email  = trim($line[1]);
+                    $email = trim($line[$emailIndex]);
+                    $nombre = isset($line[$nameIndex]) ? trim(str_replace("\xEF\xBB\xBF", '', $line[$nameIndex])) : 'Usuario';
 
                     if (empty($email) || !str_contains($email, '@')) continue;
 
