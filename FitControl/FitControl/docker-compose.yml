@@ -1,0 +1,53 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: fitcontrol-app
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+      - "5173:5173"
+    volumes:
+      - .:/var/www/html
+    command: tail -f /dev/null
+    environment:
+      - DB_HOST=db
+      - REDIS_HOST=redis
+    depends_on:
+      - db
+      - redis
+    networks:
+      - fitcontrol-network
+
+  db:
+    image: postgres:16
+    container_name: fitcontrol-db
+    restart: unless-stopped
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_DB: fitcontrol
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: "16112007"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - fitcontrol-network
+
+  redis:
+    image: redis:alpine
+    container_name: fitcontrol-redis
+    restart: unless-stopped
+    ports:
+      - "6380:6379"
+    networks:
+      - fitcontrol-network
+
+volumes:
+  pgdata:
+    driver: local
+
+networks:
+  fitcontrol-network:
+    driver: bridge

@@ -1,14 +1,19 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FitControl</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
         body {
-            background: #0f172a;
+            background: transparent;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -17,63 +22,74 @@
             font-family: 'Segoe UI', system-ui, sans-serif;
         }
 
-        canvas {
-            position: fixed;
-            top: 0;
-            left: 0;
-            z-index: 0;
-        }
+
+
+
 
         .loader {
             position: relative;
-            z-index: 1;
+            z-index: 10;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 32px;
+            gap: 20px;
         }
 
         .logo-container {
             position: relative;
-            width: 240px;
-            height: 240px;
+            width: 80px;
+            height: 80px;
             display: flex;
             align-items: center;
             justify-content: center;
+            background: transparent;
         }
 
         .logo-container img {
-            width: 160px;
-            height: 160px;
+            width: 45px;
+            height: 45px;
             object-fit: contain;
-            animation: pulse 2s ease-in-out infinite;
+            animation: pulse 2.5s ease-in-out infinite;
+            z-index: 10;
         }
 
-        .logo-container::before {
-            content: '';
+        .logo-container:before,
+        .logo-container:after {
+            content: "";
+            display: block;
             position: absolute;
-            inset: -8px;
+            border-width: 4px;
+            border-style: solid;
             border-radius: 50%;
-            border: 3px solid transparent;
-            border-top-color: #3b82f6;
+        }
+
+        .logo-container:before {
+            width: 80px;
+            height: 80px;
+            border-bottom-color: #3b82f6;
             border-right-color: #3b82f6;
+            border-top-color: transparent;
+            border-left-color: transparent;
+            top: 0;
+            left: 0;
             animation: spin 1s linear infinite;
         }
 
-        .logo-container::after {
-            content: '';
-            position: absolute;
-            inset: -16px;
-            border-radius: 50%;
-            border: 2px solid transparent;
-            border-bottom-color: #60a5fa;
-            border-left-color: #60a5fa;
-            animation: spin 1.5s linear infinite reverse;
+        .logo-container:after {
+            width: 50px;
+            height: 50px;
+            border-bottom-color: #93c5fd;
+            border-right-color: #93c5fd;
+            border-top-color: transparent;
+            border-left-color: transparent;
+            top: 15px;
+            left: 15px;
+            animation: spin 0.85s linear infinite reverse;
         }
 
         .brand {
-            color: #ffffff;
-            font-size: 28px;
+            color: rgba(59, 130, 246, 0.7);
+            font-size: 14px;
             font-weight: 900;
             text-transform: uppercase;
             letter-spacing: -1px;
@@ -88,23 +104,7 @@
             cursor: pointer;
         }
 
-        .progress-bar {
-            width: 200px;
-            height: 3px;
-            background: rgba(59, 130, 246, 0.1);
-            border-radius: 10px;
-            overflow: hidden;
-        }
 
-        .progress-bar::after {
-            content: '';
-            display: block;
-            width: 40%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, #3b82f6, transparent);
-            border-radius: 10px;
-            animation: loading 1.5s ease-in-out infinite;
-        }
 
         .hint-text {
             position: fixed;
@@ -133,30 +133,46 @@
         }
 
         @keyframes spin {
-            to { transform: rotate(360deg); }
+            to {
+                transform: rotate(360deg);
+            }
         }
 
         @keyframes pulse {
-            0%, 100% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(1.05); opacity: 0.8; }
+
+            0%,
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+
+            50% {
+                transform: scale(1.05);
+                opacity: 0.8;
+            }
         }
 
         @keyframes loading {
-            0% { transform: translateX(-100%); }
-            100% { transform: translateX(350%); }
+            0% {
+                transform: translateX(-100%);
+            }
+
+            100% {
+                transform: translateX(350%);
+            }
         }
     </style>
 </head>
+
 <body>
 
-    <canvas id="particles"></canvas>
+
 
     <div class="loader">
         <div class="logo-container">
             <img src="/images/logo.png" alt="FitControl">
         </div>
         <div class="brand">Fit<span>Control</span></div>
-        <div class="progress-bar"></div>
     </div>
 
     <script>
@@ -170,88 +186,8 @@
             window.location.replace(targetUrl);
         }, 2000);
 
-        const canvas = document.getElementById('particles');
-        const ctx = canvas.getContext('2d');
 
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-
-        window.addEventListener('resize', () => {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        });
-
-        class Particle {
-            constructor() {
-                this.reset();
-            }
-
-            reset() {
-                this.x = Math.random() * canvas.width;
-                this.y = Math.random() * canvas.height;
-                this.size = Math.random() * 2 + 0.5;
-                this.speedX = (Math.random() - 0.5) * 0.5;
-                this.speedY = (Math.random() - 0.5) * 0.5;
-                this.opacity = Math.random() * 0.5 + 0.1;
-            }
-
-            update() {
-                this.x += this.speedX;
-                this.y += this.speedY;
-
-                if (this.x < 0 || this.x > canvas.width || this.y < 0 || this.y > canvas.height) {
-                    this.reset();
-                }
-            }
-
-            draw() {
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                ctx.fillStyle = `rgba(59, 130, 246, ${this.opacity})`;
-                ctx.fill();
-            }
-        }
-
-        const particles = [];
-        const particleCount = 80;
-
-        for (let i = 0; i < particleCount; i++) {
-            particles.push(new Particle());
-        }
-
-        function connectParticles() {
-            for (let i = 0; i < particles.length; i++) {
-                for (let j = i + 1; j < particles.length; j++) {
-                    const dx = particles[i].x - particles[j].x;
-                    const dy = particles[i].y - particles[j].y;
-                    const distance = Math.sqrt(dx * dx + dy * dy);
-
-                    if (distance < 120) {
-                        const opacity = (1 - distance / 120) * 0.15;
-                        ctx.beginPath();
-                        ctx.strokeStyle = `rgba(59, 130, 246, ${opacity})`;
-                        ctx.lineWidth = 0.5;
-                        ctx.moveTo(particles[i].x, particles[i].y);
-                        ctx.lineTo(particles[j].x, particles[j].y);
-                        ctx.stroke();
-                    }
-                }
-            }
-        }
-
-        function animate() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-            particles.forEach(p => {
-                p.update();
-                p.draw();
-            });
-
-            connectParticles();
-            requestAnimationFrame(animate);
-        }
-
-        animate();
     </script>
 </body>
+
 </html>
