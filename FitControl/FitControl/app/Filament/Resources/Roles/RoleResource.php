@@ -122,7 +122,7 @@ class RoleResource extends Resource
                 DeleteAction::make(),
             ])
             ->toolbarActions([
-                \Filament\Tables\Actions\BulkActionGroup::make([
+                \Filament\Actions\BulkActionGroup::make([
                     \AlperenErsoy\FilamentExport\Actions\FilamentExportBulkAction::make('export')
                         ->label('Exportar seleccionados'),
                     DeleteBulkAction::make(),
