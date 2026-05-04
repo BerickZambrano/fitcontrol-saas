@@ -98,6 +98,14 @@ class PagosTable
             ])
 
             ->recordActions([
+                \Filament\Actions\Action::make('aprobarPago')
+                    ->label('Aprobar')
+                    ->icon('heroicon-m-check-badge')
+                    ->color('success')
+                    ->action(function ($record) {
+                        $record->update(['estado' => 'pagado']);
+                    })
+                    ->visible(fn ($record) => $record->estado !== 'pagado'),
                 EditAction::make(),
                 DeleteAction::make(),
             ])

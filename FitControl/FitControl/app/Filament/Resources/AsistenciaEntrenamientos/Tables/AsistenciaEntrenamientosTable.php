@@ -90,6 +90,14 @@ class AsistenciaEntrenamientosTable
             ])
 
             ->recordActions([
+                \Filament\Actions\Action::make('marcarPresente')
+                    ->label('Marcar Presente')
+                    ->icon('heroicon-m-check-circle')
+                    ->color('success')
+                    ->action(function ($record) {
+                        $record->update(['presente' => true]);
+                    })
+                    ->visible(fn ($record) => !$record->presente),
                 EditAction::make(),
                 DeleteAction::make(),
             ])
