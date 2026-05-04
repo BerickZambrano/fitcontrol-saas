@@ -14,6 +14,7 @@ class EquipoForm
             ->schema([
                 Forms\Components\TextInput::make('nombre')
                     ->label('Nombre del Equipo')
+                    ->maxLength(255)
                     ->required(),
 
                 Forms\Components\Select::make('categoria')
@@ -31,10 +32,12 @@ class EquipoForm
                     ->image(),
 
                 Forms\Components\TextInput::make('ubi_equipo')
-                    ->label('Ubicación'),
+                    ->label('Ubicación')
+                    ->maxLength(255),
 
                 Forms\Components\TextInput::make('contacto_equipo')
-                    ->label('Contacto'),
+                    ->label('Contacto')
+                    ->maxLength(255),
 
                 // Asignar tenant_id automáticamente
                 Forms\Components\Hidden::make('tenant_id')

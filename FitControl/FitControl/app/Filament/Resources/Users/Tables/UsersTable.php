@@ -32,7 +32,7 @@ class UsersTable
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('email')
-                    ->label('Email')
+                    ->label('Correo Electrónico')
                     ->searchable(),
 
                 Tables\Columns\TextColumn::make('roles.name')

@@ -28,6 +28,13 @@ class PagoForm
             Forms\Components\TextInput::make('monto')
                 ->label('Monto')
                 ->numeric()
+                ->minValue(0)
+                ->maxValue(99999999.99)
+                ->validationMessages([
+                    'max' => 'El monto ingresado es demasiado grande.',
+                    'min' => 'El monto no puede ser negativo.',
+                ])
+                ->prefix('$')
                 ->required(),
 
             Forms\Components\Select::make('estado')

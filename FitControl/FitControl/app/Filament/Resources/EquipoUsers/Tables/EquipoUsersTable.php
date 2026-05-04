@@ -46,11 +46,11 @@ class EquipoUsersTable
                     ->searchable(),
 
                 Tables\Columns\TextColumn::make('fecha_inicio')
-                    ->label('Inicio')
+                    ->label('Fecha de Inicio')
                     ->date(),
 
                 Tables\Columns\TextColumn::make('fecha_fin')
-                    ->label('Fin')
+                    ->label('Fecha de Fin')
                     ->date(),
 
                 Tables\Columns\TextColumn::make('created_at')
@@ -73,7 +73,7 @@ class EquipoUsersTable
                 ->preload(),
 
             Filter::make('fecha_inicio')
-                ->label('Fecha de inicio')
+                ->label('Fecha de Inicio')
                 ->form([
                     DatePicker::make('desde')
                         ->label('Desde'),

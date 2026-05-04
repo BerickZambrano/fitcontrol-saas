@@ -23,7 +23,7 @@ class AsistenciaEntrenamientosTable
             ->modifyQueryUsing(fn ($query) => $query->with(['entrenamiento', 'jugador']))
             ->columns([
                 TextColumn::make('entrenamiento.fecha')
-                    ->label('Fecha')
+                    ->label('Fecha del Entrenamiento')
                     ->date()
                     ->sortable(),
 
@@ -53,6 +53,7 @@ class AsistenciaEntrenamientosTable
 
                 // Rango de fechas
                 Filter::make('fecha')
+                    ->label('Rango de Fechas')
                     ->form([
                         DatePicker::make('desde'),
                         DatePicker::make('hasta'),
@@ -79,6 +80,7 @@ class AsistenciaEntrenamientosTable
 
                 // Solo presentes
                 Filter::make('solo_presentes')
+                    ->label('Solo Presentes')
                     ->query(fn ($query) => $query->where('presente', true)),
             ])
 

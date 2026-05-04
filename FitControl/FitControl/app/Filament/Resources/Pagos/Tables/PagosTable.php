@@ -67,7 +67,7 @@ class PagosTable
                     ]),
 
                 Filter::make('fecha')
-                    ->label('Fecha de pago')
+                    ->label('Fecha de Pago')
                     ->form([
                         DatePicker::make('desde'),
                         DatePicker::make('hasta'),
@@ -81,8 +81,8 @@ class PagosTable
                 Filter::make('monto')
                     ->label('Monto')
                     ->form([
-                        TextInput::make('min')->numeric(),
-                        TextInput::make('max')->numeric(),
+                        TextInput::make('min')->label('Mínimo')->numeric(),
+                        TextInput::make('max')->label('Máximo')->numeric(),
                     ])
                     ->query(function ($query, array $data) {
                         return $query

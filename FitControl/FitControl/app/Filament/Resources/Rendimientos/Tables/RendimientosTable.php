@@ -28,7 +28,7 @@ class RendimientosTable
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('minutos_jugados')
-                    ->label('Minutos')
+                    ->label('Minutos Jugados')
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('goles')
@@ -80,8 +80,8 @@ class RendimientosTable
                 Filter::make('evaluacion')
                     ->label('Evaluación')
                     ->form([
-                        TextInput::make('min')->numeric(),
-                        TextInput::make('max')->numeric(),
+                        TextInput::make('min')->label('Mínimo')->numeric(),
+                        TextInput::make('max')->label('Máximo')->numeric(),
                     ])
                     ->query(function ($query, array $data) {
                         return $query

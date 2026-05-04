@@ -47,12 +47,13 @@ class HistorialMedicoForm
                             ->required(),
                     ]),
 
-                ComponentsSection::make('Detalle médico')
+                ComponentsSection::make('Detalle Médico')
                     ->schema([
 
                         Textarea::make('descripcion')
                             ->label('Descripción')
                             ->rows(4)
+                        ->maxLength(1000)
                             ->required(),
 
                         Select::make('gravedad')
@@ -74,12 +75,13 @@ class HistorialMedicoForm
                     ->schema([
 
                         DatePicker::make('fecha_inicio')
-                            ->label('Fecha inicio')
+                            ->label('Fecha de Inicio')
                             ->required(),
 
                         DatePicker::make('fecha_fin')
-                            ->label('Fecha fin')
-                            ->afterOrEqual('fecha_inicio'),
+                            ->label('Fecha de Fin')
+                            ->afterOrEqual('fecha_inicio')
+                            ->validationMessages(['after_or_equal' => 'La fecha de fin debe ser igual o posterior a la fecha de inicio.']),
                     ]),
             ]);
     }

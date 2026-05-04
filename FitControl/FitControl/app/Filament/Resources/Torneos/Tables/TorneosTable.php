@@ -32,12 +32,12 @@ class TorneosTable
                     ->sortable(),
 
                 TextColumn::make('fecha_inicio')
-                    ->label('Inicio')
+                    ->label('Fecha de Inicio')
                     ->date()
                     ->sortable(),
 
                 TextColumn::make('fecha_fin')
-                    ->label('Fin')
+                    ->label('Fecha de Fin')
                     ->date()
                     ->sortable(),
 
@@ -59,7 +59,7 @@ class TorneosTable
                     ]),
 
                 Filter::make('fecha_inicio')
-                    ->label('Inicio')
+                    ->label('Fecha de Inicio')
                     ->form([
                         DatePicker::make('desde'),
                         DatePicker::make('hasta'),
@@ -71,7 +71,7 @@ class TorneosTable
                     }),
 
                 Filter::make('fecha_fin')
-                    ->label('Fin')
+                    ->label('Fecha de Fin')
                     ->form([
                         DatePicker::make('desde'),
                         DatePicker::make('hasta'),

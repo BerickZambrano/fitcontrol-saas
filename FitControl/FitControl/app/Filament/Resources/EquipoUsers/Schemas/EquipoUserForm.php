@@ -70,6 +70,8 @@ class EquipoUserForm
 
             Forms\Components\DatePicker::make('fecha_fin')
                 ->label('Fecha de Fin')
+                ->after('fecha_inicio')
+                ->validationMessages(['after' => 'La fecha de fin debe ser posterior a la fecha de inicio.'])
                 ->nullable(),
         ]);
     }

@@ -20,49 +20,71 @@ class TenantsTable
         return $table
             ->columns([
                 TextColumn::make('nombre')
+                    ->label('Nombre del Club')
                     ->searchable(),
                 TextColumn::make('subdominio')
+                    ->label('Subdominio')
                     ->searchable(),
                 TextColumn::make('estado')
+                    ->label('Estado')
                     ->badge(),
                 TextColumn::make('nombre_corto')
+                    ->label('Nombre Corto')
                     ->searchable(),
                 TextColumn::make('nit')
+                    ->label('NIT')
                     ->searchable(),
-                TextColumn::make('anio_fundacion'),
+                TextColumn::make('anio_fundacion')
+                    ->label('Año de Fundación'),
                 TextColumn::make('tipo_club')
+                    ->label('Tipo de Club')
                     ->badge(),
                 TextColumn::make('escudo_url')
+                    ->label('URL del Escudo')
                     ->searchable(),
                 TextColumn::make('direccion')
+                    ->label('Dirección')
                     ->searchable(),
                 TextColumn::make('ciudad')
+                    ->label('Ciudad')
                     ->searchable(),
                 TextColumn::make('pais')
+                    ->label('País')
                     ->searchable(),
                 TextColumn::make('email_corporativo')
+                    ->label('Correo Corporativo')
                     ->searchable(),
                 TextColumn::make('telefono')
+                    ->label('Teléfono')
                     ->searchable(),
                 TextColumn::make('sitio_web')
+                    ->label('Sitio Web')
                     ->searchable(),
                 TextColumn::make('encargado_nombre')
+                    ->label('Nombre del Encargado')
                     ->searchable(),
                 TextColumn::make('encargado_email')
+                    ->label('Correo del Encargado')
                     ->searchable(),
                 TextColumn::make('encargado_telefono')
+                    ->label('Tel. Encargado')
                     ->searchable(),
                 TextColumn::make('rut_document')
+                    ->label('Documento RUT')
                     ->searchable(),
                 TextColumn::make('camara_comercio')
+                    ->label('Cámara de Comercio')
                     ->searchable(),
                 TextColumn::make('plan')
+                    ->label('Plan')
                     ->badge(),
                 TextColumn::make('created_at')
+                    ->label('Fecha de Creación')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('updated_at')
+                    ->label('Última Actualización')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),

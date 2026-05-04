@@ -83,7 +83,7 @@ class InstalacionsTable
                     ]),
 
                 Filter::make('created_at')
-                    ->label('Fecha de creación')
+                    ->label('Fecha de Creación')
                     ->form([
                         DatePicker::make('desde'),
                         DatePicker::make('hasta'),

@@ -17,18 +17,25 @@ class UserForm
 
             Forms\Components\TextInput::make('name')
                 ->label('Nombre')
-                ->required(),
+                ->required()
+                ->maxLength(255),
 
             Forms\Components\TextInput::make('email')
-                ->label('Email')
+                ->label('Correo Electrónico')
                 ->email()
                 ->required()
-                ->unique(ignoreRecord: true),
+                ->maxLength(255)
+                ->unique(ignoreRecord: true)
+                ->validationMessages([
+                    'unique' => 'Este correo electrónico ya está registrado en el sistema.',
+                ]),
 
             Forms\Components\TextInput::make('password')
                 ->label('Contraseña')
                 ->password()
                 ->confirmed()
+                ->minLength(8)
+                ->maxLength(255)
                 ->required(fn (string $operation) => $operation === 'create')
                 ->afterStateHydrated(
                     fn ($component) => $component->state(null)
@@ -54,9 +61,10 @@ class UserForm
                 ->disabled(fn () => !$isSuperAdmin),
 
             Forms\Components\Select::make('roles')
-                ->label('Rol')
+                ->label('Roles')
                 ->relationship('roles', 'name')
                 ->multiple()
+                ->preload()
                 ->required(),
 
             Forms\Components\Select::make('two_factor_type')

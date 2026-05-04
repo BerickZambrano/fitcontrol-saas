@@ -31,12 +31,15 @@ class InstalacionForm
 
                         TextInput::make('ubicacion')
                             ->label('Ubicación')
+                            ->maxLength(255)
                             ->required(),
 
                         TextInput::make('capacidad')
                             ->label('Capacidad')
                             ->numeric()
-                            ->minValue(0),
+                            ->minValue(0)
+                            ->maxValue(999999)
+                            ->validationMessages(['max' => 'La capacidad ingresada es demasiado grande.']),
 
                         Select::make('estado')
                             ->label('Estado')

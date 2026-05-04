@@ -56,32 +56,39 @@ class RendimientoForm
                     ->schema([
 
                         TextInput::make('minutos_jugados')
-                            ->label('Minutos jugados')
+                            ->label('Minutos Jugados')
                             ->numeric()
                             ->minValue(0)
                             ->maxValue(120)
+                            ->validationMessages(['max' => 'Los minutos jugados no pueden superar 120.'])
                             ->required(),
 
                         TextInput::make('goles')
+                            ->label('Goles')
                             ->numeric()
                             ->default(0)
+                            ->maxValue(100)
                             ->minValue(0),
 
                         TextInput::make('asistencias')
+                            ->label('Asistencias')
                             ->numeric()
                             ->default(0)
+                            ->maxValue(100)
                             ->minValue(0),
 
                         TextInput::make('tarjetas_amarillas')
-                            ->label('Tarjetas amarillas')
+                            ->label('Tarjetas Amarillas')
                             ->numeric()
                             ->default(0)
+                            ->maxValue(2)
                             ->minValue(0),
 
                         TextInput::make('tarjetas_rojas')
-                            ->label('Tarjetas rojas')
+                            ->label('Tarjetas Rojas')
                             ->numeric()
                             ->default(0)
+                            ->maxValue(1)
                             ->minValue(0),
 
                         TextInput::make('evaluacion')
@@ -89,6 +96,10 @@ class RendimientoForm
                             ->numeric()
                             ->minValue(0)
                             ->maxValue(10)
+                            ->validationMessages([
+                                'max' => 'La evaluación no puede ser mayor a 10',
+                                'min' => 'La evaluación no puede ser menor a 0'
+                            ])
                             ->step(0.1)
                             ->required(),
                     ]),

@@ -17,7 +17,7 @@ class TorneoForm
                ->schema([
 
                     TextInput::make('nombre')
-                        ->label('Nombre del torneo')
+                        ->label('Nombre del Torneo')
                         ->required()
                         ->maxLength(255),
 
@@ -42,13 +42,14 @@ class TorneoForm
                             ]),
 
                     DatePicker::make('fecha_inicio')
-                        ->label('Fecha de inicio')
+                        ->label('Fecha de Inicio')
                         ->required(),
 
                     DatePicker::make('fecha_fin')
-                        ->label('Fecha de fin')
+                        ->label('Fecha de Fin')
                         ->required()
-                        ->after('fecha_inicio'),
+                        ->after('fecha_inicio')
+                        ->validationMessages(['after' => 'La fecha de fin debe ser posterior a la fecha de inicio.']),
 
                     Select::make('estado')
                         ->label('Estado')

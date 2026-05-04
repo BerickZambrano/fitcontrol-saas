@@ -50,12 +50,12 @@ class HistorialMedicosTable
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('fecha_inicio')
-                    ->label('Inicio')
+                    ->label('Fecha de Inicio')
                     ->date()
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('fecha_fin')
-                    ->label('Fin')
+                    ->label('Fecha de Fin')
                     ->date()
                     ->sortable(),
 
@@ -95,12 +95,12 @@ class HistorialMedicosTable
                     ]),
 
                 TernaryFilter::make('apto')
-                    ->label('Estado médico')
+                    ->label('Estado Médico')
                     ->trueLabel('Aptos')
                     ->falseLabel('No aptos'),
 
                 Filter::make('fecha_inicio')
-                    ->label('Fecha de inicio')
+                    ->label('Fecha de Inicio')
                     ->form([
                         DatePicker::make('desde'),
                         DatePicker::make('hasta'),

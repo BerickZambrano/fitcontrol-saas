@@ -27,12 +27,12 @@ class PartidosTable
             ->modifyQueryUsing(fn ($query) => $query->with(['local', 'visitante']))
             ->columns([
                 Tables\Columns\TextColumn::make('local.nombre')
-                    ->label('Local')
+                    ->label('Equipo Local')
                     ->sortable()
                     ->searchable(),
 
                 Tables\Columns\TextColumn::make('visitante.nombre')
-                    ->label('Visitante')
+                    ->label('Equipo Visitante')
                     ->sortable()
                     ->searchable(),
 
@@ -57,19 +57,19 @@ class PartidosTable
 
             ->filters([
                 SelectFilter::make('local_id')
-                    ->label('Equipo local')
+                    ->label('Equipo Local')
                     ->relationship('local', 'nombre')
                     ->searchable()
                     ->preload(),
 
                 SelectFilter::make('visitante_id')
-                    ->label('Equipo visitante')
+                    ->label('Equipo Visitante')
                     ->relationship('visitante', 'nombre')
                     ->searchable()
                     ->preload(),
 
                 Filter::make('fecha')
-                    ->label('Fecha del partido')
+                    ->label('Fecha del Partido')
                     ->form([
                         DatePicker::make('desde'),
                         DatePicker::make('hasta'),
