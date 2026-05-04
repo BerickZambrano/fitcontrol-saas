@@ -29,4 +29,11 @@ class ListEquipos extends ListRecords
             CreateAction::make(),
         ];
     }
+
+    protected function getHeaderWidgets(): array
+    {
+        return [
+            \App\Filament\Resources\Equipos\Widgets\EquiposStats::class,
+        ];
+    }
 }

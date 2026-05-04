@@ -29,4 +29,11 @@ class ListPagos extends ListRecords
             CreateAction::make(),
         ];
     }
+
+    protected function getHeaderWidgets(): array
+    {
+        return [
+            \App\Filament\Resources\Pagos\Widgets\PagosStats::class,
+        ];
+    }
 }
