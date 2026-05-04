@@ -94,6 +94,7 @@ class AsistenciaEntrenamientosTable
                     ->label('Marcar Presente')
                     ->icon('heroicon-m-check-circle')
                     ->color('success')
+                    ->tooltip('Marcar al jugador como presente en el entrenamiento')
                     ->action(function ($record) {
                         $record->update(['presente' => true]);
                     })

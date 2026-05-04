@@ -102,6 +102,7 @@ class PagosTable
                     ->label('Aprobar')
                     ->icon('heroicon-m-check-badge')
                     ->color('success')
+                    ->tooltip('Marcar este pago como pagado inmediatamente')
                     ->action(function ($record) {
                         $record->update(['estado' => 'pagado']);
                     })
