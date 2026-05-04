@@ -38,6 +38,8 @@ class RendimientoResource extends Resource
         return RendimientosTable::configure($table);
     }
 
+
+
     public static function getRelations(): array
     {
         return [

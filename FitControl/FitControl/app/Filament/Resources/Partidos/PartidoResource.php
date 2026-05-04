@@ -39,6 +39,8 @@ class PartidoResource extends Resource
         return PartidosTable::configure($table);
     }
 
+
+
     public static function getRelations(): array
     {
         return [

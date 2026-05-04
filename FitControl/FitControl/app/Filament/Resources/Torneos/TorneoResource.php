@@ -39,6 +39,8 @@ class TorneoResource extends Resource
         return TorneosTable::configure($table);
     }
 
+
+
     public static function getRelations(): array
     {
         return [
