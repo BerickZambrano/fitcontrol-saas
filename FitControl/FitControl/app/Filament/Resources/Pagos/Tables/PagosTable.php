@@ -34,7 +34,8 @@ class PagosTable
                 Tables\Columns\TextColumn::make('monto')
                     ->label('Monto')
                     ->money('COP')
-                    ->sortable(),
+                    ->sortable()
+                    ->summarize(Tables\Columns\Summarizers\Sum::make()->label('Total')),
 
                 Tables\Columns\BadgeColumn::make('estado')
                     ->label('Estado')
