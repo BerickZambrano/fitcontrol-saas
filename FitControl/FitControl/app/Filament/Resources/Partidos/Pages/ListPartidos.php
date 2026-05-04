@@ -29,4 +29,11 @@ class ListPartidos extends ListRecords
             CreateAction::make(),
         ];
     }
+
+    protected function getHeaderWidgets(): array
+    {
+        return [
+            \App\Filament\Resources\Partidos\Widgets\PartidosStats::class,
+        ];
+    }
 }
