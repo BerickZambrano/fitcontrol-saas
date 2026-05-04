@@ -29,4 +29,11 @@ class ListRendimientos extends ListRecords
             CreateAction::make(),
         ];
     }
+
+    protected function getHeaderWidgets(): array
+    {
+        return [
+            \App\Filament\Resources\Rendimientos\Widgets\RendimientoStats::class,
+        ];
+    }
 }

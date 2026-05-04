@@ -29,4 +29,11 @@ class ListAsistenciaEntrenamientos extends ListRecords
             CreateAction::make(),
         ];
     }
+
+    protected function getHeaderWidgets(): array
+    {
+        return [
+            \App\Filament\Resources\AsistenciaEntrenamientos\Widgets\AsistenciaStats::class,
+        ];
+    }
 }

@@ -29,4 +29,11 @@ class ListTorneos extends ListRecords
             CreateAction::make(),
         ];
     }
+
+    protected function getHeaderWidgets(): array
+    {
+        return [
+            \App\Filament\Resources\Torneos\Widgets\TorneosStats::class,
+        ];
+    }
 }
