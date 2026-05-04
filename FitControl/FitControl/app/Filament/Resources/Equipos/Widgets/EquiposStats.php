@@ -22,13 +22,11 @@ class EquiposStats extends BaseWidget
         $cantEquipos = $queryEquipos->count();
         
         // Contar el total de jugadores que pertenecen a los equipos del tenant
-        $cantJugadores = \DB::table('historial_equipo')
-            ->whereIn('id_equipo_fk', function($query) use ($isSuperAdmin, $user) {
-                $query->select('id')->from('equipos');
-                if (!$isSuperAdmin && $user && $user->tenant_id) {
-                    $query->where('tenant_id', $user->tenant_id);
-                }
-            })->count();
+        $queryJugadores = \App\Models\EquipoUser::query();
+        if (!$isSuperAdmin && $user && $user->tenant_id) {
+            $queryJugadores->where('tenant_id', $user->tenant_id);
+        }
+        $cantJugadores = $queryJugadores->count();
 
         $promedioJugadores = $cantEquipos > 0 ? round($cantJugadores / $cantEquipos, 1) : 0;
 
