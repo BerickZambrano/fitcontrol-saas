@@ -34,9 +34,11 @@ class OnboardingController extends Controller
             'encargado_telefono'=> 'required|string',
             'plan'              => 'required|in:mensual,anual',
             'tipo_club'         => 'required|in:formativo,amateur,profesional',
-            'rut_document'      => 'required|file|mimetypes:application/pdf|max:5120',
-            'camara_comercio'   => 'required|file|mimetypes:application/pdf|max:5120',
-            'escudo_url'        => 'nullable|image|max:2048',
+            'rut_document'      => 'required|file|mimetypes:application/pdf,image/jpeg,image/png|max:20480',
+            'camara_comercio'   => 'required|file|mimetypes:application/pdf,image/jpeg,image/png|max:20480',
+
+            'escudo_url'        => 'nullable|image|max:20480',
+
         ]);
 
         $data = $request->only([

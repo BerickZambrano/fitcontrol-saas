@@ -3,7 +3,7 @@
   "appName": "FitControl",
   "webDir": "public",
   "server": {
-    "url": "http://192.168.20.50:8000/login",
+    "url": "http://192.168.20.162:8000/login",
     "cleartext": true
   },
   "plugins": {

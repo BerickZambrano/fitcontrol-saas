@@ -32,7 +32,8 @@ trait BelongsToTenant
                     });
 
                     if (!$isSuperAdmin) {
-                        $query->where('tenant_id', $userInfo->tenant_id);
+                        $query->where($query->getModel()->getTable() . '.tenant_id', $userInfo->tenant_id);
+
                     }
                 }
             }
