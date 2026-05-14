@@ -15,10 +15,20 @@ class User extends Authenticatable implements HasAvatar
     use Notifiable, HasRoles, Searchable, SoftDeletes;
 
     /**
-     * The "modelWasBooted" callback to register listeners for Spatie role events.
+     * Bootstrap the model and its event listeners.
+     * Consolidates all model events in one place.
      */
     protected static function booted(): void
     {
+        // Clear cache when user data changes to prevent stale tenant/role scopes
+        static::saved(function (User $user) {
+            static::clearUserInfoCache($user->id);
+        });
+
+        static::deleted(function (User $user) {
+            static::clearUserInfoCache($user->id);
+        });
+
         // Clear cache when roles are modified via Spatie Permission
         static::registerModelEvent('roleAttached', function (User $user) {
             static::clearUserInfoCache($user->id);
@@ -96,22 +106,7 @@ class User extends Authenticatable implements HasAvatar
         ];
     }
 
-    /**
-     * Bootstrap the model and its event listeners.
-     */
-    protected static function boot(): void
-    {
-        parent::boot();
 
-        // Clear tenant/role cache when user data changes to prevent stale scopes
-        static::saved(function (User $user) {
-            static::clearUserInfoCache($user->id);
-        });
-
-        static::deleted(function (User $user) {
-            static::clearUserInfoCache($user->id);
-        });
-    }
 
     /**
      * Clear cached user info and roles to force fresh lookups.
@@ -146,14 +141,20 @@ class User extends Authenticatable implements HasAvatar
 
     /**
      * Generate a new 2FA OTP code.
+     *
+     * Uses random_int() for cryptographic security.
+     * The plain OTP is returned to be sent to the user;
+     * only the bcrypt hash is stored in the database.
      */
     public function generateTwoFactorOtp(): string
     {
-        $this->two_factor_otp = sprintf("%06d", mt_rand(1, 999999));
+        $plainOtp = sprintf("%06d", random_int(0, 999999));
+
+        $this->two_factor_otp            = bcrypt($plainOtp);
         $this->two_factor_otp_expires_at = now()->addMinutes(15);
         $this->save();
 
-        return $this->two_factor_otp;
+        return $plainOtp; // devolver texto plano para enviarlo al usuario
     }
 
     /**

@@ -4,6 +4,7 @@ namespace App\Livewire\Auth;
 
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
 
@@ -29,8 +30,22 @@ class TwoFactorVerify extends Component
         $userId = session('2fa:user_id');
         $user = User::find($userId);
 
-        if (!$user || $user->two_factor_otp !== $this->code || now()->greaterThan($user->two_factor_otp_expires_at)) {
+        // Validar que el usuario exista y que el OTP no haya sido consumido
+        if (!$user || empty($user->two_factor_otp)) {
             $this->error = 'El código ingresado es incorrecto o ha expirado.';
+            return;
+        }
+
+        // Validar expiración del OTP
+        if (now()->greaterThan($user->two_factor_otp_expires_at)) {
+            $user->resetTwoFactorOtp(); // limpiar el OTP expirado
+            $this->error = 'El código ha expirado. Por favor solicita uno nuevo.';
+            return;
+        }
+
+        // Validar el OTP contra el hash almacenado en la BD
+        if (!Hash::check($this->code, $user->two_factor_otp)) {
+            $this->error = 'El código ingresado es incorrecto.';
             return;
         }
 

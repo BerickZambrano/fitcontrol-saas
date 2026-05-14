@@ -4,23 +4,25 @@ namespace App\Services;
 
 use App\Models\Tenant;
 use App\Models\User;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Notification;
 use App\Notifications\NewTenantRequestNotification;
 
 class ApprovalService
 {
-    public function notifyAdmin(Tenant $tenant)
+    public function notifyAdmin(Tenant $tenant): void
     {
-        // Obtener administradores del sistema (roles con permiso de gestionar tenants)
-        $admins = User::role('admin')->get();
+        // Buscar super_admins — rol principal del sistema
+        // Se incluye 'admin' como fallback por compatibilidad
+        $admins = User::role(['super_admin', 'admin'])->get();
 
         if ($admins->isEmpty()) {
-            // Fallback: primer usuario o log
-            \Log::info("Nueva solicitud de tenant: {$tenant->nombre}. No se encontraron admins para notificar.");
+            Log::warning("Nueva solicitud de tenant '{$tenant->nombre}' sin admins para notificar. Verifica que existan usuarios con rol super_admin.");
             return;
         }
 
-        // Enviar notificación (asegúrate de tener la clase NewTenantRequestNotification creada)
         Notification::send($admins, new NewTenantRequestNotification($tenant));
+
+        Log::info("Notificación de nuevo tenant '{$tenant->nombre}' enviada a {$admins->count()} administrador(es).");
     }
 }

@@ -17,6 +17,7 @@ RUN apt-get update && apt-get install -y \
     unzip \
     gnupg \
     procps \
+    supervisor \
     build-essential
 
 # Install PHP extensions
@@ -37,9 +38,13 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
     && apt-get install -y nodejs
 
+# Copy Supervisor configuration
+COPY docker/supervisor.conf /etc/supervisor/conf.d/fitcontrol.conf
+
 # Expose ports for artisan serve and vite dev server
 EXPOSE 8000
 EXPOSE 5173
 
-# Entrypoint default
-CMD ["npm", "run", "dev"]
+# In production: start supervisord (manages queue workers + scheduler)
+# In development: docker-compose overrides this with 'tail -f /dev/null'
+CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/supervisord.conf"]

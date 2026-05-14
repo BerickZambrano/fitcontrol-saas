@@ -27,9 +27,9 @@ services:
     ports:
       - "5433:5432"
     environment:
-      POSTGRES_DB: fitcontrol
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: "16112007"
+      POSTGRES_DB: ${POSTGRES_DB:-fitcontrol}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       - pgdata:/var/lib/postgresql/data
     networks:
