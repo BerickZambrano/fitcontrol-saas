@@ -1,9 +1,11 @@
-<?php declare(strict_types=1);
+<?php
 
 /**
  * This file is part of the Nette Framework (https://nette.org)
  * Copyright (c) 2004 David Grudl (https://davidgrudl.com)
  */
+
+declare(strict_types=1);
 
 namespace Nette\PhpGenerator\Traits;
 
@@ -23,7 +25,7 @@ trait PropertiesAware
 
 	/**
 	 * Replaces all properties.
-	 * @param list<Property>  $props
+	 * @param  Property[]  $props
 	 */
 	public function setProperties(array $props): static
 	{
@@ -37,7 +39,7 @@ trait PropertiesAware
 	}
 
 
-	/** @return array<string, Property> */
+	/** @return Property[] */
 	public function getProperties(): array
 	{
 		return $this->properties;

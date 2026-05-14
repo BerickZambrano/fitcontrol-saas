@@ -10,20 +10,4 @@ return [
 
     ],
 
-    'filters' => [
-
-        'actions' => [
-
-            'apply' => [
-                'label' => 'Zastosuj',
-            ],
-
-            'reset' => [
-                'label' => 'Resetuj',
-            ],
-
-        ],
-
-    ],
-
 ];

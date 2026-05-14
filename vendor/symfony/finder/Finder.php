@@ -57,10 +57,8 @@ class Finder implements \IteratorAggregate, \Countable
     private bool $reverseSorting = false;
     private \Closure|int|false $sort = false;
     private int $ignore = 0;
-    /** @var list<string> */
     private array $dirs = [];
     private array $dates = [];
-    /** @var list<iterable<SplFileInfo|\SplFileInfo|string>> */
     private array $iterators = [];
     private array $contains = [];
     private array $notContains = [];
@@ -665,33 +663,27 @@ class Finder implements \IteratorAggregate, \Countable
      */
     public function getIterator(): \Iterator
     {
-        if (!$this->dirs && !$this->iterators) {
+        if (0 === \count($this->dirs) && 0 === \count($this->iterators)) {
             throw new \LogicException('You must call one of in() or append() methods before iterating over a Finder.');
         }
 
-        if (1 === \count($this->dirs) && !$this->iterators) {
+        if (1 === \count($this->dirs) && 0 === \count($this->iterators)) {
             $iterator = $this->searchInDirectory($this->dirs[0]);
-        } else {
-            $iterator = new \AppendIterator();
-            foreach ($this->dirs as $dir) {
-                $iterator->append(new \IteratorIterator(new LazyIterator(fn () => $this->searchInDirectory($dir))));
+
+            if ($this->sort || $this->reverseSorting) {
+                $iterator = (new SortableIterator($iterator, $this->sort, $this->reverseSorting))->getIterator();
             }
 
-            foreach ($this->iterators as $it) {
-                $iterator->append(new \IteratorIterator(new LazyIterator(static function () use ($it) {
-                    foreach ($it as $file) {
-                        if (!$file instanceof \SplFileInfo) {
-                            $file = new \SplFileInfo($file);
-                        }
-                        $key = $file->getPathname();
-                        if (!$file instanceof SplFileInfo) {
-                            $file = new SplFileInfo($key, $file->getPath(), $key);
-                        }
+            return $iterator;
+        }
 
-                        yield $key => $file;
-                    }
-                })));
-            }
+        $iterator = new \AppendIterator();
+        foreach ($this->dirs as $dir) {
+            $iterator->append(new \IteratorIterator(new LazyIterator(fn () => $this->searchInDirectory($dir))));
+        }
+
+        foreach ($this->iterators as $it) {
+            $iterator->append($it);
         }
 
         if ($this->sort || $this->reverseSorting) {
@@ -706,13 +698,22 @@ class Finder implements \IteratorAggregate, \Countable
      *
      * The set can be another Finder, an Iterator, an IteratorAggregate, or even a plain array.
      *
-     * @param iterable<SplFileInfo|\SplFileInfo|string> $iterator
-     *
      * @return $this
      */
     public function append(iterable $iterator): static
     {
-        $this->iterators[] = $iterator;
+        if ($iterator instanceof \IteratorAggregate) {
+            $this->iterators[] = $iterator->getIterator();
+        } elseif ($iterator instanceof \Iterator) {
+            $this->iterators[] = $iterator;
+        } else {
+            $it = new \ArrayIterator();
+            foreach ($iterator as $file) {
+                $file = $file instanceof \SplFileInfo ? $file : new \SplFileInfo($file);
+                $it[$file->getPathname()] = $file;
+            }
+            $this->iterators[] = $it;
+        }
 
         return $this;
     }

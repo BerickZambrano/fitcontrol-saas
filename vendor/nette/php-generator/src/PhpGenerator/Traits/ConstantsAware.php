@@ -1,9 +1,11 @@
-<?php declare(strict_types=1);
+<?php
 
 /**
  * This file is part of the Nette Framework (https://nette.org)
  * Copyright (c) 2004 David Grudl (https://davidgrudl.com)
  */
+
+declare(strict_types=1);
 
 namespace Nette\PhpGenerator\Traits;
 
@@ -22,7 +24,7 @@ trait ConstantsAware
 
 	/**
 	 * Replaces all constants.
-	 * @param list<Constant>  $consts
+	 * @param  Constant[]  $consts
 	 */
 	public function setConstants(array $consts): static
 	{
@@ -36,7 +38,7 @@ trait ConstantsAware
 	}
 
 
-	/** @return array<string, Constant> */
+	/** @return Constant[] */
 	public function getConstants(): array
 	{
 		return $this->consts;

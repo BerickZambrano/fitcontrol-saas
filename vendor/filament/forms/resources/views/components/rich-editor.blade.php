@@ -9,8 +9,8 @@
     $mergeTags = $getMergeTags();
     $statePath = $getStatePath();
     $mentions = $getMentionsForJs();
-    $toolbarButtons = $getToolbarButtons();
     $tools = $getTools();
+    $toolbarButtons = $getToolbarButtons();
     $floatingToolbars = $getFloatingToolbars();
     $linkProtocols = $getLinkProtocols();
     $fileAttachmentsMaxSize = $getFileAttachmentsMaxSize();
@@ -19,7 +19,6 @@
 
 <x-dynamic-component :component="$fieldWrapperView" :field="$field">
     <x-filament::input.wrapper
-        :disabled="$isDisabled"
         :valid="! $errors->has($statePath)"
         x-cloak
         :attributes="
@@ -87,11 +86,7 @@
                     @foreach ($toolbarButtons as $button => $buttonGroup)
                         <div class="fi-fo-rich-editor-toolbar-group">
                             @foreach ($buttonGroup as $button)
-                                @if (is_string($button))
-                                    {{ $tools[$button] ?? throw new LogicException("Toolbar button [{$button}] cannot be found.") }}
-                                @else
-                                    {{ $button }}
-                                @endif
+                                {{ $tools[$button] ?? throw new LogicException("Toolbar button [{$button}] cannot be found.") }}
                             @endforeach
                         </div>
                     @endforeach
@@ -131,11 +126,7 @@
                             class="fi-fo-rich-editor-floating-toolbar fi-not-prose"
                         >
                             @foreach ($buttons as $button)
-                                @if (is_string($button))
-                                    {{ $tools[$button] }}
-                                @else
-                                    {{ $button }}
-                                @endif
+                                {{ $tools[$button] }}
                             @endforeach
                         </div>
                     @endforeach

@@ -37,11 +37,6 @@ trait HasColumns
         return $this;
     }
 
-    public function hasCustomColumns(): bool
-    {
-        return $this->columns !== null;
-    }
-
     /**
      * @return array<string, ?int> | int | null
      */

@@ -43,7 +43,6 @@ trait EntanglesStateWithSingularRelationship
             $findFirstComponentWithThisRelationship = function (Schema $schema) use ($component, &$findFirstComponentWithThisRelationship): ?CanEntangleWithSingularRelationships {
                 foreach ($schema->getComponents(withActions: false, withHidden: true) as $childComponent) {
                     if (
-                        ($childComponent->getStatePath() === $component->getStatePath()) &&
                         ($childComponent->getModel() === $component->getModel()) &&
                         ($childComponent->getRecord() === $component->getRecord()) &&
                         ($childComponent instanceof CanEntangleWithSingularRelationships) &&

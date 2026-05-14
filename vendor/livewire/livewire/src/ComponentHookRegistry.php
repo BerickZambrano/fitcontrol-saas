@@ -36,13 +36,13 @@ class ComponentHookRegistry
         static::$components = new WeakMap;
 
         foreach (static::$componentHooks as $hook) {
-            on('mount', function ($component, $params, $key, $parent, $attributes) use ($hook) {
+            on('mount', function ($component, $params, $key, $parent) use ($hook) {
                 if (! $hook = static::initializeHook($hook, $component)) {
                     return;
                 }
 
                 $hook->callBoot();
-                $hook->callMount($params, $parent, $attributes);
+                $hook->callMount($params, $parent);
             });
 
             on('hydrate', function ($component, $memo) use ($hook) {
@@ -61,16 +61,12 @@ class ComponentHookRegistry
             return static::proxyCallToHooks($component, 'callUpdate')($propertyName, $fullPath, $newValue);
         });
 
-        on('call', function ($component, $method, $params, $componentContext, $earlyReturn, $metadata) {
-            return static::proxyCallToHooks($component, 'callCall')($method, $params, $earlyReturn, $metadata, $componentContext);
+        on('call', function ($component, $method, $params, $addEffect, $earlyReturn) {
+            return static::proxyCallToHooks($component, 'callCall')($method, $params, $earlyReturn);
         });
 
         on('render', function ($component, $view, $data) {
             return static::proxyCallToHooks($component, 'callRender')($view, $data);
-        });
-
-        on('renderIsland', function ($component, $name, $view, $data) {
-            return static::proxyCallToHooks($component, 'callRenderIsland')($name, $view, $data);
         });
 
         on('dehydrate', function ($component, $context) {
@@ -108,16 +104,14 @@ class ComponentHookRegistry
 
     static function proxyCallToHooks($target, $method) {
         return function (...$params) use ($target, $method) {
-            $forwardCallbacks = [];
+            $callbacks = [];
 
             foreach (static::$components[$target] ?? [] as $hook) {
-                if ($callback = $hook->{$method}(...$params)) {
-                    $forwardCallbacks[] = $callback;
-                }
+                $callbacks[] = $hook->{$method}(...$params);
             }
 
-            return function (...$forwards) use ($forwardCallbacks) {
-                foreach ($forwardCallbacks as $callback) {
+            return function (...$forwards) use ($callbacks) {
+                foreach ($callbacks as $callback) {
                     $callback(...$forwards);
                 }
             };

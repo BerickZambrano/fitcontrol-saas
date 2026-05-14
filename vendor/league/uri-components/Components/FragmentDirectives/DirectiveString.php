@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace League\Uri\Components\FragmentDirectives;
 
-use BackedEnum;
 use League\Uri\Contracts\FragmentDirective;
 use Stringable;
 
@@ -28,12 +27,8 @@ final class DirectiveString
      * separator `=` is not present when no value
      * is attached to it
      */
-    public static function resolve(BackedEnum|Stringable|string $directive): FragmentDirective
+    public static function resolve(Stringable|string $directive): FragmentDirective
     {
-        if ($directive instanceof BackedEnum) {
-            $directive = $directive->value;
-        }
-
         $directive = (string) $directive;
 
         return match (true) {

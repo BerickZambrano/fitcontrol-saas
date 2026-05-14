@@ -67,7 +67,7 @@
         :persist-collapsed="$shouldPersistCollapsed"
         :secondary="$isSecondary"
     >
-        {{ $getChildSchema()->extraAttributes(['class' => 'fi-section-content']) }}
+        {{ $getChildSchema()->gap(! $isDivided)->extraAttributes(['class' => 'fi-section-content']) }}
     </x-filament::section>
 
     @if ($belowContentContainer = $getChildSchema($schemaComponent::BELOW_CONTENT_SCHEMA_KEY)?->toHtmlString())

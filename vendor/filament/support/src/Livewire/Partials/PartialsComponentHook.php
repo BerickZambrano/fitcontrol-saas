@@ -178,13 +178,6 @@ class PartialsComponentHook extends ComponentHook
             ]);
         }
 
-        $discoveredChildren = store($this->component)->get('children', []);
-
-        if (! empty($discoveredChildren)) {
-            $previousChildren = store($this->component)->get('previousChildren', []);
-            store($this->component)->set('previousChildren', array_merge($previousChildren, $discoveredChildren));
-        }
-
         $context->addEffect('partials', $partials);
     }
 

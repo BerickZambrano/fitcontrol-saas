@@ -8,16 +8,15 @@ use Livewire\Mechanisms\HandleComponents\HandleComponents;
 use Livewire\Mechanisms\HandleComponents\ComponentContext;
 use Livewire\Mechanisms\FrontendAssets\FrontendAssets;
 use Livewire\Mechanisms\ExtendBlade\ExtendBlade;
+use Livewire\Mechanisms\ComponentRegistry;
 use Livewire\Features\SupportTesting\Testable;
 use Livewire\Features\SupportTesting\DuskTestable;
-use Livewire\Features\SupportLazyLoading\SupportLazyLoading;
 use Livewire\Features\SupportAutoInjectedAssets\SupportAutoInjectedAssets;
+use Livewire\Features\SupportLazyLoading\SupportLazyLoading;
 
 class LivewireManager
 {
     protected LivewireServiceProvider $provider;
-
-    public static $v4 = true;
 
     function setProvider(LivewireServiceProvider $provider)
     {
@@ -31,22 +30,7 @@ class LivewireManager
 
     function component($name, $class = null)
     {
-        $this->addComponent($name, class: $class);
-    }
-
-    function addComponent($name, $viewPath = null, $class = null)
-    {
-        app('livewire.finder')->addComponent($name, class: $class, viewPath: $viewPath);
-    }
-
-    function addLocation($viewPath = null, $classNamespace = null)
-    {
-        return app('livewire.finder')->addLocation(classNamespace: $classNamespace, viewPath: $viewPath);
-    }
-
-    function addNamespace($namespace, $viewPath = null, $classNamespace = null, $classPath = null, $classViewPath = null)
-    {
-        return app('livewire.finder')->addNamespace($namespace, classNamespace: $classNamespace, viewPath: $viewPath, classPath: $classPath, classViewPath: $classViewPath);
+        app(ComponentRegistry::class)->component($name, $class);
     }
 
     function componentHook($hook)
@@ -69,37 +53,24 @@ class LivewireManager
         app(ExtendBlade::class)->livewireOnlyPrecompiler($callback);
     }
 
-    function prepareViewsForCompilationUsing(callable $callback)
-    {
-        app('livewire.compiler')->prepareViewsForCompilationUsing($callback);
-    }
-
     function new($name, $id = null)
     {
-        return app('livewire.factory')->create($name, $id);
+        return app(ComponentRegistry::class)->new($name, $id);
     }
 
-    /**
-     * @deprecated This method will be removed in a future version. Use exists() instead.
-     */
     function isDiscoverable($componentNameOrClass)
     {
-        return $this->exists($componentNameOrClass);
-    }
-
-    function exists($componentNameOrClass)
-    {
-        return app('livewire.factory')->exists($componentNameOrClass);
+        return app(ComponentRegistry::class)->isDiscoverable($componentNameOrClass);
     }
 
     function resolveMissingComponent($resolver)
     {
-        return app('livewire.factory')->resolveMissingComponent($resolver);
+        return app(ComponentRegistry::class)->resolveMissingComponent($resolver);
     }
 
-    function mount($name, $params = [], $key = null, $slots = [])
+    function mount($name, $params = [], $key = null)
     {
-        return app(HandleComponents::class)->mount($name, $params, $key, $slots);
+        return app(HandleComponents::class)->mount($name, $params, $key);
     }
 
     function snapshot($component, $context = null)
@@ -158,11 +129,6 @@ class LivewireManager
     function setUpdateRoute($callback)
     {
         return app(HandleRequests::class)->setUpdateRoute($callback);
-    }
-
-    function getUriPrefix()
-    {
-        return app(HandleRequests::class)->getUriPrefix();
     }
 
     function getUpdateUri()
@@ -226,14 +192,6 @@ class LivewireManager
         return $this;
     }
 
-    /**
-     * @template TComponent of \Livewire\Component
-     *
-     * @param class-string<TComponent>|TComponent|string|array<array-key, \Livewire\Component> $name
-     * @param array $params
-     *
-     * @return Testable<TComponent>
-     */
     function test($name, $params = [])
     {
         return Testable::create(
@@ -245,12 +203,8 @@ class LivewireManager
         );
     }
 
-    function visit($name, $args = [])
+    function visit($name)
     {
-        if (class_exists(\Pest\Browser\Api\Livewire::class)) {
-            return \Pest\Browser\Api\Livewire::test($name, $args);
-        }
-
         return DuskTestable::create($name, $params = [], $this->queryParamsForTesting);
     }
 
@@ -282,11 +236,6 @@ class LivewireManager
     function getPersistentMiddleware()
     {
         return app(PersistentMiddleware::class)->getPersistentMiddleware();
-    }
-
-    function zap()
-    {
-        return app('livewire.zap');
     }
 
     function flushState()
@@ -323,10 +272,5 @@ class LivewireManager
         }
 
         return request()->method();
-    }
-
-    function isCspSafe()
-    {
-        return config('livewire.csp_safe', false);
     }
 }

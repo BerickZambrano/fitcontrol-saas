@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace League\Uri\Components;
 
-use BackedEnum;
 use Deprecated;
 use League\Uri\Contracts\AuthorityInterface;
 use League\Uri\Contracts\IpHostInterface;
@@ -27,7 +26,6 @@ use League\Uri\HostType;
 use League\Uri\Idna\Converter as IdnConverter;
 use League\Uri\IPv4\Converter as IPv4Converter;
 use League\Uri\IPv4Normalizer;
-use League\Uri\StringCoercionMode;
 use League\Uri\UriString;
 use Psr\Http\Message\UriInterface as Psr7UriInterface;
 use Stringable;
@@ -36,10 +34,10 @@ use Uri\WhatWg\Url as WhatWgUrl;
 
 use function explode;
 use function filter_var;
+use function is_string;
 use function preg_replace_callback;
 use function rawurldecode;
 use function rawurlencode;
-use function rtrim;
 use function sprintf;
 use function strtolower;
 use function strtoupper;
@@ -53,13 +51,13 @@ final class Host extends Component implements IpHostInterface
     private readonly ?string $value;
     private readonly HostRecord $host;
 
-    private function __construct(BackedEnum|Stringable|string|null $host)
+    private function __construct(Stringable|string|null $host)
     {
         $this->host = HostRecord::from($host);
         $this->value = $this->host->toAscii();
     }
 
-    public static function new(BackedEnum|Stringable|string|null $value = null): self
+    public static function new(Stringable|string|null $value = null): self
     {
         return new self($value);
     }
@@ -67,7 +65,7 @@ final class Host extends Component implements IpHostInterface
     /**
      * Create a new instance from a string.or a stringable structure or returns null on failure.
      */
-    public static function tryNew(BackedEnum|Stringable|string|null $uri = null): ?self
+    public static function tryNew(Stringable|string|null $uri = null): ?self
     {
         try {
             return self::new($uri);
@@ -82,12 +80,8 @@ final class Host extends Component implements IpHostInterface
      * @throws MissingFeature If detecting IPv4 is not possible
      * @throws SyntaxError If the $ip cannot be converted into a Host
      */
-    public static function fromIp(BackedEnum|Stringable|string $ip, string $version = ''): self
+    public static function fromIp(Stringable|string $ip, string $version = ''): self
     {
-        if ($ip instanceof BackedEnum) {
-            $ip = $ip->value;
-        }
-
         if ('' !== $version) {
             return new self('[v'.$version.'.'.$ip.']');
         }
@@ -114,7 +108,7 @@ final class Host extends Component implements IpHostInterface
     /**
      * Create a new instance from a URI object.
      */
-    public static function fromUri(WhatWgUrl|Rfc3986Uri|BackedEnum|Stringable|string $uri): self
+    public static function fromUri(WhatWgUrl|Rfc3986Uri|Stringable|string $uri): self
     {
         $uri = self::filterUri($uri);
 
@@ -129,7 +123,7 @@ final class Host extends Component implements IpHostInterface
     /**
      * Create a new instance from an Authority object.
      */
-    public static function fromAuthority(BackedEnum|Stringable|string $authority): self
+    public static function fromAuthority(Stringable|string $authority): self
     {
         return match (true) {
             $authority instanceof AuthorityInterface => new self($authority->getHost()),
@@ -144,18 +138,18 @@ final class Host extends Component implements IpHostInterface
 
     public function equals(mixed $value): bool
     {
-        if (!StringCoercionMode::Native->isCoercible($value)) {
+        if (!$value instanceof Stringable && !is_string($value) && null !== $value) {
             return false;
         }
 
         if (!$value instanceof UriComponentInterface) {
-            $value = self::tryNew(StringCoercionMode::Native->coerce($value));
+            $value = self::tryNew($value);
             if (null === $value) {
                 return false;
             }
         }
 
-        return rtrim($value->getUriComponent(), '.') === rtrim($this->getUriComponent(), '.');
+        return $value->getUriComponent() === $this->getUriComponent();
     }
 
     public function toAscii(): ?string

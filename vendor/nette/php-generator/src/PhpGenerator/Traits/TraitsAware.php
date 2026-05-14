@@ -1,9 +1,11 @@
-<?php declare(strict_types=1);
+<?php
 
 /**
  * This file is part of the Nette Framework (https://nette.org)
  * Copyright (c) 2004 David Grudl (https://davidgrudl.com)
  */
+
+declare(strict_types=1);
 
 namespace Nette\PhpGenerator\Traits;
 
@@ -23,7 +25,7 @@ trait TraitsAware
 
 	/**
 	 * Replaces all traits.
-	 * @param list<TraitUse>  $traits
+	 * @param  TraitUse[]  $traits
 	 */
 	public function setTraits(array $traits): static
 	{
@@ -37,7 +39,7 @@ trait TraitsAware
 	}
 
 
-	/** @return array<string, TraitUse> */
+	/** @return TraitUse[] */
 	public function getTraits(): array
 	{
 		return $this->traits;
@@ -55,7 +57,7 @@ trait TraitsAware
 		$this->traits[$name] = $trait = new TraitUse($name);
 		if (func_num_args() > 1 && is_array(func_get_arg(1))) { // back compatibility
 			trigger_error('Passing second argument to ' . __METHOD__ . '() is deprecated, use addResolution() instead.');
-			array_map($trait->addResolution(...), func_get_arg(1));
+			array_map(fn($item) => $trait->addResolution($item), func_get_arg(1));
 		}
 
 		return $trait;

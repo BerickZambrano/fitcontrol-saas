@@ -2,9 +2,9 @@
 
 namespace Filament\Actions\Exports\Jobs;
 
+use AnourValar\EloquentSerialize\Facades\EloquentSerializeFacade;
 use Filament\Actions\Exports\Exporter;
 use Filament\Actions\Exports\Models\Export;
-use Filament\Support\EloquentSerializer\EloquentSerializer;
 use Illuminate\Bus\Batchable;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Filesystem\Filesystem;
@@ -60,7 +60,7 @@ class PrepareCsvExport implements ShouldQueue
         $filePath = $this->export->getFileDirectory() . DIRECTORY_SEPARATOR . 'headers.csv';
         $this->export->getFileDisk()->put($filePath, $csv->toString(), Filesystem::VISIBILITY_PRIVATE);
 
-        $query = app(EloquentSerializer::class)->unserialize($this->query);
+        $query = EloquentSerializeFacade::unserialize($this->query);
         $keyName = $query->getModel()->getKeyName();
         $qualifiedKeyName = $query->getModel()->getQualifiedKeyName();
 
@@ -96,11 +96,8 @@ class PrepareCsvExport implements ShouldQueue
                 $firstOrder = $originalOrders->first();
 
                 if (($firstOrder['type'] ?? null) === 'Raw') {
-                    /** @var literal-string $sql */
-                    $sql = $firstOrder['sql'];
-
                     $query->reorder();
-                    $query->orderByRaw($sql);
+                    $query->orderByRaw($firstOrder['sql']);
                 } else {
                     $query->reorder($firstOrder['column'], $firstOrder['direction']);
                 }
@@ -112,10 +109,7 @@ class PrepareCsvExport implements ShouldQueue
 
             foreach ($originalOrders as $order) {
                 if (($order['type'] ?? null) === 'Raw') {
-                    /** @var literal-string $orderSql */
-                    $orderSql = $order['sql'];
-
-                    $query->orderByRaw($orderSql);
+                    $query->orderByRaw($order['sql']);
                 } elseif (filled($order['column'] ?? null) && filled($order['direction'] ?? null)) {
                     $query->orderBy($order['column'], $order['direction']);
                 }

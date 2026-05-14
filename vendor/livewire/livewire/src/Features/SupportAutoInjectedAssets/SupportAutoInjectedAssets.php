@@ -48,7 +48,7 @@ class SupportAutoInjectedAssets extends ComponentHook
                 $assetsBody .= FrontendAssets::scripts()."\n";
             }
 
-            if (trim($assetsHead) === '' && trim($assetsBody) === '') return;
+            if ($assetsHead === '' && $assetsBody === '') return;
 
             $html = $handled->response->getContent();
 
@@ -64,6 +64,7 @@ class SupportAutoInjectedAssets extends ComponentHook
     {
         if (! static::$forceAssetInjection && config('livewire.inject_assets', true) === false) return false;
         if ((! static::$hasRenderedAComponentThisRequest) && (! static::$forceAssetInjection)) return false;
+        if (app(FrontendAssets::class)->hasRenderedScripts) return false;
 
         return true;
     }

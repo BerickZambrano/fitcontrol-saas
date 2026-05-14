@@ -566,14 +566,7 @@ return [
 
         'file_attachments_max_size_message' => 'File upload ho hi :max kilobytes ai a lian theilo.',
 
-        'no_merge_tag_search_results_message' => 'Merge tag results a awmlo.',
-
-        'mentions' => [
-            'no_options_message' => 'Duh thlan tur a awmlo.',
-            'no_search_results_message' => 'I thilzawn hi a awmlo.',
-            'search_prompt' => 'Zawng turin thil chhu rawh...',
-            'searching_message' => 'Zawn mek ani...',
-        ],
+        'no_merge_tag_search_results_message' => 'No merge tag results.',
 
         'tools' => [
             'align_center' => 'Align center',
@@ -699,15 +692,6 @@ return [
     ],
 
     'tags_input' => [
-
-        'actions' => [
-
-            'delete' => [
-                'label' => 'Thai bona',
-            ],
-
-        ],
-
         'placeholder' => 'Tag thar',
     ],
 

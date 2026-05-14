@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace League\Uri\Components;
 
-use BackedEnum;
 use Deprecated;
 use Iterator;
 use League\Uri\Contracts\AuthorityInterface;
@@ -39,7 +38,6 @@ use function count;
 use function explode;
 use function implode;
 use function sprintf;
-use function str_ends_with;
 
 final class Domain extends Component implements DomainHostInterface
 {
@@ -49,7 +47,7 @@ final class Domain extends Component implements DomainHostInterface
     /** @var string[] */
     private readonly array $labels;
 
-    private function __construct(BackedEnum|Stringable|string|null $host)
+    private function __construct(Stringable|string|null $host)
     {
         $host = match (true) {
             $host instanceof HostInterface => $host,
@@ -68,7 +66,7 @@ final class Domain extends Component implements DomainHostInterface
     /**
      * Returns a new instance from a string or a stringable object.
      */
-    public static function new(BackedEnum|Stringable|string|null $value = null): self
+    public static function new(Stringable|string|null $value = null): self
     {
         return new self($value);
     }
@@ -76,7 +74,7 @@ final class Domain extends Component implements DomainHostInterface
     /**
      * Create a new instance from a string.or a stringable structure or returns null on failure.
      */
-    public static function tryNew(BackedEnum|Stringable|string|null $uri = null): ?self
+    public static function tryNew(Stringable|string|null $uri = null): ?self
     {
         try {
             return self::new($uri);
@@ -88,7 +86,7 @@ final class Domain extends Component implements DomainHostInterface
     /**
      * Returns a new instance from an iterable structure.
      */
-    public static function fromLabels(BackedEnum|Stringable|string ...$labels): self
+    public static function fromLabels(Stringable|string ...$labels): self
     {
         return new self(match ([]) {
             $labels => null,
@@ -102,7 +100,7 @@ final class Domain extends Component implements DomainHostInterface
     /**
      * Create a new instance from a URI object.
      */
-    public static function fromUri(WhatWgUrl|Rfc3986Uri|BackedEnum|Stringable|string $uri): self
+    public static function fromUri(WhatWgUrl|Rfc3986Uri|Stringable|string $uri): self
     {
         return self::new(Host::fromUri($uri));
     }
@@ -110,7 +108,7 @@ final class Domain extends Component implements DomainHostInterface
     /**
      * Create a new instance from an Authority object.
      */
-    public static function fromAuthority(BackedEnum|Stringable|string $authority): self
+    public static function fromAuthority(Stringable|string $authority): self
     {
         return self::new(Host::fromAuthority($authority));
     }
@@ -185,19 +183,19 @@ final class Domain extends Component implements DomainHostInterface
         return $this->get(-1);
     }
 
-    public function indexOf(BackedEnum|Stringable|string $label): ?int
+    public function indexOf(string $label): ?int
     {
         return $this->keys($label)[0] ?? null;
     }
 
-    public function lastIndexOf(BackedEnum|Stringable|string $label): ?int
+    public function lastIndexOf(string $label): ?int
     {
         $res = $this->keys($label);
 
         return $res[count($res) - 1] ?? null;
     }
 
-    public function contains(BackedEnum|Stringable|string $label): bool
+    public function contains(string $label): bool
     {
         return [] !== $this->keys($label);
     }
@@ -216,12 +214,8 @@ final class Domain extends Component implements DomainHostInterface
         return $this->labels[$offset] ?? null;
     }
 
-    public function keys(BackedEnum|Stringable|string|null $label = null): array
+    public function keys(?string $label = null): array
     {
-        if ($label instanceof BackedEnum) {
-            $label = (string) $label->value;
-        }
-
         return match (null) {
             $label => array_keys($this->labels),
             default => array_keys($this->labels, $label, true),
@@ -233,75 +227,7 @@ final class Domain extends Component implements DomainHostInterface
         return count($this->labels) > 1 && '' === $this->labels[array_key_first($this->labels)];
     }
 
-    public function isSubdomainOf(BackedEnum|Stringable|string|null $parentHost): bool
-    {
-        if ($this->isEmpty()) {
-            return false;
-        }
-
-        if (!$parentHost instanceof self) {
-            $parentHost = self::tryNew($parentHost);
-        }
-
-        return null !== $parentHost
-            && !$parentHost->isEmpty()
-            && count($this) > count($parentHost)
-            && str_ends_with(''.$this->withoutRootLabel()->toAscii(), '.'.$parentHost->withoutRootLabel()->toAscii());
-    }
-
-    public function hasSubdomain(BackedEnum|Stringable|string|null $childHost): bool
-    {
-        if (!$childHost instanceof self) {
-            $childHost = self::tryNew($childHost);
-        }
-
-        return ($childHost?->isSubdomainOf($this)) ?? false;
-    }
-
-    public function isSiblingOf(BackedEnum|Stringable|string|null $siblingHost): bool
-    {
-        if (!$siblingHost instanceof self) {
-            $siblingHost = self::tryNew($siblingHost);
-        }
-
-        return null !== $siblingHost
-            && !$this->isEmpty()
-            && !$siblingHost->isEmpty()
-            && !$this->equals($siblingHost)
-            && $this->parentHost()->equals($siblingHost->parentHost());
-    }
-
-    public function parentHost(): DomainHostInterface
-    {
-        return $this->withoutRootLabel()->slice(0, -1);
-    }
-
-    public function commonAncestorWith(BackedEnum|Stringable|string|null $other): DomainHostInterface
-    {
-        if (!$other instanceof self) {
-            $other = self::tryNew($other);
-        }
-
-        if (null === $other) {
-            return Domain::new();
-        }
-
-        $other = $other->withoutRootLabel();
-        $current = $this->withoutRootLabel();
-        $labels = [];
-        /** @var int $offset */
-        foreach ($current as $offset => $label) {
-            if ($label !== $other->get($offset)) {
-                break;
-            }
-
-            $labels[] = $label;
-        }
-
-        return Domain::fromLabels(...$labels);
-    }
-
-    public function prepend(BackedEnum|Stringable|string|int|null $label): DomainHostInterface
+    public function prepend(Stringable|string|int|null $label): DomainHostInterface
     {
         $label = self::filterComponent($label);
         $value = $this->value();
@@ -314,7 +240,7 @@ final class Domain extends Component implements DomainHostInterface
         };
     }
 
-    public function append(BackedEnum|Stringable|string|int|null $label): DomainHostInterface
+    public function append(Stringable|string|int|null $label): DomainHostInterface
     {
         $label = self::filterComponent($label);
         $value = $this->value();
@@ -369,7 +295,7 @@ final class Domain extends Component implements DomainHostInterface
     /**
      * @throws OffsetOutOfBounds
      */
-    public function withLabel(int $key, BackedEnum|Stringable|string|int|null $label): DomainHostInterface
+    public function withLabel(int $key, Stringable|string|int|null $label): DomainHostInterface
     {
         $nbLabels = count($this->labels);
         if ($key < - $nbLabels - 1 || $key > $nbLabels) {
@@ -389,11 +315,7 @@ final class Domain extends Component implements DomainHostInterface
         }
 
         if (!$label instanceof HostInterface && null !== $label) {
-            if (is_int($label)) {
-                $label = (string) $label;
-            }
-
-            $label = Host::new($label)->value();
+            $label = Host::new((string) $label)->value();
         }
 
         if ($label === $this->labels[$key]) {

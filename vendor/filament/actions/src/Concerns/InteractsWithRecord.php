@@ -112,40 +112,37 @@ trait InteractsWithRecord
             $this->record = $record;
         }
 
+        $customModel = $this->getCustomModel();
+
+        $ensureCorrectRecordType = function (Model | array | null $record) use ($customModel): Model | array | null {
+            if (
+                ($record instanceof Model)
+                && filled($customModel)
+                && (! $record instanceof $customModel)
+            ) {
+                return null;
+            }
+
+            return $record;
+        };
+
         if ($record) {
-            return $this->ensureCorrectRecordType($record);
+            return $ensureCorrectRecordType($record);
         }
 
         if ($record = $this->getGroup()?->getRecord($withDefault)) {
-            return $this->ensureCorrectRecordType($record);
+            return $ensureCorrectRecordType($record);
         }
 
         if (($this instanceof Action) && $record = $this->getSchemaContainer()?->getRecord()) {
-            return $this->ensureCorrectRecordType($record);
+            return $ensureCorrectRecordType($record);
         }
 
         if (($this instanceof Action) && $record = $this->getSchemaComponent()?->getRecord()) {
-            return $this->ensureCorrectRecordType($record);
+            return $ensureCorrectRecordType($record);
         }
 
-        return ($withDefault && ($this instanceof Action)) ? $this->ensureCorrectRecordType($this->getHasActionsLivewire()?->getDefaultActionRecord($this)) : null;
-    }
-
-    /**
-     * @param  Model | array<string, mixed> | null  $record
-     * @return Model | array<string, mixed> | null
-     */
-    protected function ensureCorrectRecordType(Model | array | null $record): Model | array | null
-    {
-        if (
-            ($record instanceof Model)
-            && filled($customModel = $this->getCustomModel())
-            && (! $record instanceof $customModel)
-        ) {
-            return null;
-        }
-
-        return $record;
+        return ($withDefault && ($this instanceof Action)) ? $ensureCorrectRecordType($this->getHasActionsLivewire()?->getDefaultActionRecord($this)) : null;
     }
 
     public function getRecordTitle(?Model $record = null): ?string

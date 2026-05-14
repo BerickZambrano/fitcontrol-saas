@@ -13,13 +13,11 @@ declare(strict_types=1);
 
 namespace League\Uri\Components;
 
-use BackedEnum;
 use Deprecated;
 use League\Uri\Contracts\UriComponentInterface;
 use League\Uri\Contracts\UriInterface;
 use League\Uri\Exceptions\SyntaxError;
 use League\Uri\SchemeType;
-use League\Uri\StringCoercionMode;
 use League\Uri\UriScheme;
 use League\Uri\UriString;
 use Psr\Http\Message\UriInterface as Psr7UriInterface;
@@ -28,8 +26,8 @@ use Throwable;
 use Uri\Rfc3986\Uri as Rfc3986Uri;
 use Uri\WhatWg\Url as WhatWgUrl;
 
-use function count;
 use function in_array;
+use function is_string;
 use function preg_match;
 use function sprintf;
 use function strtolower;
@@ -41,7 +39,7 @@ final class Scheme extends Component
     private readonly ?string $scheme;
     private readonly ?UriScheme $uriScheme;
 
-    private function __construct(BackedEnum|Stringable|string|null $scheme)
+    private function __construct(Stringable|string|null $scheme)
     {
         $this->scheme = $this->validate($scheme);
         $this->uriScheme = UriScheme::tryFrom((string) $this->scheme);
@@ -95,7 +93,7 @@ final class Scheme extends Component
      *
      * @throws SyntaxError if the scheme is invalid
      */
-    private function validate(BackedEnum|Stringable|string|null $scheme): ?string
+    private function validate(Stringable|string|null $scheme): ?string
     {
         $scheme = self::filterComponent($scheme);
         if (null === $scheme) {
@@ -122,7 +120,7 @@ final class Scheme extends Component
         return $fScheme;
     }
 
-    public static function new(BackedEnum|Stringable|string|null $value = null): self
+    public static function new(Stringable|string|null $value = null): self
     {
         return new self($value);
     }
@@ -130,7 +128,7 @@ final class Scheme extends Component
     /**
      * Create a new instance from a string.or a stringable structure or returns null on failure.
      */
-    public static function tryNew(BackedEnum|Stringable|string|null $uri = null): ?self
+    public static function tryNew(Stringable|string|null $uri = null): ?self
     {
         try {
             return self::new($uri);
@@ -142,14 +140,14 @@ final class Scheme extends Component
     /**
      * Create a new instance from a URI object.
      */
-    public static function fromUri(WhatWgUrl|Rfc3986Uri|BackedEnum|Stringable|string $uri): self
+    public static function fromUri(WhatWgUrl|Rfc3986Uri|Stringable|string $uri): self
     {
         $uri = self::filterUri($uri);
 
         return new self(
             $uri instanceof Psr7UriInterface
-                ? UriString::parse($uri)['scheme']
-                : $uri->getScheme()
+            ? UriString::parse($uri)['scheme']
+            : $uri->getScheme()
         );
     }
 
@@ -165,12 +163,12 @@ final class Scheme extends Component
 
     public function equals(mixed $value): bool
     {
-        if (!StringCoercionMode::Native->isCoercible($value)) {
+        if (!$value instanceof Stringable && !is_string($value) && null !== $value) {
             return false;
         }
 
         if (!$value instanceof UriComponentInterface) {
-            $value = self::tryNew(StringCoercionMode::Native->coerce($value));
+            $value = self::tryNew($value);
             if (null === $value) {
                 return false;
             }

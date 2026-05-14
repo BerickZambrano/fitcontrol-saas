@@ -319,7 +319,7 @@ class ActionGroup extends ViewComponent implements Arrayable, HasEmbeddedView
             'size' => $this->getSize(),
             'tooltip' => $this->getTooltip(),
             'triggerView' => $this->getTriggerView(),
-            'view' => $this->hasView() ? $this->getView() : null,
+            'view' => $this->getView(),
         ];
     }
 
@@ -521,9 +521,7 @@ class ActionGroup extends ViewComponent implements Arrayable, HasEmbeddedView
             <?= $this->getExtraDropdownAttributeBag()->class(['fi-dropdown'])->toHtml() ?>
         >
             <div
-                x-on:keyup.enter="toggle($event)"
-                x-on:keyup.space="toggle($event)"
-                x-on:mousedown="if ($event.button === 0) toggle($event)"
+                x-on:mousedown="toggle"
                 class="fi-dropdown-trigger"
             >
                 <?= $this->toTriggerHtml() ?>

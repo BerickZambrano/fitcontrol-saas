@@ -3,6 +3,7 @@
 namespace Livewire\Features\SupportReleaseTokens;
 
 use Livewire\Exceptions\LivewireReleaseTokenMismatchException;
+use Livewire\Mechanisms\ComponentRegistry;
 
 class ReleaseToken {
     // This token is stored client-side and sent along with each request to check
@@ -12,7 +13,7 @@ class ReleaseToken {
 
     static function verify($snapshot): void
     {
-        $componentClass = app('livewire.factory')->resolveComponentClass($snapshot['memo']['name']);
+        $componentClass = app(ComponentRegistry::class)->getClass($snapshot['memo']['name']);
 
         if (!isset($snapshot['memo']['release']) || $snapshot['memo']['release'] !== static::generate($componentClass)) {
             throw new LivewireReleaseTokenMismatchException;

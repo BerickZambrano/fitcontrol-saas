@@ -568,13 +568,6 @@ return [
 
         'no_merge_tag_search_results_message' => 'Brak wyników.',
 
-        'mentions' => [
-            'no_options_message' => 'Brak dostępnych opcji.',
-            'no_search_results_message' => 'Brak wyników wyszukiwania.',
-            'search_prompt' => 'Zacznij pisać aby wyszukać...',
-            'searching_message' => 'Wyszukiwanie...',
-        ],
-
         'tools' => [
             'align_center' => 'Wyśrodkuj',
             'align_end' => 'Wyrównaj do prawej',
@@ -686,8 +679,6 @@ return [
 
         'max_items_message' => 'Można wybrać tylko :count elementów.',
 
-        'no_options_message' => 'Brak dostępnych opcji.',
-
         'no_search_results_message' => 'Żadne wyniki nie pasują do Twojego wyszukiwania.',
 
         'placeholder' => 'Wybierz z listy',
@@ -699,17 +690,7 @@ return [
     ],
 
     'tags_input' => [
-
-        'actions' => [
-
-            'delete' => [
-                'label' => 'Usuń',
-            ],
-
-        ],
-
         'placeholder' => 'Nowy tag',
-
     ],
 
     'text_input' => [

@@ -12,18 +12,14 @@ class SupportNestingComponents extends ComponentHook
 {
     static function provide()
     {
-        on('pre-mount', function ($name, $params, $key, $parent, $hijack, $slots, $attributes) {
+        on('pre-mount', function ($name, $params, $key, $parent, $hijack) {
             // If this has already been rendered spoof it...
             if ($parent && static::hasPreviouslyRenderedChild($parent, $key)) {
                 [$tag, $childId] = static::getPreviouslyRenderedChild($parent, $key);
 
-                $finish = trigger('mount.stub', $tag, $childId, $params, $parent, $key, $slots, $attributes);
+                $finish = trigger('mount.stub', $tag, $childId, $params, $parent, $key);
 
-                $idAttribute = " wire:id=\"{$childId}\"";
-                $nameAttribute = " wire:name=\"{$name}\"";
-                $keyAttribute = $key !== null ? " wire:key=\"{$key}\"" : '';
-
-                $html = "<{$tag}{$idAttribute}{$nameAttribute}{$keyAttribute}></{$tag}>";
+                $html = "<{$tag} wire:id=\"{$childId}\"></{$tag}>";
 
                 static::setParentChild($parent, $key, $tag, $childId);
 
@@ -37,20 +33,12 @@ class SupportNestingComponents extends ComponentHook
 
             static::setParametersToMatchingProperties($component, $params);
 
-            return function (&$html) use ($component, $key, $parent, $start) {
-                if ($key !== null) {
-                   $html = Utils::insertAttributesIntoHtmlRoot($html, [
-                        'wire:key' => $key,
-                    ]);
-                }
-
+            return function ($html) use ($component, $key, $parent, $start) {
                 if ($parent) {
                     if (config('app.debug')) trigger('profile', 'child:'.$component->getId(), $parent->getId(), [$start, microtime(true)]);
 
                     preg_match('/<([a-zA-Z0-9\-]*)/', $html, $matches, PREG_OFFSET_CAPTURE);
-
                     $tag = $matches[1][0];
-
                     static::setParentChild($parent, $key, $tag, $component->getId());
                 }
             };
@@ -92,22 +80,7 @@ class SupportNestingComponents extends ComponentHook
 
     static function getPreviouslyRenderedChild($parent, $key)
     {
-        $child = store($parent)->get('previousChildren')[$key];
-
-        [$tag, $childId] = $child;
-
-        // Validate tag name - only allow valid HTML tag characters (letters, numbers, hyphens)
-        // Must start with a letter to be a valid HTML tag
-        if (! preg_match('/^[a-zA-Z][a-zA-Z0-9\-]*$/', $tag)) {
-            throw new \Exception('Invalid Livewire child tag name. Tag names must only contain letters, numbers, and hyphens.');
-        }
-
-        // Validate child ID format - only allow alphanumeric and hyphens
-        if (! preg_match('/^[a-zA-Z0-9\-]+$/', $childId)) {
-            throw new \Exception('Invalid Livewire child component ID format.');
-        }
-
-        return $child;
+        return store($parent)->get('previousChildren')[$key];
     }
 
     function keepRenderedChildren()

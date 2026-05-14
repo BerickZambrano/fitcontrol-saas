@@ -194,8 +194,7 @@ trait HasChildComponents
             } elseif (
                 ($childComponents instanceof Component) ||
                 ($childComponents instanceof Action) ||
-                ($childComponents instanceof ActionGroup) ||
-                ($childComponents instanceof Schema)
+                ($childComponents instanceof ActionGroup)
             ) {
                 $this->childComponents[$key] = $childComponents->getClone();
             }

@@ -130,27 +130,12 @@ class ConsoleOutput extends StreamOutput implements ConsoleOutputInterface
      */
     private function openOutputStream()
     {
-        static $stdout;
-
-        if ($stdout) {
-            return $stdout;
-        }
-
         if (!$this->hasStdoutSupport()) {
-            return $stdout = fopen('php://output', 'w');
+            return fopen('php://output', 'w');
         }
 
         // Use STDOUT when possible to prevent from opening too many file descriptors
-        if (!\defined('STDOUT')) {
-            return $stdout = @fopen('php://stdout', 'w') ?: fopen('php://output', 'w');
-        }
-
-        // On Windows, STDOUT is opened in text mode; reopen in binary mode to prevent \n to \r\n conversion
-        if ('\\' === \DIRECTORY_SEPARATOR) {
-            return $stdout = @fopen('php://stdout', 'w') ?: \STDOUT;
-        }
-
-        return $stdout = \STDOUT;
+        return \defined('STDOUT') ? \STDOUT : (@fopen('php://stdout', 'w') ?: fopen('php://output', 'w'));
     }
 
     /**
@@ -158,26 +143,11 @@ class ConsoleOutput extends StreamOutput implements ConsoleOutputInterface
      */
     private function openErrorStream()
     {
-        static $stderr;
-
-        if ($stderr) {
-            return $stderr;
-        }
-
         if (!$this->hasStderrSupport()) {
-            return $stderr = fopen('php://output', 'w');
+            return fopen('php://output', 'w');
         }
 
         // Use STDERR when possible to prevent from opening too many file descriptors
-        if (!\defined('STDERR')) {
-            return $stderr = @fopen('php://stderr', 'w') ?: fopen('php://output', 'w');
-        }
-
-        // On Windows, STDERR is opened in text mode; reopen in binary mode to prevent \n → \r\n conversion
-        if ('\\' === \DIRECTORY_SEPARATOR) {
-            return $stderr = @fopen('php://stderr', 'w') ?: \STDERR;
-        }
-
-        return $stderr ??= \STDERR;
+        return \defined('STDERR') ? \STDERR : (@fopen('php://stderr', 'w') ?: fopen('php://output', 'w'));
     }
 }

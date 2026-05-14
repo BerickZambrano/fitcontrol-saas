@@ -52,11 +52,9 @@
                     },
                     disabledSvgEditingMessage: @js(__('filament-forms::components.file_upload.editor.svg.messages.disabled')),
                     getUploadedFilesUsing: async () => {
-                        return await Livewire.fireAction(
-                            $wire.__instance,
-                            'callSchemaComponentMethod',
-                            [@js($key), 'getUploadedFiles'],
-                            { async: true },
+                        return await $wire.callSchemaComponentMethod(
+                            @js($key),
+                            'getUploadedFiles',
                         )
                     },
                     hasCircleCropper: @js($hasCircleCropper),

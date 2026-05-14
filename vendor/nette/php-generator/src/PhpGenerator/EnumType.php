@@ -1,9 +1,11 @@
-<?php declare(strict_types=1);
+<?php
 
 /**
  * This file is part of the Nette Framework (https://nette.org)
  * Copyright (c) 2004 David Grudl (https://davidgrudl.com)
  */
+
+declare(strict_types=1);
 
 namespace Nette\PhpGenerator;
 
@@ -19,7 +21,7 @@ final class EnumType extends ClassLike
 	use Traits\MethodsAware;
 	use Traits\TraitsAware;
 
-	/** @var list<string> */
+	/** @var string[] */
 	private array $implements = [];
 
 	/** @var array<string, EnumCase> */
@@ -40,7 +42,9 @@ final class EnumType extends ClassLike
 	}
 
 
-	/** @param list<string>  $names */
+	/**
+	 * @param  string[]  $names
+	 */
 	public function setImplements(array $names): static
 	{
 		$this->validateNames($names);
@@ -49,7 +53,7 @@ final class EnumType extends ClassLike
 	}
 
 
-	/** @return list<string> */
+	/** @return string[] */
 	public function getImplements(): array
 	{
 		return $this->implements;
@@ -66,14 +70,14 @@ final class EnumType extends ClassLike
 
 	public function removeImplement(string $name): static
 	{
-		$this->implements = array_values(array_diff($this->implements, [$name]));
+		$this->implements = array_diff($this->implements, [$name]);
 		return $this;
 	}
 
 
 	/**
 	 * Sets cases to enum
-	 * @param  list<EnumCase>  $cases
+	 * @param  EnumCase[]  $cases
 	 */
 	public function setCases(array $cases): static
 	{
@@ -87,7 +91,7 @@ final class EnumType extends ClassLike
 	}
 
 
-	/** @return array<string, EnumCase> */
+	/** @return EnumCase[] */
 	public function getCases(): array
 	{
 		return $this->cases;
@@ -135,9 +139,10 @@ final class EnumType extends ClassLike
 	public function __clone(): void
 	{
 		parent::__clone();
-		$this->consts = array_map(fn(Constant $c) => clone $c, $this->consts);
-		$this->methods = array_map(fn(Method $m) => clone $m, $this->methods);
-		$this->traits = array_map(fn(TraitUse $t) => clone $t, $this->traits);
-		$this->cases = array_map(fn(EnumCase $c) => clone $c, $this->cases);
+		$clone = fn($item) => clone $item;
+		$this->consts = array_map($clone, $this->consts);
+		$this->methods = array_map($clone, $this->methods);
+		$this->traits = array_map($clone, $this->traits);
+		$this->cases = array_map($clone, $this->cases);
 	}
 }

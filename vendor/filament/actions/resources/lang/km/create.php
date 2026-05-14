@@ -4,7 +4,7 @@ return [
 
     'single' => [
 
-        'label' => 'បង្កើត :label ថ្មី',
+        'label' => 'ថ្មី :label',
 
         'modal' => [
 

@@ -220,7 +220,7 @@ trait InteractsWithSchemas
                 return null;
             }
 
-            $methodReflection = new ReflectionMethod($this, $methodName);
+            $methodReflection = new ReflectionMethod($this, $name);
             $parameterReflection = $methodReflection->getParameters()[0] ?? null;
 
             if (! $parameterReflection) {
@@ -469,7 +469,7 @@ trait InteractsWithSchemas
             $currentStatePath .= ".{$key}";
 
             if (
-                (is_numeric($key) || array_is_list($state)) &&
+                is_numeric($key) &&
                 (! array_key_exists($key, $state)) &&
                 str($currentStatePath)->startsWith($schemaStatePath)
             ) {

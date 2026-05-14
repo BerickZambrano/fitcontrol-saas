@@ -8,7 +8,6 @@ use Livewire\Features\SupportAttributes\Attribute as LivewireAttribute;
 class BaseLazy extends LivewireAttribute
 {
     public function __construct(
-        public $isolate = null,
-        public $bundle = null,
+        public $isolate = true
     ) {}
 }

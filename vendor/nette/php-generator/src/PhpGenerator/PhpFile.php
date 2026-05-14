@@ -1,13 +1,14 @@
-<?php declare(strict_types=1);
+<?php
 
 /**
  * This file is part of the Nette Framework (https://nette.org)
  * Copyright (c) 2004 David Grudl (https://davidgrudl.com)
  */
 
+declare(strict_types=1);
+
 namespace Nette\PhpGenerator;
 
-use Nette;
 use function count;
 
 
@@ -23,7 +24,7 @@ final class PhpFile
 {
 	use Traits\CommentAware;
 
-	/** @var array<string, PhpNamespace> */
+	/** @var PhpNamespace[] */
 	private array $namespaces = [];
 	private bool $strictTypes = false;
 
@@ -31,30 +32,6 @@ final class PhpFile
 	public static function fromCode(string $code): self
 	{
 		return (new Factory)->fromCode($code);
-	}
-
-
-	/**
-	 * Adds a namespace, class-like type, or function to the file. If the item has a namespace,
-	 * it will be added to that namespace (creating it if needed).
-	 */
-	public function add(ClassType|InterfaceType|TraitType|EnumType|GlobalFunction|PhpNamespace $item): static
-	{
-		if ($item instanceof PhpNamespace) {
-			if (isset($this->namespaces[$name = $item->getName()])) {
-				throw new Nette\InvalidStateException("Namespace '$name' already exists in the file.");
-			}
-			$this->namespaces[$name] = $item;
-			$this->refreshBracketedSyntax();
-
-		} elseif ($item instanceof GlobalFunction) {
-			$this->addNamespace('')->add($item);
-
-		} else {
-			$this->addNamespace($item->getNamespace()?->getName() ?? '')->add($item);
-		}
-
-		return $this;
 	}
 
 
@@ -127,7 +104,10 @@ final class PhpFile
 			? ($this->namespaces[$namespace->getName()] = $namespace)
 			: ($this->namespaces[$namespace] ??= new PhpNamespace($namespace));
 
-		$this->refreshBracketedSyntax();
+		foreach ($this->namespaces as $namespace) {
+			$namespace->setBracketedSyntax(count($this->namespaces) > 1 && isset($this->namespaces['']));
+		}
+
 		return $res;
 	}
 
@@ -143,14 +123,14 @@ final class PhpFile
 	}
 
 
-	/** @return array<string, PhpNamespace> */
+	/** @return PhpNamespace[] */
 	public function getNamespaces(): array
 	{
 		return $this->namespaces;
 	}
 
 
-	/** @return array<string, ClassType|InterfaceType|TraitType|EnumType> */
+	/** @return (ClassType|InterfaceType|TraitType|EnumType)[] */
 	public function getClasses(): array
 	{
 		$classes = [];
@@ -165,7 +145,7 @@ final class PhpFile
 	}
 
 
-	/** @return array<string, GlobalFunction> */
+	/** @return GlobalFunction[] */
 	public function getFunctions(): array
 	{
 		$functions = [];
@@ -182,7 +162,6 @@ final class PhpFile
 
 	/**
 	 * Adds a use statement to the file, to the global namespace.
-	 * @param  PhpNamespace::Name*  $of
 	 */
 	public function addUse(string $name, ?string $alias = null, string $of = PhpNamespace::NameNormal): static
 	{
@@ -210,13 +189,5 @@ final class PhpFile
 	public function __toString(): string
 	{
 		return (new Printer)->printFile($this);
-	}
-
-
-	private function refreshBracketedSyntax(): void
-	{
-		foreach ($this->namespaces as $namespace) {
-			$namespace->setBracketedSyntax(count($this->namespaces) > 1 && isset($this->namespaces['']));
-		}
 	}
 }

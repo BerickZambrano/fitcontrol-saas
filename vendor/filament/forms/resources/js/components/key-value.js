@@ -14,10 +14,6 @@ export default function keyValueFormComponent({ state }) {
             }
 
             this.$watch('state', (state, oldState) => {
-                if (!Array.isArray(state)) {
-                    return
-                }
-
                 const getLength = (value) => {
                     if (value === null) {
                         return 0

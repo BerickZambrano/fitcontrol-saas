@@ -1,9 +1,11 @@
-<?php declare(strict_types=1);
+<?php
 
 /**
  * This file is part of the Nette Framework (https://nette.org)
  * Copyright (c) 2004 David Grudl (https://davidgrudl.com)
  */
+
+declare(strict_types=1);
 
 namespace Nette\PhpGenerator;
 
@@ -15,14 +17,21 @@ use Nette;
  */
 final class Attribute
 {
-	public function __construct(
-		private readonly string $name,
-		/** @var mixed[] */
-		private readonly array $args,
-	) {
+	private string $name;
+
+	/** @var mixed[] */
+	private array $args;
+
+
+	/** @param  mixed[]  $args */
+	public function __construct(string $name, array $args)
+	{
 		if (!Helpers::isNamespaceIdentifier($name)) {
 			throw new Nette\InvalidArgumentException("Value '$name' is not valid attribute name.");
 		}
+
+		$this->name = $name;
+		$this->args = $args;
 	}
 
 

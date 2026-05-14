@@ -98,9 +98,7 @@ trait InteractsWithActions
 
         // Boot the InteractsWithTable trait first so the table object is available.
         if (! ($this instanceof HasTable)) {
-            if (empty($this->cacheMountedActions($this->mountedActions))) {
-                $this->mountedActions = [];
-            }
+            $this->cacheMountedActions($this->mountedActions);
         }
     }
 
@@ -167,17 +165,11 @@ trait InteractsWithActions
                 $action->callAfterFormFilled();
             }
         } catch (Halt $exception) {
-            $this->unmountAction(canCancelParentActions: false);
-
             return null;
         } catch (Cancel $exception) {
             $this->unmountAction(canCancelParentActions: false);
 
             return null;
-        } catch (ValidationException $exception) {
-            $this->unmountAction(canCancelParentActions: false);
-
-            throw $exception;
         }
 
         if (! $this->mountedActionShouldOpenModal(mountedAction: $action)) {
@@ -482,11 +474,7 @@ trait InteractsWithActions
      */
     protected function cacheMountedActions(array $mountedActions): array
     {
-        try {
-            return $this->cachedMountedActions = $this->resolveActions($mountedActions);
-        } catch (ActionNotResolvableException) {
-            return $this->cachedMountedActions = [];
-        }
+        return $this->cachedMountedActions = $this->resolveActions($mountedActions);
     }
 
     /**
@@ -512,10 +500,6 @@ trait InteractsWithActions
 
             if (! $resolvedAction) {
                 continue;
-            }
-
-            if (filled($action['arguments'] ?? [])) {
-                $resolvedAction->mergeArguments($action['arguments']);
             }
 
             $resolvedAction->nestingIndex($actionNestingIndex);
@@ -595,12 +579,6 @@ trait InteractsWithActions
             throw new ActionNotResolvableException('Failed to resolve table action for Livewire component without the [' . HasTable::class . '] trait.');
         }
 
-        if (count($parentActions)) {
-            $parentAction = Arr::last($parentActions);
-
-            return $parentAction->getModalAction($action['name']) ?? throw new ActionNotResolvableException("Action [{$action['name']}] was not found for action [{$parentAction->getName()}].");
-        }
-
         if ($action['context']['bulk'] ?? false) {
             $resolvedAction = $this->getTable()->getBulkAction($action['name']);
         }
@@ -609,10 +587,6 @@ trait InteractsWithActions
 
         if (filled($action['context']['recordKey'] ?? null)) {
             $record = $this->getTableRecord($action['context']['recordKey']);
-
-            if (! $record) {
-                throw new ActionNotResolvableException("Record [{$action['context']['recordKey']}] no longer exists.");
-            }
 
             $resolvedAction->getRootGroup()?->record($record) ?? $resolvedAction->record($record);
         }
@@ -653,7 +627,7 @@ trait InteractsWithActions
     }
 
     /**
-     * @param  string | array<string | array<string, mixed>>  $actions
+     * @param  string | array<string>  $actions
      */
     public function getAction(string | array $actions, bool $isMounting = true): ?Action
     {
@@ -773,12 +747,7 @@ trait InteractsWithActions
 
     protected function syncActionModals(): void
     {
-        $this->dispatch(
-            'sync-action-modals',
-            id: $this->getId(),
-            newActionNestingIndex: array_key_last($this->mountedActions),
-            shouldOverlayParentActions: $this->getMountedAction()?->shouldOverlayParentActions() ?? false,
-        );
+        $this->dispatch('sync-action-modals', id: $this->getId(), newActionNestingIndex: array_key_last($this->mountedActions));
     }
 
     public function getOriginallyMountedActionIndex(): ?int

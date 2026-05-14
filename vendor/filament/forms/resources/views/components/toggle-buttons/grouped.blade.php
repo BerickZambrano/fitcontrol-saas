@@ -24,7 +24,6 @@
                 $shouldOptionBeDisabled = $isDisabled || $isOptionDisabled($value, $label);
                 $color = $getColor($value);
                 $icon = $getIcon($value);
-                $tooltip = $getTooltip($value);
             @endphp
 
             <input
@@ -48,7 +47,6 @@
                 :icon="$icon"
                 :label-sr-only="$areButtonLabelsHidden"
                 tag="label"
-                :tooltip="$tooltip"
             >
                 {{ $label }}
             </x-filament::button>

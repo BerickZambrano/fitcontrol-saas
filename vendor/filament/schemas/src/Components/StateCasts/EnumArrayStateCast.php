@@ -28,11 +28,8 @@ class EnumArrayStateCast implements StateCast
             $state = json_decode($state, associative: true);
         }
 
-        /** @var array<mixed> $state */
-        $state = Arr::wrap($state);
-
         return array_reduce(
-            $state,
+            Arr::wrap($state),
             function (array $carry, $stateItem): array {
                 if (blank($stateItem)) {
                     return $carry;
@@ -65,11 +62,8 @@ class EnumArrayStateCast implements StateCast
             $state = json_decode($state, associative: true);
         }
 
-        /** @var array<mixed> $state */
-        $state = Arr::wrap($state);
-
         return array_reduce(
-            $state,
+            Arr::wrap($state),
             function (array $carry, $stateItem): array {
                 if (blank($stateItem)) {
                     return $carry;

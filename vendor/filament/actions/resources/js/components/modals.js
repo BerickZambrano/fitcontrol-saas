@@ -7,17 +7,11 @@ export default ({ livewireId }) => ({
                 return
             }
 
-            this.syncActionModals(
-                event.detail.newActionNestingIndex,
-                event.detail.shouldOverlayParentActions ?? false,
-            )
+            this.syncActionModals(event.detail.newActionNestingIndex)
         })
     },
 
-    syncActionModals(
-        newActionNestingIndex,
-        shouldOverlayParentActions = false,
-    ) {
+    syncActionModals(newActionNestingIndex) {
         if (this.actionNestingIndex === newActionNestingIndex) {
             // https://github.com/filamentphp/filament/issues/16474
             this.actionNestingIndex !== null &&
@@ -26,15 +20,7 @@ export default ({ livewireId }) => ({
             return
         }
 
-        const isNestingIncrease =
-            this.actionNestingIndex !== null &&
-            newActionNestingIndex !== null &&
-            newActionNestingIndex > this.actionNestingIndex
-
-        if (
-            this.actionNestingIndex !== null &&
-            !(shouldOverlayParentActions && isNestingIncrease)
-        ) {
+        if (this.actionNestingIndex !== null) {
             this.closeModal()
         }
 

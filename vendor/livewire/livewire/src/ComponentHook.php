@@ -35,10 +35,10 @@ abstract class ComponentHook
         };
     }
 
-    function callCall($method, $params, $returnEarly, $metadata, $componentContext) {
+    function callCall($method, $params, $returnEarly) {
         $callbacks = [];
 
-        if (method_exists($this, 'call')) $callbacks[] = $this->call($method, $params, $returnEarly, $metadata, $componentContext);
+        if (method_exists($this, 'call')) $callbacks[] = $this->call($method, $params, $returnEarly);
 
         return function (...$params) use ($callbacks) {
             foreach ($callbacks as $callback) {
@@ -51,18 +51,6 @@ abstract class ComponentHook
         $callbacks = [];
 
         if (method_exists($this, 'render')) $callbacks[] = $this->render(...$params);
-
-        return function (...$params) use ($callbacks) {
-            foreach ($callbacks as $callback) {
-                if (is_callable($callback)) $callback(...$params);
-            }
-        };
-    }
-
-    function callRenderIsland(...$params) {
-        $callbacks = [];
-
-        if (method_exists($this, 'renderIsland')) $callbacks[] = $this->renderIsland(...$params);
 
         return function (...$params) use ($callbacks) {
             foreach ($callbacks as $callback) {

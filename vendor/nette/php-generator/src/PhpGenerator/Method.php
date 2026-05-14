@@ -1,9 +1,11 @@
-<?php declare(strict_types=1);
+<?php
 
 /**
  * This file is part of the Nette Framework (https://nette.org)
  * Copyright (c) 2004 David Grudl (https://davidgrudl.com)
  */
+
+declare(strict_types=1);
 
 namespace Nette\PhpGenerator;
 
@@ -29,7 +31,9 @@ final class Method
 	private bool $abstract = false;
 
 
-	/** @param  string|array{object|string, string}|(\Closure(): mixed)  $method */
+	/**
+	 * @param  string|array{object|string, string}|\Closure  $method
+	 */
 	public static function from(string|array|\Closure $method): static
 	{
 		return (new Factory)->fromMethodReflection(Nette\Utils\Callback::toReflection($method));

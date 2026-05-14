@@ -10,20 +10,4 @@ return [
 
     ],
 
-    'filters' => [
-
-        'actions' => [
-
-            'apply' => [
-                'label' => 'Použít',
-            ],
-
-            'reset' => [
-                'label' => 'Resetovat',
-            ],
-
-        ],
-
-    ],
-
 ];

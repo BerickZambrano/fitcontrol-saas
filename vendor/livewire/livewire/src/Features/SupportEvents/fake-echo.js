@@ -1,6 +1,5 @@
 
 window.fakeEchoListeners = []
-window.fakeEchoLeftChannels = []
 
 class FakeChannel {
     constructor(channel) {
@@ -54,24 +53,10 @@ class FakePresenceChannel extends FakeChannel {
     }
 
     here(callback) {
-        window.fakeEchoListeners.push({
-            channel: this.channel,
-            event: 'here',
-            type: this.type,
-            callback,
-        })
-
         return this
     }
 
     joining(callback) {
-        window.fakeEchoListeners.push({
-            channel: this.channel,
-            event: 'joining',
-            type: this.type,
-            callback,
-        })
-
         return this
     }
 
@@ -80,13 +65,6 @@ class FakePresenceChannel extends FakeChannel {
     }
 
     leaving(callback) {
-        window.fakeEchoListeners.push({
-            channel: this.channel,
-            event: 'leaving',
-            type: this.type,
-            callback,
-        })
-
         return this
     }
 }
@@ -106,22 +84,6 @@ class FakeEcho {
 
     encryptedPrivate(channel) {
         return new FakePrivateChannel(channel);
-    }
-
-    leave(channel) {
-        window.fakeEchoLeftChannels.push(channel)
-
-        window.fakeEchoListeners = window.fakeEchoListeners.filter(i => {
-            return i.channel !== channel
-        })
-    }
-
-    leaveChannel(channel) {
-        window.fakeEchoLeftChannels.push(channel)
-
-        window.fakeEchoListeners = window.fakeEchoListeners.filter(i => {
-            return i.channel !== channel
-        })
     }
 
     socketId() {

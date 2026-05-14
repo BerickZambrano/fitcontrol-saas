@@ -9,7 +9,6 @@ use Filament\Schemas\Components\Concerns\CanTrimState;
 use Filament\Schemas\Components\Contracts\HasAffixActions;
 use Filament\Schemas\Components\StateCasts\Contracts\StateCast;
 use Filament\Schemas\Components\StateCasts\NumberStateCast;
-use Filament\Schemas\Components\StateCasts\StripCharactersStateCast;
 use Filament\Support\Concerns\HasExtraAlpineAttributes;
 use Filament\Support\RawJs;
 use LogicException;
@@ -303,13 +302,13 @@ class TextInput extends Field implements CanHaveNumericState, Contracts\CanBeLen
     {
         return [
             ...parent::getDefaultStateCasts(),
-            ...($this->hasStripCharacters() ? [app(StripCharactersStateCast::class, ['characters' => $this->getStripCharacters()])] : []),
             ...($this->isNumeric() ? [app(NumberStateCast::class, ['isNullable' => true])] : []),
         ];
     }
 
     public function mutateDehydratedState(mixed $state): mixed
     {
+        $state = $this->stripCharactersFromState($state);
         $state = $this->trimState($state);
 
         return parent::mutateDehydratedState($state);
@@ -325,7 +324,7 @@ class TextInput extends Field implements CanHaveNumericState, Contracts\CanBeLen
 
     public function mutatesDehydratedState(): bool
     {
-        return parent::mutatesDehydratedState() || $this->isTrimmed();
+        return parent::mutatesDehydratedState() || $this->hasStripCharacters() || $this->isTrimmed();
     }
 
     public function mutatesStateForValidation(): bool

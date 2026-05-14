@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace League\Uri\Components;
 
-use BackedEnum;
 use Deprecated;
 use finfo;
 use League\Uri\Contracts\DataPathInterface;
@@ -21,7 +20,6 @@ use League\Uri\Contracts\PathInterface;
 use League\Uri\Contracts\UriInterface;
 use League\Uri\Exceptions\SyntaxError;
 use League\Uri\FeatureDetection;
-use League\Uri\StringCoercionMode;
 use Psr\Http\Message\UriInterface as Psr7UriInterface;
 use SplFileObject;
 use Stringable;
@@ -69,7 +67,7 @@ final class DataPath extends Component implements DataPathInterface
     /**
      * New instance.
      */
-    private function __construct(BackedEnum|Stringable|string $path)
+    private function __construct(Stringable|string $path)
     {
         /** @var string $path */
         $path = self::filterComponent($path);
@@ -175,7 +173,7 @@ final class DataPath extends Component implements DataPathInterface
     /**
      * Returns a new instance from a string or a stringable object.
      */
-    public static function new(BackedEnum|Stringable|string $value = ''): self
+    public static function new(Stringable|string $value = ''): self
     {
         return new self($value);
     }
@@ -183,7 +181,7 @@ final class DataPath extends Component implements DataPathInterface
     /**
      * Create a new instance from a string.or a stringable structure or returns null on failure.
      */
-    public static function tryNew(BackedEnum|Stringable|string $uri = ''): ?self
+    public static function tryNew(Stringable|string $uri = ''): ?self
     {
         try {
             return self::new($uri);
@@ -226,7 +224,7 @@ final class DataPath extends Component implements DataPathInterface
     /**
      * Create a new instance from a URI object.
      */
-    public static function fromUri(WhatWgUrl|Rfc3986Uri|BackedEnum|Stringable|string $uri): self
+    public static function fromUri(WhatWgUrl|Rfc3986Uri|Stringable|string $uri): self
     {
         return self::new(Path::fromUri($uri)->toString());
     }
@@ -289,14 +287,10 @@ final class DataPath extends Component implements DataPathInterface
     /**
      * @param ?resource $context
      */
-    public function save(BackedEnum|Stringable|string $path, string $mode = 'w', $context = null): SplFileObject
+    public function save(string $path, string $mode = 'w', $context = null): SplFileObject
     {
-        if ($path instanceof BackedEnum) {
-            $path = $path->value;
-        }
-
         $data = $this->isBinaryData ? base64_decode($this->document, true) : rawurldecode($this->document);
-        $file = new SplFileObject((string) $path, $mode, context: $context);
+        $file = new SplFileObject($path, $mode, context: $context);
         $file->fwrite((string) $data);
 
         return $file;
@@ -390,9 +384,9 @@ final class DataPath extends Component implements DataPathInterface
         };
     }
 
-    public function withParameters(BackedEnum|Stringable|string $parameters): DataPathInterface
+    public function withParameters(Stringable|string $parameters): DataPathInterface
     {
-        $parameters = (string) StringCoercionMode::Native->coerce($parameters);
+        $parameters = (string) $parameters;
 
         return match ($this->getParameters()) {
             $parameters => $this,

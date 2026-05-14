@@ -132,7 +132,8 @@ export default async ({
                   }),
               ]
             : []),
-        ...(mentions.length
+        ...(mentions.length ||
+        typeof getMentionSearchResultsUsing === 'function'
             ? [
                   Mention.configure({
                       HTMLAttributes: { class: 'fi-fo-rich-editor-mention' },

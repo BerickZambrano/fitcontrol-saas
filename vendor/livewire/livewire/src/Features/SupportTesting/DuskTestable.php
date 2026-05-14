@@ -53,27 +53,23 @@ class DuskTestable
      */
     static function create($components, $params = [], $queryParams = [])
     {
-        $components = is_array($components) ? $components : [$components];
+        if (static::$shortCircuitCreateCall) {
+            throw new class ($components) extends \Exception {
+                public $components;
+                public $isDuskShortcircuit = true;
+                function __construct($components) {
+                    $this->components = $components;
+                }
+            };
+        }
+
+        $components = (array) $components;
+
         $firstComponent = array_shift($components);
 
-        if (is_string($firstComponent) && ! class_exists($firstComponent)) {
-            // Simple component name (eg. `counter`)
-            $id = $firstComponent;
-            $components = [$firstComponent, ...$components];
-        } else {
-            if (is_string($firstComponent)) {
-                // Component class name (eg. `App\Livewire\Counter`)
-                $className = $firstComponent;
-            } else {
-                // Anonymous class instance (eg. `new class extends Component {}`)
-                // Remove the runtime '$123' suffix to make the class name stable
-                $className = str()->beforeLast($firstComponent::class, '$');
-            }
+        $id = 'a'.str()->random(10);
 
-            // A string ID that can be used in the URL
-            $id = 'a' . substr(md5($className), 0, 8);
-            $components = [$id => $firstComponent, ...$components];
-        }
+        $components = [$id => $firstComponent, ...$components];
 
         return static::createBrowser($id, $components, $params, $queryParams)->visit('/livewire-dusk/'.$id.'?'.Arr::query($queryParams));
     }
@@ -143,6 +139,12 @@ class DuskTestable
                 if (! $e->isDuskShortcircuit) throw $e;
                 $components = $e->components;
             }
+
+            $components = is_array($components) ? $components : [$components];
+
+            $firstComponent = array_shift($components);
+
+            $components = [$id => $firstComponent, ...$components];
 
             static::$shortCircuitCreateCall = false;
 

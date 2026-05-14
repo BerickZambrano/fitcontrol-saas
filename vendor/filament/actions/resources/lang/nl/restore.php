@@ -61,7 +61,7 @@ return [
             ],
 
             'restored_none' => [
-                'title' => 'Herstellen mislukt',
+                'title' => 'Failed to restore',
                 'missing_authorization_failure_message' => 'Je hebt geen toestemming om :count te herstellen.',
                 'missing_processing_failure_message' => ':count kon niet worden hersteld.',
             ],

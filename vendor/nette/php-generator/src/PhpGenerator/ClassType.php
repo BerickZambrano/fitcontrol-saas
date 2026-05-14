@@ -1,14 +1,16 @@
-<?php declare(strict_types=1);
+<?php
 
 /**
  * This file is part of the Nette Framework (https://nette.org)
  * Copyright (c) 2004 David Grudl (https://davidgrudl.com)
  */
 
+declare(strict_types=1);
+
 namespace Nette\PhpGenerator;
 
 use Nette;
-use function array_diff, array_map, func_num_args, strtolower;
+use function array_diff, array_map, strtolower;
 
 
 /**
@@ -33,15 +35,17 @@ final class ClassType extends ClassLike
 	private ?string $extends = null;
 	private bool $readOnly = false;
 
-	/** @var list<string> */
+	/** @var string[] */
 	private array $implements = [];
 
 
-	public function __construct(?string $name = null)
+	public function __construct(?string $name = null, ?PhpNamespace $namespace = null)
 	{
-		parent::__construct($name ?? 'foo', func_num_args() > 1 ? func_get_arg(1) : null); // backward compatibility
 		if ($name === null) {
+			parent::__construct('foo', $namespace);
 			$this->setName(null);
+		} else {
+			parent::__construct($name, $namespace);
 		}
 	}
 
@@ -101,7 +105,9 @@ final class ClassType extends ClassLike
 	}
 
 
-	/** @param list<string>  $names */
+	/**
+	 * @param  string[]  $names
+	 */
 	public function setImplements(array $names): static
 	{
 		$this->validateNames($names);
@@ -110,7 +116,7 @@ final class ClassType extends ClassLike
 	}
 
 
-	/** @return list<string> */
+	/** @return string[] */
 	public function getImplements(): array
 	{
 		return $this->implements;
@@ -127,7 +133,7 @@ final class ClassType extends ClassLike
 
 	public function removeImplement(string $name): static
 	{
-		$this->implements = array_values(array_diff($this->implements, [$name]));
+		$this->implements = array_diff($this->implements, [$name]);
 		return $this;
 	}
 
@@ -183,9 +189,10 @@ final class ClassType extends ClassLike
 	public function __clone(): void
 	{
 		parent::__clone();
-		$this->consts = array_map(fn(Constant $c) => clone $c, $this->consts);
-		$this->methods = array_map(fn(Method $m) => clone $m, $this->methods);
-		$this->properties = array_map(fn(Property $p) => clone $p, $this->properties);
-		$this->traits = array_map(fn(TraitUse $t) => clone $t, $this->traits);
+		$clone = fn($item) => clone $item;
+		$this->consts = array_map($clone, $this->consts);
+		$this->methods = array_map($clone, $this->methods);
+		$this->properties = array_map($clone, $this->properties);
+		$this->traits = array_map($clone, $this->traits);
 	}
 }

@@ -596,7 +596,7 @@ return [
         'nativeName' => 'Slovenčina, Slovenský Jazyk',
     ],
     'sl' => [
-        'isoName' => 'Slovenian',
+        'isoName' => 'Slovene',
         'nativeName' => 'Slovenski Jezik, Slovenščina',
     ],
     'so' => [

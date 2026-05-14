@@ -1,9 +1,11 @@
-<?php declare(strict_types=1);
+<?php
 
 /**
  * This file is part of the Nette Framework (https://nette.org)
  * Copyright (c) 2004 David Grudl (https://davidgrudl.com)
  */
+
+declare(strict_types=1);
 
 namespace Nette\PhpGenerator;
 
@@ -18,7 +20,7 @@ final class TraitUse
 	use Traits\NameAware;
 	use Traits\CommentAware;
 
-	/** @var list<string> */
+	/** @var string[] */
 	private array $resolutions = [];
 
 
@@ -39,7 +41,7 @@ final class TraitUse
 	}
 
 
-	/** @return list<string> */
+	/** @return string[] */
 	public function getResolutions(): array
 	{
 		return $this->resolutions;

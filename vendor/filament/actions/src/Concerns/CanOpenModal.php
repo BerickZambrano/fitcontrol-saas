@@ -5,7 +5,6 @@ namespace Filament\Actions\Concerns;
 use BackedEnum;
 use Closure;
 use Filament\Actions\Action;
-use Filament\Actions\ActionGroup;
 use Filament\Actions\View\ActionsIconAlias;
 use Filament\Support\Enums\Alignment;
 use Filament\Support\Enums\Width;
@@ -19,12 +18,12 @@ use Illuminate\Support\Arr;
 trait CanOpenModal
 {
     /**
-     * @var array<string, Action | ActionGroup>
+     * @var array<string, Action>
      */
     protected array $cachedExtraModalFooterActions;
 
     /**
-     * @var array<Action | ActionGroup> | Closure
+     * @var array<Action> | Closure
      */
     protected array | Closure $extraModalFooterActions = [];
 
@@ -47,7 +46,7 @@ trait CanOpenModal
     protected Alignment | string | Closure | null $modalAlignment = null;
 
     /**
-     * @var array<string, Action | ActionGroup>
+     * @var array<string, Action>
      */
     protected array $cachedModalFooterActions;
 
@@ -208,7 +207,7 @@ trait CanOpenModal
     }
 
     /**
-     * @param  array<Action | ActionGroup> | Closure  $actions
+     * @param  array<Action> | Closure  $actions
      */
     public function extraModalFooterActions(array | Closure $actions): static
     {
@@ -341,7 +340,7 @@ trait CanOpenModal
     }
 
     /**
-     * @return array<string, Action | ActionGroup>
+     * @return array<string, Action>
      */
     public function getModalFooterActions(): array
     {
@@ -407,17 +406,7 @@ trait CanOpenModal
             return $this->cachedModalActions;
         }
 
-        $actions = [];
-
-        foreach ($this->getModalFooterActions() as $key => $action) {
-            if ($action instanceof ActionGroup) {
-                foreach ($action->getFlatActions() as $flatAction) {
-                    $actions[$flatAction->getName()] = $flatAction;
-                }
-            } else {
-                $actions[$key] = $action;
-            }
-        }
+        $actions = $this->getModalFooterActions();
 
         foreach ($this->modalActions as $action) {
             foreach (Arr::wrap($this->evaluate($action)) as $modalAction) {
@@ -447,39 +436,14 @@ trait CanOpenModal
             ->table($this->getTable());
     }
 
-    protected function prepareModalActionGroup(ActionGroup $group): ActionGroup
-    {
-        $group
-            ->schemaContainer($this->getSchemaContainer())
-            ->schemaComponent($this->getSchemaComponent())
-            ->livewire($this->getLivewire())
-            ->when(
-                ! $group->hasRecord(),
-                fn (ActionGroup $group) => $group->record($this->getRecord()),
-            )
-            ->table($this->getTable());
-
-        foreach ($group->getActions() as $nestedAction) {
-            if ($nestedAction instanceof ActionGroup) {
-                $this->prepareModalActionGroup($nestedAction);
-
-                continue;
-            }
-
-            $this->prepareModalAction($nestedAction);
-        }
-
-        return $group;
-    }
-
     /**
-     * @return array<Action | ActionGroup>
+     * @return array<Action>
      */
     public function getVisibleModalFooterActions(): array
     {
         return array_filter(
             $this->getModalFooterActions(),
-            fn (Action | ActionGroup $action): bool => $action->isVisible(),
+            fn (Action $action): bool => $action->isVisible(),
         );
     }
 
@@ -526,7 +490,7 @@ trait CanOpenModal
     }
 
     /**
-     * @return array<Action | ActionGroup>
+     * @return array<Action>
      */
     public function getExtraModalFooterActions(): array
     {
@@ -537,11 +501,7 @@ trait CanOpenModal
         $actions = [];
 
         foreach ($this->evaluate($this->extraModalFooterActions) as $action) {
-            if ($action instanceof ActionGroup) {
-                $actions[] = $this->prepareModalActionGroup($action);
-            } else {
-                $actions[$action->getName()] = $this->prepareModalAction($action);
-            }
+            $actions[$action->getName()] = $this->prepareModalAction($action);
         }
 
         return $this->cachedExtraModalFooterActions = $actions;

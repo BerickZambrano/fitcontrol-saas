@@ -8,13 +8,13 @@ use Livewire\Features\SupportAttributes\Attribute as LivewireAttribute;
 #[\Attribute]
 class BaseModelable extends LivewireAttribute
 {
-    public function mount($params, $parent, $attributes)
+    public function mount($params, $parent)
     {
         if (! $parent) return;
 
         $outer = null;
 
-        foreach ($attributes as $key => $value) {
+        foreach ($params as $key => $value) {
             if (str($key)->startsWith('wire:model')) {
                 $outer = $value;
                 store($this->component)->push('bindings-directives', $key, $value);

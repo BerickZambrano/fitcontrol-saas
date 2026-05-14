@@ -9,7 +9,7 @@ if (
     Chart.register(...window.filamentChartJsGlobalPlugins)
 }
 
-export default function chart({ cachedData, maxHeight, options, type }) {
+export default function chart({ cachedData, options, type }) {
     return {
         userPointBackgroundColor: options?.pointBackgroundColor,
         userXGridColor: options?.scales?.x?.grid?.color,
@@ -21,13 +21,8 @@ export default function chart({ cachedData, maxHeight, options, type }) {
             this.initChart()
 
             this.$wire.$on('updateChartData', ({ data }) => {
-                const chart = this.getChart()
-
-                if (!chart) {
-                    return
-                }
-
                 cachedData = data
+                chart = this.getChart()
                 chart.data = data
                 chart.update('resize')
             })
@@ -36,13 +31,11 @@ export default function chart({ cachedData, maxHeight, options, type }) {
                 Alpine.store('theme')
 
                 this.$nextTick(() => {
-                    const chart = this.getChart()
-
-                    if (!chart) {
+                    if (!this.getChart()) {
                         return
                     }
 
-                    chart.destroy()
+                    this.getChart().destroy()
                     this.initChart()
                 })
             })
@@ -55,29 +48,19 @@ export default function chart({ cachedData, maxHeight, options, type }) {
                     }
 
                     this.$nextTick(() => {
-                        const chart = this.getChart()
-
-                        if (!chart) {
-                            return
-                        }
-
-                        chart.destroy()
+                        this.getChart().destroy()
                         this.initChart()
                     })
                 })
 
-            this.resizeObserver = new ResizeObserver(
-                Alpine.debounce(() => {
-                    const chart = this.getChart()
+            this.resizeHandler = Alpine.debounce(() => {
+                this.getChart().destroy()
+                this.initChart()
+            }, 250)
 
-                    if (!chart) {
-                        return
-                    }
+            window.addEventListener('resize', this.resizeHandler)
 
-                    chart.destroy()
-                    this.initChart()
-                }, 250),
-            )
+            this.resizeObserver = new ResizeObserver(() => this.resizeHandler())
             this.resizeObserver.observe(this.$el)
         },
 
@@ -119,7 +102,7 @@ export default function chart({ cachedData, maxHeight, options, type }) {
 
             options ??= {}
             options.borderWidth ??= 2
-            options.maintainAspectRatio ??= !!maxHeight
+            options.maintainAspectRatio ??= false
             options.pointBackgroundColor =
                 this.userPointBackgroundColor ?? borderColor
             options.pointHitRadius ??= 4
@@ -175,6 +158,8 @@ export default function chart({ cachedData, maxHeight, options, type }) {
         },
 
         destroy() {
+            window.removeEventListener('resize', this.resizeHandler)
+
             if (this.resizeObserver) {
                 this.resizeObserver.disconnect()
             }

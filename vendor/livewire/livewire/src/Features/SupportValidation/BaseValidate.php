@@ -86,17 +86,11 @@ class BaseValidate extends LivewireAttribute
     {
         if ($this->onUpdate === false) return;
 
-        return function () use ($fullPath) {
+        return function () {
             // If this attribute is added to a "form object", we want to run
             // the validateOnly method on the form object, not the base component...
             $target = $this->subTarget ?: $this->component;
-
-            // Use the full path so that wildcard rules (e.g. 'items.*') are matched
-            // when validating nested properties (e.g. 'items.0'). For form objects,
-            // strip the form prefix to get the path relative to the form.
-            $name = $this->subTarget
-                ? $this->getSubName() . str($fullPath)->after($this->getName())
-                : $fullPath;
+            $name = $this->subTarget ? $this->getSubName() : $this->getName();
 
             // Here we have to run the form object validator from the context
             // of the base "wrapped" component so that validation works...

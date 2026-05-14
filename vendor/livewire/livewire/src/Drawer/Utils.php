@@ -48,7 +48,7 @@ class Utils extends BaseUtils
             return htmlspecialchars($subject, ENT_QUOTES|ENT_SUBSTITUTE);
         }
 
-        return htmlspecialchars(json_encode($subject, JSON_THROW_ON_ERROR), ENT_QUOTES|ENT_SUBSTITUTE);
+        return htmlspecialchars(json_encode($subject), ENT_QUOTES|ENT_SUBSTITUTE);
     }
 
     static function pretendResponseIsFile($file, $contentType = 'application/javascript; charset=utf-8')
@@ -57,12 +57,6 @@ class Utils extends BaseUtils
 
         return static::cachedFileResponse($file, $contentType, $lastModified,
             fn ($headers) => response()->file($file, $headers));
-    }
-
-    static function pretendResponseIsFileFromString($content, $filemtime, $filename = 'generated', $contentType = 'application/javascript; charset=utf-8')
-    {
-        return static::cachedFileResponse($filename, $contentType, $filemtime,
-            fn ($headers) => response($content, 200, $headers));
     }
 
     static function pretendPreviewResponseIsPreviewFile($filename)

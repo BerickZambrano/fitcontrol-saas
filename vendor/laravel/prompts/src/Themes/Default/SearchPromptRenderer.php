@@ -46,7 +46,6 @@ class SearchPromptRenderer extends Renderer implements Scrolling
                     $this->cyan($this->truncate($prompt->label, $prompt->terminal()->cols() - 6)),
                     $this->valueWithCursorAndSearchIcon($prompt, $maxWidth),
                     $this->renderOptions($prompt),
-                    info: $prompt->infoText(),
                 )
                 ->hint($prompt->hint),
 
@@ -55,7 +54,6 @@ class SearchPromptRenderer extends Renderer implements Scrolling
                     $this->cyan($this->truncate($prompt->label, $prompt->terminal()->cols() - 6)),
                     $prompt->valueWithCursor($maxWidth),
                     $this->renderOptions($prompt),
-                    info: $prompt->infoText(),
                 )
                 ->when(
                     $prompt->hint,

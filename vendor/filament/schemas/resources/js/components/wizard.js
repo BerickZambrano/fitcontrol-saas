@@ -9,14 +9,11 @@ export default function wizardSchemaComponent({
         step: null,
 
         init() {
+            this.$watch('step', () => this.updateQueryString())
+
             this.step = this.getSteps().at(startStep - 1)
 
-            this.$watch('step', () => {
-                this.updateQueryString()
-                this.autofocusFields()
-            })
-
-            this.autofocusFields(true)
+            this.autofocusFields()
         },
 
         async requestNextStep() {
@@ -34,6 +31,7 @@ export default function wizardSchemaComponent({
 
             this.step = this.getSteps()[nextStepIndex]
 
+            this.autofocusFields()
             this.scroll()
         },
 
@@ -46,22 +44,7 @@ export default function wizardSchemaComponent({
 
             this.step = this.getSteps()[previousStepIndex]
 
-            this.scroll()
-        },
-
-        goToStep(stepKey) {
-            const stepIndex = this.getStepIndex(stepKey)
-
-            if (stepIndex <= -1) {
-                return
-            }
-
-            if (!isSkippable && stepIndex > this.getStepIndex(this.step)) {
-                return
-            }
-
-            this.step = stepKey
-
+            this.autofocusFields()
             this.scroll()
         },
 
@@ -73,31 +56,12 @@ export default function wizardSchemaComponent({
             })
         },
 
-        autofocusFields(respectCurrentFocus = false) {
-            this.$nextTick(() => {
-                if (
-                    respectCurrentFocus &&
-                    document.activeElement &&
-                    document.activeElement !== document.body &&
-                    this.$el.compareDocumentPosition(document.activeElement) &
-                        Node.DOCUMENT_POSITION_PRECEDING
-                ) {
-                    return
-                }
-
-                const fields =
-                    this.$refs[`step-${this.step}`]?.querySelectorAll(
-                        '[autofocus]',
-                    ) ?? []
-
-                for (const field of fields) {
-                    field.focus()
-
-                    if (document.activeElement === field) {
-                        break
-                    }
-                }
-            })
+        autofocusFields() {
+            this.$nextTick(() =>
+                this.$refs[`step-${this.step}`]
+                    .querySelector('[autofocus]')
+                    ?.focus(),
+            )
         },
 
         getStepIndex(step) {

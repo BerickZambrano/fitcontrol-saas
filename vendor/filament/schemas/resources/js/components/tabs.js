@@ -11,7 +11,6 @@ export default function tabsSchemaComponent({
         isScrollable,
         resizeDebounceTimer: null,
         tab,
-        unsubscribeLivewireHook: null,
         withinDropdownIndex: null,
         withinDropdownMounted: false,
 
@@ -27,22 +26,18 @@ export default function tabsSchemaComponent({
                 this.tab = queryString.get(tabQueryStringKey)
             }
 
+            this.$watch('tab', () => this.updateQueryString())
+
             if (!this.tab || !tabs.includes(this.tab)) {
                 this.tab = tabs[activeTab - 1]
             }
 
-            this.$watch('tab', () => {
-                this.updateQueryString()
-                this.autofocusFields()
-            })
-
-            this.autofocusFields(true)
-
-            this.unsubscribeLivewireHook = Livewire.interceptMessage(
-                ({ message, onSuccess }) => {
-                    onSuccess(() => {
+            Livewire.hook(
+                'commit',
+                ({ component, commit, succeed, fail, respond }) => {
+                    succeed(({ snapshot, effect }) => {
                         this.$nextTick(() => {
-                            if (message.component.id !== livewireId) {
+                            if (component.id !== livewireId) {
                                 return
                             }
 
@@ -194,32 +189,6 @@ export default function tabsSchemaComponent({
             history.replaceState(null, document.title, url.toString())
         },
 
-        autofocusFields(respectCurrentFocus = false) {
-            this.$nextTick(() => {
-                if (
-                    respectCurrentFocus &&
-                    document.activeElement &&
-                    document.activeElement !== document.body &&
-                    this.$el.compareDocumentPosition(document.activeElement) &
-                        Node.DOCUMENT_POSITION_PRECEDING
-                ) {
-                    return
-                }
-
-                const fields = this.$el.querySelectorAll(
-                    '.fi-sc-tabs-tab.fi-active [autofocus]',
-                )
-
-                for (const field of fields) {
-                    field.focus()
-
-                    if (document.activeElement === field) {
-                        break
-                    }
-                }
-            })
-        },
-
         debouncedUpdateTabsWithinDropdown() {
             clearTimeout(this.resizeDebounceTimer)
 
@@ -276,8 +245,6 @@ export default function tabsSchemaComponent({
         },
 
         destroy() {
-            this.unsubscribeLivewireHook?.()
-
             if (this.boundResizeHandler) {
                 window.removeEventListener('resize', this.boundResizeHandler)
             }

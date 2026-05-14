@@ -323,8 +323,7 @@ class AttachAction extends Action
                     ->mapWithKeys(fn (Model $record): array => [$record->getKey() => $this->getRecordTitle($record)])
                     ->all();
             })
-            ->options(fn (Select $component): ?array => $this->isRecordSelectPreloaded() ? $getOptions(optionsLimit: $component->getOptionsLimit()) : null)
-            ->dynamicOptions(fn (): ?bool => $this->isRecordSelectPreloaded() ? null : false)
+            ->options(fn (Select $component): array => $this->isRecordSelectPreloaded() ? $getOptions(optionsLimit: $component->getOptionsLimit()) : [])
             ->hiddenLabel();
 
         if ($this->modifyRecordSelectUsing) {

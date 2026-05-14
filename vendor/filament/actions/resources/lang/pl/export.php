@@ -14,18 +14,6 @@ return [
 
                 'label' => 'Kolumny',
 
-                'actions' => [
-
-                    'select_all' => [
-                        'label' => 'Zaznacz wszystko',
-                    ],
-
-                    'deselect_all' => [
-                        'label' => 'Odznacz wszystko',
-                    ],
-
-                ],
-
                 'form' => [
 
                     'is_enabled' => [
@@ -75,11 +63,6 @@ return [
         'max_rows' => [
             'title' => 'Zbyt dużo wierszy',
             'body' => 'Nie możesz wyeksportować więcej niż 1 wiersz na raz.|Nie możesz wyeksportować więcej niż :count wierszy na raz.',
-        ],
-
-        'no_columns' => [
-            'title' => 'Brak wybranych kolumn',
-            'body' => 'Proszę wybrać przynajmniej jedną kolumnę do eksportu.',
         ],
 
         'started' => [

@@ -66,7 +66,6 @@ To arrange components into a [layout](layouts), Filament includes layout compone
 - [Section](sections)
 - [Tabs](tabs)
 - [Wizard](wizards)
-- [Callout](callouts)
 - [Empty states](empty-states)
 - Or, build your own [custom layout component](custom-components#custom-layout-components)
 
@@ -118,7 +117,7 @@ $schema
     ])
 ```
 
-<AutoScreenshot name="schemas/overview/example" alt="Example schema" version="5.x" />
+<AutoScreenshot name="schemas/overview/example" alt="Example schema" version="4.x" />
 
 [Grid](layouts#grid-component) is a layout component that renders multiple components together in a responsive grid. The number of columns in the grid is specified in the `make()` method. The `schema()` method is used to nest components within the grid.
 

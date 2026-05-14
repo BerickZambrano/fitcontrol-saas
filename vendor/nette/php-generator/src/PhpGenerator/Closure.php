@@ -1,9 +1,11 @@
-<?php declare(strict_types=1);
+<?php
 
 /**
  * This file is part of the Nette Framework (https://nette.org)
  * Copyright (c) 2004 David Grudl (https://davidgrudl.com)
  */
+
+declare(strict_types=1);
 
 namespace Nette\PhpGenerator;
 
@@ -16,11 +18,10 @@ final class Closure
 	use Traits\FunctionLike;
 	use Traits\AttributeAware;
 
-	/** @var list<Parameter> */
+	/** @var Parameter[] */
 	private array $uses = [];
 
 
-	/** @param \Closure(): mixed  $closure */
 	public static function from(\Closure $closure): self
 	{
 		return (new Factory)->fromFunctionReflection(new \ReflectionFunction($closure));
@@ -35,7 +36,7 @@ final class Closure
 
 	/**
 	 * Replaces all uses.
-	 * @param  list<Parameter>  $uses
+	 * @param  Parameter[]  $uses
 	 */
 	public function setUses(array $uses): static
 	{
@@ -45,7 +46,7 @@ final class Closure
 	}
 
 
-	/** @return list<Parameter> */
+	/** @return Parameter[] */
 	public function getUses(): array
 	{
 		return $this->uses;

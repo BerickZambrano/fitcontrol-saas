@@ -14,18 +14,6 @@ return [
 
                 'label' => 'Stulpeliai',
 
-                'actions' => [
-
-                    'select_all' => [
-                        'label' => 'Pažymėti visus',
-                    ],
-
-                    'deselect_all' => [
-                        'label' => 'Atžymėti visus',
-                    ],
-
-                ],
-
                 'form' => [
 
                     'is_enabled' => [
@@ -75,11 +63,6 @@ return [
         'max_rows' => [
             'title' => 'Eksportas per didelis',
             'body' => 'Negalite eksportuoti daugiau nei 1 eilutės vienu metu.|Negalite eksportuoti daugiau nei :count eilučių vienu metu.',
-        ],
-
-        'no_columns' => [
-            'title' => 'Nepasirinkti stulpeliai',
-            'body' => 'Prašome pasirinkti bent vieną stulpelį eksportui.',
         ],
 
         'started' => [

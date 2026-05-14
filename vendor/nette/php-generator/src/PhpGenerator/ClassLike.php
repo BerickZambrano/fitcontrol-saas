@@ -1,14 +1,16 @@
-<?php declare(strict_types=1);
+<?php
 
 /**
  * This file is part of the Nette Framework (https://nette.org)
  * Copyright (c) 2004 David Grudl (https://davidgrudl.com)
  */
 
+declare(strict_types=1);
+
 namespace Nette\PhpGenerator;
 
 use Nette;
-use function array_map, func_num_args, is_object, str_contains, strtolower;
+use function array_map, is_object, strtolower;
 
 
 /**
@@ -35,7 +37,6 @@ abstract class ClassLike
 	private ?string $name;
 
 
-	/** @param class-string|object  $class */
 	public static function from(string|object $class, bool $withBodies = false): static
 	{
 		$instance = (new Factory)
@@ -63,15 +64,10 @@ abstract class ClassLike
 	}
 
 
-	public function __construct(string $name)
+	public function __construct(string $name, ?PhpNamespace $namespace = null)
 	{
-		if (str_contains($name, '\\')) {
-			$this->namespace = new PhpNamespace(Helpers::extractNamespace($name));
-			$this->setName(Helpers::extractShortName($name));
-		} else {
-			$this->namespace = func_num_args() > 1 ? func_get_arg(1) : null; // backward compatibility
-			$this->setName($name);
-		}
+		$this->setName($name);
+		$this->namespace = $namespace;
 	}
 
 
@@ -81,14 +77,7 @@ abstract class ClassLike
 	}
 
 
-	/** @internal */
-	public function setNamespace(?PhpNamespace $namespace): static
-	{
-		$this->namespace = $namespace;
-		return $this;
-	}
-
-
+	/** @deprecated  an object can be in multiple namespaces */
 	public function getNamespace(): ?PhpNamespace
 	{
 		return $this->namespace;
@@ -109,14 +98,6 @@ abstract class ClassLike
 	public function getName(): ?string
 	{
 		return $this->name;
-	}
-
-
-	public function getFullName(): ?string
-	{
-		return $this->name && ($namespace = $this->namespace?->getName())
-			? $namespace . '\\' . $this->name
-			: $this->name;
 	}
 
 
@@ -144,7 +125,7 @@ abstract class ClassLike
 	}
 
 
-	/** @param list<string>  $names */
+	/** @param  string[]  $names */
 	protected function validateNames(array $names): void
 	{
 		foreach ($names as $name) {

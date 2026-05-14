@@ -14,18 +14,6 @@ return [
 
                 'label' => 'Kolommen',
 
-                'actions' => [
-
-                    'select_all' => [
-                        'label' => 'Alles selecteren',
-                    ],
-
-                    'deselect_all' => [
-                        'label' => 'Alles deselecteren',
-                    ],
-
-                ],
-
                 'form' => [
 
                     'is_enabled' => [
@@ -75,11 +63,6 @@ return [
         'max_rows' => [
             'title' => 'Export is te groot',
             'body' => 'Je mag niet meer dan 1 rij tegelijk exporteren.|Je mag niet meer dan :count rijen tegelijk exporteren.',
-        ],
-
-        'no_columns' => [
-            'title' => 'Geen kolommen geselecteerd',
-            'body' => 'Selecteer ten minste één kolom om te exporteren.',
         ],
 
         'started' => [

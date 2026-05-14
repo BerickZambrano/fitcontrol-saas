@@ -1,9 +1,11 @@
-<?php declare(strict_types=1);
+<?php
 
 /**
  * This file is part of the Nette Framework (https://nette.org)
  * Copyright (c) 2004 David Grudl (https://davidgrudl.com)
  */
+
+declare(strict_types=1);
 
 namespace Nette\PhpGenerator;
 
@@ -19,11 +21,13 @@ final class InterfaceType extends ClassLike
 	use Traits\MethodsAware;
 	use Traits\PropertiesAware;
 
-	/** @var list<string> */
+	/** @var string[] */
 	private array $extends = [];
 
 
-	/** @param string|list<string>  $names */
+	/**
+	 * @param  string|string[]  $names
+	 */
 	public function setExtends(string|array $names): static
 	{
 		$names = (array) $names;
@@ -33,7 +37,7 @@ final class InterfaceType extends ClassLike
 	}
 
 
-	/** @return list<string> */
+	/** @return string[] */
 	public function getExtends(): array
 	{
 		return $this->extends;
@@ -83,8 +87,9 @@ final class InterfaceType extends ClassLike
 	public function __clone(): void
 	{
 		parent::__clone();
-		$this->consts = array_map(fn(Constant $c) => clone $c, $this->consts);
-		$this->methods = array_map(fn(Method $m) => clone $m, $this->methods);
-		$this->properties = array_map(fn(Property $p) => clone $p, $this->properties);
+		$clone = fn($item) => clone $item;
+		$this->consts = array_map($clone, $this->consts);
+		$this->methods = array_map($clone, $this->methods);
+		$this->properties = array_map($clone, $this->properties);
 	}
 }

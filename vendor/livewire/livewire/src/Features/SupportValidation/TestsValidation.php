@@ -106,12 +106,7 @@ trait TestsValidation
         $errors = $this->errors();
 
         if (empty($keys)) {
-            $message = 'Component has errors: ';
-            $message .= collect($errors->toArray())->map(function ($messages, $key) {
-                return '"'.$key.'" => ["'.implode('", "', $messages).'"]';
-            })->implode(', ');
-
-            PHPUnit::assertTrue($errors->isEmpty(), $message);
+            PHPUnit::assertTrue($errors->isEmpty(), 'Component has errors: "'.implode('", "', $errors->keys()).'"');
 
             return $this;
         }

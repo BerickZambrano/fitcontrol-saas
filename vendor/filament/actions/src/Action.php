@@ -178,7 +178,6 @@ class Action extends ViewComponent implements Arrayable
 
         return [
             'name' => $this->getName(),
-            'alpineClickHandler' => $this->getCustomAlpineClickHandler(),
             'color' => $this->getColor(),
             'event' => $this->getEvent(),
             'eventData' => $this->getEventData(),
@@ -224,10 +223,6 @@ class Action extends ViewComponent implements Arrayable
 
         if (filled($size = $data['size'] ?? null)) {
             $static->size($size);
-        }
-
-        if (filled($data['alpineClickHandler'] ?? null)) {
-            $static->alpineClickHandler($data['alpineClickHandler']);
         }
 
         $static->close($data['shouldClose'] ?? false);
@@ -387,7 +382,7 @@ class Action extends ViewComponent implements Arrayable
 
     public function getAlpineClickHandler(): ?string
     {
-        if (filled($handler = $this->getCustomAlpineClickHandler())) {
+        if (filled($handler = $this->evaluate($this->alpineClickHandler))) {
             return $handler;
         }
 
@@ -410,11 +405,6 @@ class Action extends ViewComponent implements Arrayable
         return $this->getJsClickHandler();
     }
 
-    public function getCustomAlpineClickHandler(): ?string
-    {
-        return $this->evaluate($this->alpineClickHandler);
-    }
-
     public function livewireTarget(?string $target): static
     {
         $this->livewireTarget = $target;
@@ -428,8 +418,8 @@ class Action extends ViewComponent implements Arrayable
             return $this->livewireTarget;
         }
 
-        if (! $this->canAccessSelectedRecords()) {
-            return $this->canSubmitForm() ? $this->getFormToSubmit() : null;
+        if ($this->getTable() && ! $this->canAccessSelectedRecords()) {
+            return null;
         }
 
         return $this->getJsClickHandler();
@@ -466,7 +456,7 @@ class Action extends ViewComponent implements Arrayable
 
         $argumentsParameter = '';
 
-        if (count($arguments = $this->getInvokedArguments() ?? [])) {
+        if (count($arguments = $this->getArguments())) {
             $argumentsParameter .= ', ';
             $argumentsParameter .= Js::from($arguments);
         }

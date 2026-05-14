@@ -10,8 +10,6 @@ export default (Alpine) => {
 
         transitionEasing: null,
 
-        unsubscribeLivewireHook: null,
-
         init() {
             this.computedStyle = window.getComputedStyle(this.$el)
 
@@ -78,8 +76,16 @@ export default (Alpine) => {
         configureAnimations() {
             let animation
 
-            this.unsubscribeLivewireHook = Livewire.interceptMessage(
-                ({ onFinish, onSuccess }) => {
+            Livewire.hook(
+                'commit',
+                ({ component, commit, succeed, fail, respond }) => {
+                    if (
+                        !component.snapshot.data
+                            .isFilamentNotificationsComponent
+                    ) {
+                        return
+                    }
+
                     // Calling `el.getBoundingClientRect()` from outside `requestAnimationFrame()` can
                     // occasionally cause the page to scroll to the top.
                     requestAnimationFrame(() => {
@@ -87,7 +93,7 @@ export default (Alpine) => {
                             this.$el.getBoundingClientRect().top
                         const oldTop = getTop()
 
-                        onFinish(() => {
+                        respond(() => {
                             animation = () => {
                                 if (!this.isShown) {
                                     return
@@ -96,7 +102,9 @@ export default (Alpine) => {
                                 this.$el.animate(
                                     [
                                         {
-                                            transform: `translateY(${oldTop - getTop()}px)`,
+                                            transform: `translateY(${
+                                                oldTop - getTop()
+                                            }px)`,
                                         },
                                         { transform: 'translateY(0px)' },
                                     ],
@@ -112,17 +120,8 @@ export default (Alpine) => {
                                 .forEach((animation) => animation.finish())
                         })
 
-                        onSuccess(({ payload }) => {
-                            if (
-                                !payload?.snapshot?.data
-                                    ?.isFilamentNotificationsComponent
-                            ) {
-                                return
-                            }
-
-                            if (typeof animation === 'function') {
-                                animation()
-                            }
+                        succeed(({ snapshot, effect }) => {
+                            animation()
                         })
                     })
                 },
@@ -163,10 +162,6 @@ export default (Alpine) => {
                     },
                 }),
             )
-        },
-
-        destroy() {
-            this.unsubscribeLivewireHook?.()
         },
     }))
 }

@@ -5,8 +5,7 @@ namespace Livewire\Features\SupportFileUploads;
 use function Livewire\on;
 use Livewire\ComponentHook;
 use Illuminate\Support\Facades\Route;
-use Livewire\Mechanisms\HandleRequests\EndpointResolver;
-use Livewire\Facades\GenerateSignedUploadUrlFacade;
+use Facades\Livewire\Features\SupportFileUploads\GenerateSignedUploadUrl as GenerateSignedUploadUrlFacade;
 
 class SupportFileUploads extends ComponentHook
 {
@@ -23,7 +22,7 @@ class SupportFileUploads extends ComponentHook
             FileUploadSynth::class,
         ]);
 
-        on('call', function ($component, $method, $params, $componentContext, $earlyReturn) {
+        on('call', function ($component, $method, $params, $addEffect, $earlyReturn) {
             if ($method === '_startUpload') {
                 if (! method_exists($component, $method)) {
                     throw new MissingFileUploadsTraitException($component);
@@ -31,10 +30,10 @@ class SupportFileUploads extends ComponentHook
             }
         });
 
-        Route::post(EndpointResolver::uploadPath(), [FileUploadController::class, 'handle'])
+        Route::post('/livewire/upload-file', [FileUploadController::class, 'handle'])
             ->name('livewire.upload-file');
 
-        Route::get(EndpointResolver::previewPath(), [FilePreviewController::class, 'handle'])
+        Route::get('/livewire/preview-file/{filename}', [FilePreviewController::class, 'handle'])
             ->name('livewire.preview-file');
     }
 }

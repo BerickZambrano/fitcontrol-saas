@@ -27,10 +27,6 @@ class Note extends Prompt
     {
         $this->capturePreviousNewLines();
 
-        if (static::shouldFallback()) {
-            return $this->fallback();
-        }
-
         $this->state = 'submit';
 
         static::output()->write($this->renderTheme());

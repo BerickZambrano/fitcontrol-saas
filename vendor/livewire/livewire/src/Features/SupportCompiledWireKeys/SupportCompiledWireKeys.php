@@ -53,8 +53,8 @@ class SupportCompiledWireKeys extends ComponentHook
         preg_match_all('/(?<=\s)wire:key\s*=\s*(?:"([^"\\\\]*(?:\\\\.[^"\\\\]*)*)"|\'([^\'\\\\]*(?:\\\\.[^\'\\\\]*)*)\')/', $cleanedContents, $keys);
 
         foreach ($keys[0] as $index => $key) {
-            $keyExpression = static::compileKeyExpression($keys[1][$index]);
-            $prefix = "<?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::\$currentLoop['key'] = {$keyExpression}; ?>";
+            $escapedKey = str_replace("'", "\'", $keys[1][$index]);
+            $prefix = "<?php \Livewire\Features\SupportCompiledWireKeys\SupportCompiledWireKeys::processElementKey('{$escapedKey}', get_defined_vars()); ?>";
             $contents = str_replace($key, $prefix . $key, $contents);
         }
 
@@ -83,7 +83,7 @@ class SupportCompiledWireKeys extends ComponentHook
             'key' => null,
         ];
     }
-
+    
     public static function startLoop($index) {
         static::$currentLoop['index'] = $index;
     }
@@ -100,44 +100,9 @@ class SupportCompiledWireKeys extends ComponentHook
         static::$currentLoop = array_pop(static::$loopStack);
     }
 
-    public static function compileKeyExpression($keyString)
-    {
-        // Compile Blade echo statements into PHP string concatenation
-        // (mirrors Laravel's ComponentTagCompiler::compileAttributeEchos approach)...
-        $value = Blade::compileEchos($keyString);
-
-        // Escape single quotes only outside of PHP blocks...
-        $value = collect(token_get_all('<'.'?php ?'.'>'.$value))
-            ->slice(2)
-            ->map(function ($token) {
-                if (! is_array($token)) {
-                    return $token;
-                }
-
-                return $token[0] === T_INLINE_HTML
-                    ? str_replace("'", "\\'", $token[1])
-                    : $token[1];
-            })->implode('');
-
-        $value = str_replace('<'.'?php echo ', "'.", $value);
-        $value = str_replace('; ?'.'>', ".'", $value);
-
-        return "'".$value."'";
-    }
-
-    /**
-     * Backward-compatibility shim for cached compiled Blade views that still
-     * reference this method from before the smart keys optimisation in v4.2.
-     *
-     * TODO: Remove in v5.
-     */
     public static function processElementKey($keyString, $data)
     {
-        if (view()->exists($keyString)) {
-            $key = $keyString;
-        } else {
-            $key = Blade::render($keyString, $data);
-        }
+        $key = Blade::render($keyString, $data);
 
         static::$currentLoop['key'] = $key;
     }
@@ -152,9 +117,9 @@ class SupportCompiledWireKeys extends ComponentHook
     public static function generateKey($deterministicBladeKey, $key = null)
     {
         $finalKey = $deterministicBladeKey;
-
+        
         $loops = array_merge(static::$loopStack, [static::$currentLoop]);
-
+        
         foreach ($loops as $loop) {
             if (isset($loop['key']) || isset($loop['index'])) {
                 $finalKey .= isset($loop['key'])

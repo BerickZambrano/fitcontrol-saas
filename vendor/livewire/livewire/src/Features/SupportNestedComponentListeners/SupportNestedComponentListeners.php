@@ -25,7 +25,7 @@ class SupportNestedComponentListeners extends ComponentHook
                 $attributeKey = 'x-on:'.$fullEvent;
                 $attributeValue = "\$wire.\$parent.".$value;
 
-                store($this->component)->push('generatedAttributes', $attributeValue, $attributeKey);
+                store($this->component)->push('attributes', $attributeValue, $attributeKey);
             }
         }
     }
@@ -33,7 +33,7 @@ class SupportNestedComponentListeners extends ComponentHook
     public function render($view, $data)
     {
         return function ($html, $replaceHtml) {
-            $attributes = store($this->component)->get('generatedAttributes', false);
+            $attributes = store($this->component)->get('attributes', false);
 
             if (! $attributes) return;
 
@@ -43,20 +43,20 @@ class SupportNestedComponentListeners extends ComponentHook
 
     public function dehydrate($context)
     {
-        $attributes = store($this->component)->get('generatedAttributes', false);
+        $attributes = store($this->component)->get('attributes', false);
 
         if (! $attributes) return;
 
-        $attributes && $context->addMemo('generatedAttributes', $attributes);
+        $attributes && $context->addMemo('attributes', $attributes);
     }
 
     public function hydrate($memo)
     {
-        if (! isset($memo['generatedAttributes'])) return;
+        if (! isset($memo['attributes'])) return;
 
-        $attributes = $memo['generatedAttributes'];
+        $attributes = $memo['attributes'];
 
         // Store the attributes for later dehydration...
-        store($this->component)->set('generatedAttributes', $attributes);
+        store($this->component)->set('attributes', $attributes);
     }
 }

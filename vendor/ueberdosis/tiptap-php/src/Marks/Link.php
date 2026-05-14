@@ -80,19 +80,9 @@ class Link extends Mark
             $HTMLAttributes['href'] = '';
         }
 
-        $attributes = HTML::mergeAttributes($this->options['HTMLAttributes'], $HTMLAttributes);
-
-        if (isset($mark->attrs)) {
-            foreach ((array) $mark->attrs as $key => $value) {
-                if ($value === null) {
-                    unset($attributes[$key]);
-                }
-            }
-        }
-
         return [
             'a',
-            $attributes,
+            HTML::mergeAttributes($this->options['HTMLAttributes'], $HTMLAttributes),
             0,
         ];
     }

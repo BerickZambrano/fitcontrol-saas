@@ -4,25 +4,10 @@ namespace Livewire\Features\SupportLifecycleHooks;
 
 use function Livewire\store;
 use function Livewire\wrap;
-use function Livewire\on;
 use Livewire\ComponentHook;
 
 class SupportLifecycleHooks extends ComponentHook
 {
-    // Performance optimization: Cache trait lookups per component class...
-    protected static $traitCache = [];
-
-    // Performance optimization: Cache method existence checks per component class...
-    protected static $methodCache = [];
-
-    public static function provide()
-    {
-        on('flush-state', function () {
-            static::$traitCache = [];
-            static::$methodCache = [];
-        });
-    }
-
     public function mount($params)
     {
         if (store($this->component)->has('skipMount')) { return; }
@@ -96,44 +81,25 @@ class SupportLifecycleHooks extends ComponentHook
         };
     }
 
-    public function call($methodName, $params, $returnEarly, $metadata)
+    public function call($methodName, $params, $returnEarly)
     {
         $protectedMethods = [
             'mount',
-            'boot',
-            'booted',
             'exception',
             'hydrate*',
             'dehydrate*',
             'updating*',
             'updated*',
-            'rendering',
-            'rendered',
-            'scriptSrc',
         ];
-
-        // Also block trait-suffixed lifecycle hooks (e.g. mountWithFileUploads, bootMyTrait)
-        $class = get_class($this->component);
-
-        if (! isset(static::$traitCache[$class])) {
-            static::$traitCache[$class] = class_uses_recursive($this->component);
-        }
-
-        foreach (static::$traitCache[$class] as $trait) {
-            $traitBasename = class_basename($trait);
-            $protectedMethods[] = 'mount'.$traitBasename;
-            $protectedMethods[] = 'boot'.$traitBasename;
-            $protectedMethods[] = 'booted'.$traitBasename;
-        }
 
         throw_if(
             str($methodName)->is($protectedMethods),
             new DirectlyCallingLifecycleHooksNotAllowedException($methodName, $this->component->getName())
         );
 
-        $this->callTraitHook('call', ['methodName' => $methodName, 'params' => $params, 'returnEarly' => $returnEarly, 'metadata' => $metadata]);
+        $this->callTraitHook('call', ['methodName' => $methodName, 'params' => $params, 'returnEarly' => $returnEarly]);
     }
-
+    
     public function exception($e, $stopPropagation)
     {
         $this->callHook('exception', ['e' => $e, 'stopPropagation' => $stopPropagation]);
@@ -164,39 +130,17 @@ class SupportLifecycleHooks extends ComponentHook
 
     public function callHook($name, $params = [])
     {
-        // Performance optimization: Cache method existence checks
-        $class = get_class($this->component);
-        $cacheKey = "{$class}::{$name}";
-
-        if (!isset(static::$methodCache[$cacheKey])) {
-            static::$methodCache[$cacheKey] = method_exists($this->component, $name);
-        }
-
-        if (static::$methodCache[$cacheKey]) {
+        if (method_exists($this->component, $name)) {
             wrap($this->component)->__call($name, $params);
         }
     }
 
     function callTraitHook($name, $params = [])
     {
-        // Performance optimization: Cache trait lookups per component class
-        $class = get_class($this->component);
-
-        if (!isset(static::$traitCache[$class])) {
-            static::$traitCache[$class] = class_uses_recursive($this->component);
-        }
-
-        foreach (static::$traitCache[$class] as $trait) {
+        foreach (class_uses_recursive($this->component) as $trait) {
             $method = $name.class_basename($trait);
 
-            // Performance optimization: Cache method existence checks
-            $cacheKey = "{$class}::{$method}";
-
-            if (!isset(static::$methodCache[$cacheKey])) {
-                static::$methodCache[$cacheKey] = method_exists($this->component, $method);
-            }
-
-            if (static::$methodCache[$cacheKey]) {
+            if (method_exists($this->component, $method)) {
                 wrap($this->component)->$method(...$params);
             }
         }

@@ -23,7 +23,7 @@ return [
         'notifications' => [
 
             'saved' => [
-                'title' => 'A in thlâkthleng e.',
+                'title' => 'A in save e.',
             ],
 
         ],

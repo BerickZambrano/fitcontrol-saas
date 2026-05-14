@@ -104,63 +104,7 @@ export default function fileUploadFormComponent({
 
         editor: {},
 
-        visibilityObserver: null,
-
-        intersectionObserver: null,
-
-        isInitializing: false,
-
         async init() {
-            if (this.pond || this.isInitializing) {
-                return
-            }
-
-            this.isInitializing = true
-
-            // https://github.com/filamentphp/filament/issues/15394
-            // https://github.com/filamentphp/filament/issues/16253
-            // https://github.com/filamentphp/filament/issues/19522
-            if (!this.visibilityObserver) {
-                const onVisible = () => {
-                    const isHidden =
-                        this.$el.offsetParent === null ||
-                        getComputedStyle(this.$el).visibility === 'hidden'
-
-                    if (isHidden) {
-                        return
-                    }
-
-                    if (!this.pond) {
-                        this.init()
-                    } else {
-                        document.dispatchEvent(new Event('visibilitychange'))
-                    }
-                }
-
-                this.visibilityObserver = new ResizeObserver(() => onVisible())
-                this.visibilityObserver.observe(this.$el)
-
-                this.intersectionObserver = new IntersectionObserver(
-                    (entries) => {
-                        if (entries[0]?.isIntersecting) {
-                            onVisible()
-                        }
-                    },
-                    { threshold: 0 },
-                )
-                this.intersectionObserver.observe(this.$el)
-            }
-
-            const isHidden =
-                this.$el.offsetParent === null ||
-                getComputedStyle(this.$el).visibility === 'hidden'
-
-            if (isHidden) {
-                this.isInitializing = false
-
-                return
-            }
-
             FilePond.setOptions(locales[locale] ?? locales['en'])
 
             this.pond = FilePond.create(this.$refs.input, {
@@ -186,7 +130,7 @@ export default function fileUploadFormComponent({
                 itemInsertLocation: shouldAppendFiles ? 'after' : 'before',
                 ...(placeholder && { labelIdle: placeholder }),
                 maxFiles,
-                maxFileSize: maxSize,
+                fileAttachmentsMaxFileSize: maxSize,
                 minFileSize: minSize,
                 ...(maxParallelUploads && { maxParallelUploads }),
                 styleButtonProcessItemPosition: uploadButtonPosition,
@@ -443,20 +387,13 @@ export default function fileUploadFormComponent({
                     this.checkImageAspectRatio(fileItem.file)
                 })
             }
-
-            this.isInitializing = false
         },
 
         destroy() {
-            this.visibilityObserver?.disconnect()
-            this.intersectionObserver?.disconnect()
-
             this.destroyEditor()
 
-            if (this.pond) {
-                FilePond.destroy(this.$refs.input)
-                this.pond = null
-            }
+            FilePond.destroy(this.$refs.input)
+            this.pond = null
         },
 
         dispatchFormEvent(name, detail = {}) {

@@ -3,18 +3,13 @@
 namespace Livewire\Features\SupportTesting;
 
 use Livewire\Features\SupportFileDownloads\TestsFileDownloads;
-use Livewire\Features\SupportJsEvaluation\TestsJsEvaluation;
 use Livewire\Features\SupportValidation\TestsValidation;
 use Livewire\Features\SupportRedirects\TestsRedirects;
 use Livewire\Features\SupportEvents\TestsEvents;
 use Illuminate\Support\Traits\Macroable;
 use BackedEnum;
 
-/**
- * @template TComponent of \Livewire\Component
- *
- * @mixin \Illuminate\Testing\TestResponse
- */
+/** @mixin \Illuminate\Testing\TestResponse */
 
 class Testable
 {
@@ -22,7 +17,6 @@ class Testable
         TestsEvents,
         TestsRedirects,
         TestsValidation,
-        TestsJsEvaluation,
         TestsFileDownloads;
 
     use Macroable { Macroable::__call as macroCall; }
@@ -33,13 +27,13 @@ class Testable
     ) {}
 
     /**
-     * @param class-string<TComponent>|TComponent|string|array<array-key, \Livewire\Component> $name
+     * @param string $name
      * @param array $params
      * @param array $fromQueryString
      * @param array $cookies
      * @param array $headers
      *
-     * @return static<TComponent>
+     * @return static
      */
     static function create($name, $params = [], $fromQueryString = [], $cookies = [], $headers = [])
     {
@@ -66,18 +60,16 @@ class Testable
      */
     static function normalizeAndRegisterComponentName($name)
     {
-        if (is_array($components = $name)) {
-            $firstComponent = array_values($components)[0];
+        if (is_array($otherComponents = $name)) {
+            $name = array_shift($otherComponents);
 
-            foreach ($components as $key => $value) {
+            foreach ($otherComponents as $key => $value) {
                 if (is_numeric($key)) {
-                    app('livewire')->exists($value) || app('livewire')->component($value);
+                    app('livewire')->isDiscoverable($name) || app('livewire')->component($value);
                 } else {
                     app('livewire')->component($key, $value);
                 }
             }
-
-            return app('livewire.factory')->resolveComponentName($firstComponent);
         } elseif (is_object($name)) {
             $anonymousClassComponent = $name;
 
@@ -308,7 +300,23 @@ class Testable
             return $this;
         }
 
-        $this->call('_finishUpload', $name, $fileHashes, $isMultiple);
+        // We are going to encode the original file size, mimeType and hashName in the filename
+        // so when we create a new TemporaryUploadedFile instance we can fake the
+        // same file size, mimeType and hashName set for the original file upload.
+        $newFileHashes = collect($files)->zip($fileHashes)->mapSpread(function ($file, $fileHash) {
+            // MimeTypes contain slashes, so we replace them with underscores to ensure the filename is valid.
+            $escapedMimeType = (string) str($file->getMimeType())->replace('/', '_');
+
+            return (string) str($fileHash)->replaceFirst('.', "-hash={$file->hashName()}-mimeType={$escapedMimeType}-size={$file->getSize()}.");
+        })->toArray();
+
+        collect($fileHashes)->zip($newFileHashes)->mapSpread(function ($fileHash, $newFileHash) use ($storage) {
+            $storage->move('/'.\Livewire\Features\SupportFileUploads\FileUploadConfiguration::path($fileHash), '/'.\Livewire\Features\SupportFileUploads\FileUploadConfiguration::path($newFileHash));
+        });
+
+        // Now we finish the upload with a final call to the Livewire component
+        // with the temporarily uploaded file path.
+        $this->call('_finishUpload', $name, $newFileHashes, $isMultiple);
 
         return $this;
     }
@@ -326,9 +334,6 @@ class Testable
         return $this->lastState->getSnapshotData();
     }
 
-    /**
-     * @return TComponent
-     */
     function instance()
     {
         return $this->lastState->getComponent();
@@ -380,27 +385,6 @@ class Testable
         if ($property === 'target') return $this->lastState->getComponent();
 
         return $this->instance()->$property;
-    }
-
-    /**
-     * @param string $property
-     * @param mixed $value
-     */
-    function __set($property, $value)
-    {
-        if ($property === 'snapshot') {
-            $this->lastState = new ComponentState(
-                $this->lastState->getComponent(),
-                $this->lastState->getResponse(),
-                $this->lastState->getView(),
-                $this->lastState->getHtml(),
-                $value,
-                $this->lastState->getEffects(),
-            );
-            return;
-        }
-
-        $this->setProperty($property, $value);
     }
 
     /**

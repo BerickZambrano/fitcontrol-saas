@@ -6,7 +6,6 @@ use Closure;
 use Filament\Schemas\Components\Concerns\CanStripCharactersFromState;
 use Filament\Schemas\Components\Concerns\CanTrimState;
 use Filament\Schemas\Components\Contracts\HasAffixActions;
-use Filament\Schemas\Components\StateCasts\StripCharactersStateCast;
 use Filament\Support\Concerns\HasColor;
 use Filament\Support\Concerns\HasExtraAlpineAttributes;
 use Filament\Support\Concerns\HasReorderAnimationDuration;
@@ -176,21 +175,17 @@ class TagsInput extends Field implements Contracts\HasNestedRecursiveValidationR
         return (bool) $this->evaluate($this->isReorderable);
     }
 
-    public function getDefaultStateCasts(): array
-    {
-        return [
-            ...parent::getDefaultStateCasts(),
-            ...($this->hasStripCharacters() ? [app(StripCharactersStateCast::class, ['characters' => $this->getStripCharacters()])] : []),
-        ];
-    }
-
     public function mutateDehydratedState(mixed $state): mixed
     {
         if (is_array($state)) {
             $state = array_map(function (mixed $value): mixed {
-                return $this->trimState($value);
+                $value = $this->stripCharactersFromState($value);
+                $value = $this->trimState($value);
+
+                return $value;
             }, $state);
         } else {
+            $state = $this->stripCharactersFromState($state);
             $state = $this->trimState($state);
         }
 
@@ -216,7 +211,7 @@ class TagsInput extends Field implements Contracts\HasNestedRecursiveValidationR
 
     public function mutatesDehydratedState(): bool
     {
-        return parent::mutatesDehydratedState() || $this->isTrimmed();
+        return parent::mutatesDehydratedState() || $this->hasStripCharacters() || $this->isTrimmed();
     }
 
     public function mutatesStateForValidation(): bool

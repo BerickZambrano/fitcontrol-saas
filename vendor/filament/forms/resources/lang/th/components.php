@@ -12,11 +12,11 @@ return [
 
             'add' => [
 
-                'label' => 'เพิ่มไปยัง :label',
+                'label' => 'เพิ่มไปยัง:label',
 
                 'modal' => [
 
-                    'heading' => 'เพิ่มไปยัง :label',
+                    'heading' => 'เพิ่มไปยัง:label',
 
                     'actions' => [
 
@@ -31,23 +31,7 @@ return [
             ],
 
             'add_between' => [
-
                 'label' => 'แทรกระหว่างบล็อก',
-
-                'modal' => [
-
-                    'heading' => 'เพิ่มไปยัง :label',
-
-                    'actions' => [
-
-                        'add' => [
-                            'label' => 'เพิ่ม',
-                        ],
-
-                    ],
-
-                ],
-
             ],
 
             'delete' => [
@@ -60,12 +44,12 @@ return [
 
                 'modal' => [
 
-                    'heading' => 'แก้ไขบล็อก',
+                    'heading' => 'แก้ไขบล็อค',
 
                     'actions' => [
 
                         'save' => [
-                            'label' => 'บันทึกการเปลี่ยนแปลง',
+                            'label' => 'บันทึก',
                         ],
 
                     ],
@@ -111,11 +95,11 @@ return [
         'actions' => [
 
             'deselect_all' => [
-                'label' => 'ยกเลิกการเลือกทั้งหมด',
+                'label' => 'เลือกทั้งหมด',
             ],
 
             'select_all' => [
-                'label' => 'เลือกทั้งหมด',
+                'label' => 'ยกเลิกการเลือกทั้งหมด',
             ],
 
         ],
@@ -202,7 +186,7 @@ return [
 
                 'height' => [
                     'label' => 'ความสูง',
-                    'unit' => 'พิกเซล',
+                    'unit' => 'พิก',
                 ],
 
                 'rotation' => [
@@ -211,18 +195,18 @@ return [
                 ],
 
                 'width' => [
-                    'label' => 'ความกว้าง',
-                    'unit' => 'พิกเซล',
+                    'label' => 'กว้าง',
+                    'unit' => 'พิก',
                 ],
 
                 'x_position' => [
                     'label' => 'X',
-                    'unit' => 'พิกเซล',
+                    'unit' => 'พิก',
                 ],
 
                 'y_position' => [
                     'label' => 'Y',
-                    'unit' => 'พิกเซล',
+                    'unit' => 'พิก',
                 ],
 
             ],
@@ -240,7 +224,7 @@ return [
             'svg' => [
 
                 'messages' => [
-                    'confirmation' => "การแก้ไขไฟล์ SVG ไม่แนะนำ เนื่องจากอาจเกิดการสูญเสียคุณภาพเมื่อมีการปรับขนาด\nแน่ใจหรือไม่ว่าต้องการดำเนินการต่อ?",
+                    'confirmation' => 'การแก้ไขไฟล์ SVG ไม่แนะนำ เนื่องจากอาจเกิดการสูญเสียคุณภาพเมื่อมีการปรับขนาด \n แน่ใจหรือไม่ว่าต้องการดำเนินการต่อ?',
                     'disabled' => 'การแก้ไขไฟล์ SVG ถูกปิดใช้งาน เนื่องจากอาจทำให้เกิดการสูญเสียคุณภาพเมื่อมีการปรับขนาด',
                 ],
 
@@ -284,10 +268,6 @@ return [
 
     'markdown_editor' => [
 
-        'file_attachments_accepted_file_types_message' => 'ไฟล์ที่อัปโหลดต้องเป็นประเภท: :values',
-
-        'file_attachments_max_size_message' => 'ไฟล์ที่อัปโหลดต้องมีขนาดไม่เกิน :max กิโลไบต์',
-
         'tools' => [
             'attach_files' => 'แนบไฟล์',
             'blockquote' => 'บล็อกคำพูด',
@@ -297,11 +277,11 @@ return [
             'heading' => 'หัวข้อ',
             'italic' => 'ตัวเอียง',
             'link' => 'ลิงก์',
-            'ordered_list' => 'รายการลำดับเลข',
+            'ordered_list' => 'รายการลําดับเลข',
             'redo' => 'ทำอีกครั้ง',
             'strike' => 'ขีดฆ่า',
             'table' => 'ตาราง',
-            'undo' => 'ยกเลิก',
+            'undo' => 'ยกเลิกทำ',
         ],
 
     ],
@@ -342,7 +322,7 @@ return [
         'actions' => [
 
             'add' => [
-                'label' => 'เพิ่มไปยัง :label',
+                'label' => 'เพิ่มไปยัง:label',
             ],
 
             'add_between' => [
@@ -395,11 +375,11 @@ return [
 
             'attach_files' => [
 
-                'label' => 'อัปโหลดไฟล์',
+                'label' => 'อัพโหลดไฟล์',
 
                 'modal' => [
 
-                    'heading' => 'อัปโหลดไฟล์',
+                    'heading' => 'อัพโหลดไฟล์',
 
                     'form' => [
 
@@ -447,78 +427,13 @@ return [
 
             ],
 
-            'grid' => [
-
-                'label' => 'ตารางกริด',
-
-                'modal' => [
-
-                    'heading' => 'ตารางกริด',
-
-                    'form' => [
-
-                        'preset' => [
-
-                            'label' => 'ค่าที่กำหนดไว้',
-
-                            'placeholder' => 'ไม่มี',
-
-                            'options' => [
-                                'two' => 'สองคอลัมน์',
-                                'three' => 'สามคอลัมน์',
-                                'four' => 'สี่คอลัมน์',
-                                'five' => 'ห้าคอลัมน์',
-                                'two_start_third' => 'สองคอลัมน์ (เริ่มที่หนึ่งในสาม)',
-                                'two_end_third' => 'สองคอลัมน์ (จบที่สองในสาม)',
-                                'two_start_fourth' => 'สองคอลัมน์ (เริ่มที่หนึ่งในสี่)',
-                                'two_end_fourth' => 'สองคอลัมน์ (จบที่สามในสี่)',
-                            ],
-                        ],
-
-                        'columns' => [
-                            'label' => 'คอลัมน์',
-                        ],
-
-                        'from_breakpoint' => [
-
-                            'label' => 'จากจุดปรับขนาด (Breakpoint)',
-
-                            'options' => [
-                                'default' => 'ทั้งหมด',
-                                'sm' => 'ขนาดเล็ก (sm)',
-                                'md' => 'ขนาดกลาง (md)',
-                                'lg' => 'ขนาดใหญ่ (lg)',
-                                'xl' => 'ขนาดใหญ่พิเศษ (xl)',
-                                '2xl' => 'ขนาดใหญ่พิเศษมาก (2xl)',
-                            ],
-
-                        ],
-
-                        'is_asymmetric' => [
-                            'label' => 'สองคอลัมน์ไม่สมมาตร',
-                        ],
-
-                        'start_span' => [
-                            'label' => 'การขยายเริ่มต้น',
-                        ],
-
-                        'end_span' => [
-                            'label' => 'การขยายสิ้นสุด',
-                        ],
-
-                    ],
-
-                ],
-
-            ],
-
             'link' => [
 
-                'label' => 'ลิงก์',
+                'label' => 'แก้ไข',
 
                 'modal' => [
 
-                    'heading' => 'ลิงก์',
+                    'heading' => 'ลิ้งค์',
 
                     'form' => [
 
@@ -536,44 +451,9 @@ return [
 
             ],
 
-            'text_color' => [
-
-                'label' => 'สีข้อความ',
-
-                'modal' => [
-
-                    'heading' => 'สีข้อความ',
-
-                    'form' => [
-
-                        'color' => [
-                            'label' => 'สี',
-                        ],
-
-                        'custom_color' => [
-                            'label' => 'สีที่กำหนดเอง',
-                        ],
-
-                    ],
-
-                ],
-
-            ],
-
         ],
 
-        'file_attachments_accepted_file_types_message' => 'ไฟล์ที่อัปโหลดต้องเป็นประเภท: :values',
-
-        'file_attachments_max_size_message' => 'ไฟล์ที่อัปโหลดต้องมีขนาดไม่เกิน :max กิโลไบต์',
-
-        'no_merge_tag_search_results_message' => 'ไม่พบผลลัพธ์ของแท็กที่รวม',
-
-        'mentions' => [
-            'no_options_message' => 'ไม่มีตัวเลือกที่ใช้งานได้',
-            'no_search_results_message' => 'ไม่พบผลลัพธ์ที่ตรงกับการค้นหาของคุณ',
-            'search_prompt' => 'เริ่มพิมพ์เพื่อค้นหา...',
-            'searching_message' => 'กำลังค้นหา...',
-        ],
+        'no_merge_tag_search_results_message' => 'No merge tag results.',
 
         'tools' => [
             'align_center' => 'จัดกึ่งกลาง',
@@ -592,8 +472,6 @@ return [
             'h1' => 'หัวข้อหลัก',
             'h2' => 'หัวข้อรอง',
             'h3' => 'หัวข้อย่อย',
-            'grid' => 'ตารางกริด',
-            'grid_delete' => 'ลบตารางกริด',
             'highlight' => 'เน้นข้อความ',
             'horizontal_rule' => 'เส้นคั่นแนวนอน',
             'italic' => 'ตัวเอียง',
@@ -617,14 +495,9 @@ return [
             'table_merge_cells' => 'รวมเซลล์',
             'table_split_cell' => 'แยกเซลล์',
             'table_toggle_header_row' => 'แสดง/ซ่อนหัวตาราง',
-            'table_toggle_header_cell' => 'แสดง/ซ่อนหัวเซลล์',
-            'text_color' => 'สีข้อความ',
             'underline' => 'ขีดเส้นใต้',
             'undo' => 'ยกเลิก',
         ],
-
-        'uploading_file_message' => 'กำลังอัปโหลดไฟล์...',
-
     ],
 
     'select' => [
@@ -633,7 +506,7 @@ return [
 
             'create_option' => [
 
-                'label' => 'สร้าง',
+                'label' => 'Create',
 
                 'modal' => [
 
@@ -657,7 +530,7 @@ return [
 
             'edit_option' => [
 
-                'label' => 'แก้ไข',
+                'label' => 'Edit',
 
                 'modal' => [
 
@@ -686,8 +559,6 @@ return [
 
         'max_items_message' => 'สามารถเลือกได้เพียง :count เท่านั้น',
 
-        'no_options_message' => 'ไม่มีตัวเลือกที่ใช้งานได้',
-
         'no_search_results_message' => 'ไม่มีตัวเลือกที่ตรงกับการค้นหา',
 
         'placeholder' => 'เลือก',
@@ -699,27 +570,12 @@ return [
     ],
 
     'tags_input' => [
-
-        'actions' => [
-
-            'delete' => [
-                'label' => 'ลบ',
-            ],
-
-        ],
-
         'placeholder' => 'แท็กใหม่',
-
     ],
 
     'text_input' => [
 
         'actions' => [
-
-            'copy' => [
-                'label' => 'คัดลอก',
-                'message' => 'คัดลอกแล้ว',
-            ],
 
             'hide_password' => [
                 'label' => 'ซ่อนรหัสผ่าน',

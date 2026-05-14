@@ -50,16 +50,6 @@
 
                         <div class="fi-wi-chart-filter-content">
                             {{ $this->getFiltersSchema() }}
-
-                            @if (method_exists($this, 'hasDeferredFilters') && $this->hasDeferredFilters())
-                                <div
-                                    class="fi-wi-chart-filter-content-actions-ctn"
-                                >
-                                    {{ $this->getFiltersApplyAction() }}
-
-                                    {{ $this->getFiltersResetAction() }}
-                                </div>
-                            @endif
                         </div>
                     </x-filament::dropdown>
                 @endif
@@ -78,7 +68,6 @@
                 data-chart-type="{{ $type }}"
                 x-data="chart({
                             cachedData: @js($this->getCachedData()),
-                            maxHeight: @js($maxHeight = $this->getMaxHeight()),
                             options: @js($this->getOptions()),
                             type: @js($type),
                         })"
@@ -87,16 +76,14 @@
                         ->color(ChartWidgetComponent::class, $color)
                         ->class([
                             'fi-wi-chart-canvas-ctn',
-                            'fi-wi-chart-canvas-ctn-no-aspect-ratio' => filled($maxHeight),
+                            'fi-wi-chart-canvas-ctn-no-aspect-ratio' => filled($maxHeight = $this->getMaxHeight()),
+                        ])
+                        ->style([
+                            'max-height: ' . $maxHeight => filled($maxHeight),
                         ])
                 }}
             >
-                <canvas
-                    x-ref="canvas"
-                    @if ($maxHeight)
-                        style="max-height: {{ $maxHeight }}"
-                    @endif
-                ></canvas>
+                <canvas x-ref="canvas"></canvas>
 
                 <span
                     x-ref="backgroundColorElement"

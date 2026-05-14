@@ -2,6 +2,7 @@
 
 namespace Filament\Actions\Concerns;
 
+use AnourValar\EloquentSerialize\Facades\EloquentSerializeFacade;
 use Closure;
 use Filament\Actions\Action;
 use Filament\Actions\ExportAction;
@@ -23,14 +24,12 @@ use Filament\Schemas\Components\Fieldset;
 use Filament\Schemas\Components\Flex;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Components\Utilities\Set;
-use Filament\Support\EloquentSerializer\EloquentSerializer;
 use Filament\Support\Enums\Size;
 use Filament\Support\Enums\Width;
 use Filament\Support\Facades\FilamentIcon;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Contracts\HasTable;
 use Illuminate\Bus\PendingBatch;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Bus\PendingChain;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
@@ -294,7 +293,7 @@ trait CanExportRecords
             $hasCsv = in_array(ExportFormat::Csv, $formats);
             $hasXlsx = in_array(ExportFormat::Xlsx, $formats);
 
-            $serializedQuery = app(EloquentSerializer::class)->serialize($query);
+            $serializedQuery = EloquentSerializeFacade::serialize($query);
 
             $job = $action->getJob();
             $jobQueue = $exporter->getJobQueue();
@@ -604,14 +603,5 @@ trait CanExportRecords
         }
 
         return $authGuard->name;
-    }
-
-    /**
-     * @param  Model | array<string, mixed> | null  $record
-     * @return Model | array<string, mixed> | null
-     */
-    protected function ensureCorrectRecordType(Model | array | null $record): Model | array | null
-    {
-        return $record;
     }
 }

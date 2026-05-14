@@ -15,7 +15,6 @@ Filament's grid system allows you to create responsive, multi-column layouts usi
 - [Section](sections)
 - [Tabs](tabs)
 - [Wizard](wizards)
-- [Callout](callouts)
 - [Empty state](empty-states)
 
 You may also [create your own custom layout components](custom-components#custom-layout-components) to display components however you wish.
@@ -29,7 +28,7 @@ All layout components have a `columns()` method that you can use in a couple of 
 
 Breakpoints (`sm`, `md`, `lg`, `xl`, `2xl`) are defined by Tailwind, and can be found in the [Tailwind documentation](https://tailwindcss.com/docs/responsive-design#overview).
 
-<UtilityInjection set="schemaComponents" version="5.x">As well as allowing a static value, the `columns()` method also accepts a function to dynamically calculate it. You can inject various utilities into the function as parameters.</UtilityInjection>
+<UtilityInjection set="schemaComponents" version="4.x">As well as allowing a static value, the `columns()` method also accepts a function to dynamically calculate it. You can inject various utilities into the function as parameters.</UtilityInjection>
 
 ### Grid column spans
 
@@ -40,7 +39,7 @@ In addition to specifying how many columns a layout component should have, you m
 - `columnSpan('full')` will make the component fill the full width of the parent grid on the `lg` breakpoint and higher, regardless of how many columns there are. All smaller devices span just 1 column.
 - `columnSpanFull()` will make the component fill the full width of the parent grid on all devices, regardless of how many columns it has.
 
-<UtilityInjection set="schemaComponents" version="5.x">As well as allowing a static value, the `columnSpan()` method also accepts a function to dynamically calculate it. You can inject various utilities into the function as parameters.</UtilityInjection>
+<UtilityInjection set="schemaComponents" version="4.x">As well as allowing a static value, the `columnSpan()` method also accepts a function to dynamically calculate it. You can inject various utilities into the function as parameters.</UtilityInjection>
 
 ### Grid column starts
 
@@ -72,7 +71,7 @@ Grid::make()
 
 In this example, the grid has 3 columns on small devices, 6 columns on extra large devices, and 8 columns on extra extra large devices. The text input will start at column 2 on small devices, column 3 on extra large devices, and column 4 on extra extra large devices. This is essentially producing a layout whereby the text input always starts halfway through the grid, regardless of how many columns the grid has.
 
-<UtilityInjection set="schemaComponents" version="5.x">As well as allowing a static value, the `columnStart()` method also accepts a function to dynamically calculate it. You can inject various utilities into the function as parameters.</UtilityInjection>
+<UtilityInjection set="schemaComponents" version="4.x">As well as allowing a static value, the `columnStart()` method also accepts a function to dynamically calculate it. You can inject various utilities into the function as parameters.</UtilityInjection>
 
 ### Grid column ordering
 
@@ -130,7 +129,7 @@ Grid::make()
 
 In this example, on small screens the order will be: title, description, category. On large screens, the order will be: description, category, title.
 
-<UtilityInjection set="schemaComponents" version="5.x">As well as allowing a static value, the `columnOrder()` method also accepts a function to dynamically calculate it. You can inject various utilities into the function as parameters.</UtilityInjection>
+<UtilityInjection set="schemaComponents" version="4.x">As well as allowing a static value, the `columnOrder()` method also accepts a function to dynamically calculate it. You can inject various utilities into the function as parameters.</UtilityInjection>
 
 ### An example of a responsive grid layout
 
@@ -228,9 +227,9 @@ In this example, the first section will `grow()` to consume available horizontal
 
 The `from()` method is used to control the [Tailwind breakpoint](https://tailwindcss.com/docs/responsive-design#overview) (`sm`, `md`, `lg`, `xl`, `2xl`) at which the horizontally-split layout should be used. In this example, the horizontally-split layout will be used on medium devices and larger. On smaller devices, the sections will stack on top of each other.
 
-<UtilityInjection set="schemaComponents" version="5.x">As well as allowing static values, the `grow()` and `from()` methods also accept functions to dynamically calculate them. You can inject various utilities into the functions as parameters.</UtilityInjection>
+<UtilityInjection set="schemaComponents" version="4.x">As well as allowing static values, the `grow()` and `from()` methods also accept functions to dynamically calculate them. You can inject various utilities into the functions as parameters.</UtilityInjection>
 
-<AutoScreenshot name="schemas/layout/flex/simple" alt="Flex" version="5.x" />
+<AutoScreenshot name="schemas/layout/flex/simple" alt="Flex" version="4.x" />
 
 ### Fieldset component
 
@@ -250,9 +249,9 @@ Fieldset::make('Label')
     ])
 ```
 
-<UtilityInjection set="schemaComponents" version="5.x">As well as allowing a static label, the `make()` method also accepts a function to dynamically calculate it. You can inject various utilities into the function as parameters.</UtilityInjection>
+<UtilityInjection set="schemaComponents" version="4.x">As well as allowing a static label, the `make()` method also accepts a function to dynamically calculate it. You can inject various utilities into the function as parameters.</UtilityInjection>
 
-<AutoScreenshot name="schemas/layout/fieldset/simple" alt="Fieldset" version="5.x" />
+<AutoScreenshot name="schemas/layout/fieldset/simple" alt="Fieldset" version="4.x" />
 
 ### Removing the border from a fieldset
 
@@ -268,9 +267,9 @@ Fieldset::make('Label')
     ])
 ```
 
-<UtilityInjection set="schemaComponents" version="5.x">As well as allowing a static value, the `contained()` method also accepts a function to dynamically calculate it. You can inject various utilities into the function as parameters.</UtilityInjection>
+<UtilityInjection set="schemaComponents" version="4.x">As well as allowing a static value, the `contained()` method also accepts a function to dynamically calculate it. You can inject various utilities into the function as parameters.</UtilityInjection>
 
-<AutoScreenshot name="schemas/layout/fieldset/not-contained" alt="Fieldset without a container border" version="5.x" />
+<AutoScreenshot name="schemas/layout/fieldset/not-contained" alt="Fieldset without a container border" version="4.x" />
 
 ## Using container queries
 
@@ -412,32 +411,32 @@ In this example, the fallback breakpoints ensure that even in browsers that don'
 The `dense()` method creates a more compact layout by reducing the spacing between components by 50%:
 
 ```php
-use Filament\Schemas\Components\Fieldset;
+use Filament\Schemas\Components\Grid;
 
-Fieldset::make('Dense')
+Grid::make()
     ->dense()
     ->schema([
         // ...
     ])
 ```
 
-<AutoScreenshot name="schemas/layout/dense" alt="A layout with dense spacing" version="5.x" />
+<AutoScreenshot name="schemas/layout/dense" alt="A layout with dense spacing" version="4.x" />
 
 ### Removing space between components
 
 The `gap(false)` method removes space between components:
 
 ```php
-use Filament\Schemas\Components\Fieldset;
+use Filament\Schemas\Components\Grid;
 
-Fieldset::make('No gap')
+Grid::make()
     ->gap(false)
     ->schema([
         // ...
     ])
 ```
 
-<AutoScreenshot name="schemas/layout/no-gap" alt="A layout with no gap" version="5.x" />
+<AutoScreenshot name="schemas/layout/no-gap" alt="A layout with no gap" version="4.x" />
 
 ## Adding extra HTML attributes to a layout component
 
@@ -450,6 +449,6 @@ Section::make()
     ->extraAttributes(['class' => 'custom-section-style'])
 ```
 
-<UtilityInjection set="schemaComponents" version="5.x">As well as allowing a static value, the `extraAttributes()` method also accepts a function to dynamically calculate it. You can inject various utilities into the function as parameters.</UtilityInjection>
+<UtilityInjection set="schemaComponents" version="4.x">As well as allowing a static value, the `extraAttributes()` method also accepts a function to dynamically calculate it. You can inject various utilities into the function as parameters.</UtilityInjection>
 
 By default, calling `extraAttributes()` multiple times will overwrite the previous attributes. If you wish to merge the attributes instead, you can pass `merge: true` to the method.

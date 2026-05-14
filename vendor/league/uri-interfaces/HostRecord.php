@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace League\Uri;
 
-use BackedEnum;
 use Exception;
 use JsonSerializable;
 use League\Uri\Contracts\UriComponentInterface;
@@ -224,7 +223,7 @@ final class HostRecord implements JsonSerializable
         return $this->ipValue;
     }
 
-    public static function isValid(BackedEnum|Stringable|string|null $host): bool
+    public static function isValid(Stringable|string|null $host): bool
     {
         try {
             HostRecord::from($host);
@@ -264,9 +263,7 @@ final class HostRecord implements JsonSerializable
 
     public static function isIp(Stringable|string|null $host): bool
     {
-        return self::isIpv4($host)
-            || self::isIpv6($host)
-            || self::isIpvFuture($host);
+        return !self::isRegisteredName($host);
     }
 
     public static function isRegisteredName(Stringable|string|null $host): bool
@@ -290,12 +287,8 @@ final class HostRecord implements JsonSerializable
     /**
      * @throws SyntaxError
      */
-    public static function from(BackedEnum|Stringable|string|null $host): self
+    public static function from(Stringable|string|null $host): self
     {
-        if ($host instanceof BackedEnum) {
-            $host = $host->value;
-        }
-
         if ($host instanceof UriComponentInterface) {
             $host = $host->value();
         }
@@ -441,7 +434,7 @@ final class HostRecord implements JsonSerializable
         $record = self::from($properties['host'] ?? throw new Exception('The `host` property is missing from the serialized object.'));
         //if the Host computed value are already cache this avoid recomputing them
         foreach (get_object_vars($record) as $prop => $value) {
-            /* @phpstan-ignore-next-line */
+            /** @phpstan-ignore-next-line */
             $this->{$prop} = $value;
         }
     }

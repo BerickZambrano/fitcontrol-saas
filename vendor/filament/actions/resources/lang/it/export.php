@@ -14,18 +14,6 @@ return [
 
                 'label' => 'Colonne',
 
-                'actions' => [
-
-                    'select_all' => [
-                        'label' => 'Seleziona tutte',
-                    ],
-
-                    'deselect_all' => [
-                        'label' => 'Deseleziona tutte',
-                    ],
-
-                ],
-
                 'form' => [
 
                     'is_enabled' => [
@@ -75,11 +63,6 @@ return [
         'max_rows' => [
             'title' => 'L\'esportazione è troppo grande',
             'body' => 'Non puoi esportare più di 1 riga alla volta.|Non puoi esportare più di :count righe alla volta.',
-        ],
-
-        'no_columns' => [
-            'title' => 'Nessuna colonna selezionata',
-            'body' => 'Seleziona almeno una colonna per esportare.',
         ],
 
         'started' => [

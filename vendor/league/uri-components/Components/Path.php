@@ -13,13 +13,11 @@ declare(strict_types=1);
 
 namespace League\Uri\Components;
 
-use BackedEnum;
 use Deprecated;
 use League\Uri\Contracts\PathInterface;
 use League\Uri\Contracts\UriComponentInterface;
 use League\Uri\Contracts\UriInterface;
 use League\Uri\Encoder;
-use League\Uri\StringCoercionMode;
 use League\Uri\UriString;
 use Psr\Http\Message\UriInterface as Psr7UriInterface;
 use Stringable;
@@ -27,6 +25,7 @@ use Throwable;
 use Uri\Rfc3986\Uri as Rfc3986Uri;
 use Uri\WhatWg\Url as WhatWgUrl;
 
+use function is_string;
 use function substr;
 
 final class Path extends Component implements PathInterface
@@ -38,7 +37,7 @@ final class Path extends Component implements PathInterface
     /**
      * New instance.
      */
-    private function __construct(BackedEnum|Stringable|string $path)
+    private function __construct(Stringable|string $path)
     {
         $this->path = $this->validate($path);
     }
@@ -46,7 +45,7 @@ final class Path extends Component implements PathInterface
     /**
      * Validate the component content.
      */
-    private function validate(BackedEnum|Stringable|string $path): string
+    private function validate(Stringable|string $path): string
     {
         return (string) $this->validateComponent($path);
     }
@@ -54,7 +53,7 @@ final class Path extends Component implements PathInterface
     /**
      * Returns a new instance from a string or a stringable object.
      */
-    public static function new(BackedEnum|Stringable|string $value = ''): self
+    public static function new(Stringable|string $value = ''): self
     {
         return new self($value);
     }
@@ -62,7 +61,7 @@ final class Path extends Component implements PathInterface
     /**
      * Create a new instance from a string or a stringable structure or returns null on failure.
      */
-    public static function tryNew(BackedEnum|Stringable|string $uri = ''): ?self
+    public static function tryNew(Stringable|string $uri = ''): ?self
     {
         try {
             return self::new($uri);
@@ -74,7 +73,7 @@ final class Path extends Component implements PathInterface
     /**
      * Create a new instance from a URI object.
      */
-    public static function fromUri(WhatwgUrl|Rfc3986Uri|BackedEnum|Stringable|string $uri): self
+    public static function fromUri(WhatwgUrl|Rfc3986Uri|Stringable|string $uri): self
     {
         $uri = self::filterUri($uri);
         if ($uri instanceof Rfc3986Uri) {
@@ -101,12 +100,12 @@ final class Path extends Component implements PathInterface
 
     public function equals(mixed $value): bool
     {
-        if (null === $value || !StringCoercionMode::Native->isCoercible($value)) {
+        if (!$value instanceof Stringable && !is_string($value)) {
             return false;
         }
 
         if (!$value instanceof UriComponentInterface) {
-            $value = self::tryNew((string) StringCoercionMode::Native->coerce($value));
+            $value = self::tryNew($value);
             if (null === $value) {
                 return false;
             }

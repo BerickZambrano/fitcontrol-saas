@@ -194,17 +194,13 @@ class BaseFileUpload extends Field implements Contracts\HasNestedRecursiveValida
                 return $newPath;
             }
 
-            $path = $file->storeAs(
+            $storeMethod = $component->getVisibility() === 'public' ? 'storePubliclyAs' : 'storeAs';
+
+            return $file->{$storeMethod}(
                 $component->getDirectory(),
                 $component->getUploadedFileNameForStorage($file),
                 $component->getDiskName(),
             );
-
-            if ($component->getVisibility() === 'public') {
-                rescue(fn () => $component->getDisk()->setVisibility($path, 'public'), report: false);
-            }
-
-            return $path;
         });
     }
 
@@ -645,7 +641,7 @@ class BaseFileUpload extends Field implements Contracts\HasNestedRecursiveValida
         $rules[] = function (string $attribute, array $value, Closure $fail) use ($fileRules): void {
             $files = array_filter($value, fn (TemporaryUploadedFile | string $file): bool => $file instanceof TemporaryUploadedFile);
 
-            $name = Str::afterLast($this->getName(), '.');
+            $name = $this->getName();
 
             $validationMessages = $this->getValidationMessages();
 
@@ -1047,10 +1043,6 @@ class BaseFileUpload extends Field implements Contracts\HasNestedRecursiveValida
 
         if (str_contains($ratio, '/')) {
             return str_replace('/', ':', $ratio);
-        }
-
-        if (is_numeric($ratio)) {
-            return "{$ratio}:1";
         }
 
         return null;
