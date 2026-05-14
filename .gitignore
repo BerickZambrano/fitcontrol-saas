@@ -21,3 +21,11 @@ yarn-error.log
 /.nova
 /.vscode
 /.zed
+
+# Bases de datos locales — nunca en el repositorio
+/database/database.sqlite
+
+# Archivos de depuración de rutas
+routes.json
+routes_get.json
+routes_list.json
