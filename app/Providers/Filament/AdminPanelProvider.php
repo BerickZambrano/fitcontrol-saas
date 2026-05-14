@@ -24,6 +24,7 @@ use App\Models\Entrenamiento;
 use App\Filament\Pages\Calendario;
 use App\Filament\Admin\Pages\Reportes\GenerarReporte;
 use Leandrocfe\FilamentApexCharts\FilamentApexChartsPlugin;
+use Illuminate\Support\HtmlString;
 
 class AdminPanelProvider extends PanelProvider
 {
@@ -38,14 +39,28 @@ class AdminPanelProvider extends PanelProvider
             ->brandLogo(asset('images/logo.png'))
             ->brandLogoHeight('5rem')
             ->favicon(asset('images/logo.ico'))
+            ->userMenuItems([
+                'profile' => \Filament\Navigation\MenuItem::make()
+                    ->label('Mi Perfil')
+                    ->url(fn (): string => \App\Filament\Admin\Pages\AdminProfile::getUrl())
+                    ->icon('heroicon-o-user-circle'),
+            ])
             ->plugins([
-            FilamentApexChartsPlugin::make()
-                ])
+                \Leandrocfe\FilamentApexCharts\FilamentApexChartsPlugin::make()
+            ])
             ->colors([
                 'primary' => Color::Blue,
             ])
+            ->renderHook(
+                'panels::head.end',
+                fn (): HtmlString => new HtmlString(
+                    auth()->check() && ($color = auth()->user()->tenant?->colores_oficiales['primary'] ?? null)
+                        ? "<style>:root { " . implode(' ', array_map(fn ($key, $value) => "--primary-{$key}: {$value};", array_keys(Color::hex($color)), Color::hex($color))) . " }</style>"
+                        : ''
+                )
+            )
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
-            ->discoverPages(in: app_path('Filament/Pages'), for: 'App\Filament\Pages')
+            ->discoverPages(in: app_path('Filament/Admin/Pages'), for: 'App\Filament\Admin\Pages')
             ->pages([
                  \App\Filament\Admin\Pages\Dashboard::class,
                  \App\Filament\Admin\Pages\Calendario::class,
@@ -73,6 +88,7 @@ class AdminPanelProvider extends PanelProvider
                 SubstituteBindings::class,
                 DisableBladeIconComponents::class,
                 DispatchServingFilamentEvent::class,
+                \App\Http\Middleware\ApplyTenantColor::class,
             ])
             ->plugins([
                 FilamentShieldPlugin::make(),

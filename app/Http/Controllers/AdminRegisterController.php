@@ -30,12 +30,12 @@ class AdminRegisterController extends Controller
         $lock = Cache::lock("admin_register_{$tenant->id}", 10);
 
         if (! $lock->get()) {
-            abort(429, 'Este tenant ya está siendo registrado. Intenta en unos segundos.');
+            abort(429, 'Este equipo ya está siendo registrado. Intenta en unos segundos.');
         }
 
         try {
             if (User::where('tenant_id', $tenant->id)->exists()) {
-                abort(403, 'Este tenant ya tiene administrador.');
+                abort(403, 'Este equipo ya tiene administrador.');
             }
 
             $user = User::create([

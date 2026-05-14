@@ -14,16 +14,16 @@ class PlayerProfile extends Page
 {
     use InteractsWithForms;
 
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-user';
+    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-user-circle';
     protected static ?string $navigationLabel = 'Mi Perfil';
+    protected static bool $shouldRegisterNavigation = false;
     protected static ?string $title = 'Mi Perfil';
 
     protected string $view = 'filament.pages.player-profile';
 
     public $name;
     public $email;
-    public $phone;
-    public $avatar;
+    public $avatar_url;
     public $two_factor_enabled;
 
     // Inicializa el formulario
@@ -32,10 +32,11 @@ class PlayerProfile extends Page
         return [
             Forms\Components\TextInput::make('name')->label('Nombre')->required(),
             Forms\Components\TextInput::make('email')->label('Correo electrónico')->email()->required(),
-            Forms\Components\TextInput::make('phone')->label('Teléfono')->tel(),
-            Forms\Components\FileUpload::make('avatar')
-                ->label('Foto de perfil')
+            Forms\Components\FileUpload::make('avatar_url')
+                ->label('Foto de perfil (Ficha)')
                 ->image()
+                ->avatar()
+                ->disk('public')
                 ->directory('avatars')
                 ->maxSize(1024),
             \Filament\Schemas\Components\Section::make('Seguridad')
@@ -54,19 +55,13 @@ class PlayerProfile extends Page
     public function mount(): void
     {
         $user = Auth::user();
-        $this->name = $user->name;
-        $this->email = $user->email;
-        $this->phone = $user->phone ?? '';
-        $this->avatar = $user->avatar ?? null;
-        $this->two_factor_enabled = $user->two_factor_type === 'email';
-
+        
         // Inicializa el formulario con los datos actuales
         $this->form->fill([
-            'name' => $this->name,
-            'email' => $this->email,
-            'phone' => $this->phone,
-            'avatar' => $this->avatar,
-            'two_factor_enabled' => $this->two_factor_enabled,
+            'name' => $user->name,
+            'email' => $user->email,
+            'avatar_url' => $user->avatar_url,
+            'two_factor_enabled' => $user->two_factor_type === 'email',
         ]);
     }
 
@@ -77,7 +72,7 @@ class PlayerProfile extends Page
         $user = Auth::user();
         $user->name = $data['name'];
         $user->email = $data['email'];
-        // Los campos phone y avatar no existen en la tabla users en este momento
+        $user->avatar_url = $data['avatar_url'];
         $user->two_factor_type = ($data['two_factor_enabled'] ?? false) ? 'email' : 'none';
         $user->save();
 

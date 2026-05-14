@@ -59,152 +59,123 @@ class PostRegisterOnboarding extends Page
     {
         return $schema
             ->schema([
-                // ── Step 1: Club Info ──────────────────────
-                Section::make('Paso 1: Datos del club')
-                    ->description('Personaliza la información de tu club')
-                    ->schema([
-                        TextInput::make('club_nombre')
-                            ->label('Nombre del club')
-                            ->default(fn () => auth()->user()?->tenant?->nombre)
-                            ->required()
-                            ->maxLength(255),
+                \Filament\Schemas\Components\Wizard::make([
+                    // ── Step 1: Club Info ──────────────────────
+                    \Filament\Schemas\Components\Wizard\Step::make('Identidad del Club')
+                        ->description('Define el nombre y estilo de tu marca')
+                        ->icon('heroicon-o-building-office')
+                        ->schema([
+                            TextInput::make('club_nombre')
+                                ->label('Nombre del club')
+                                ->default(fn () => auth()->user()?->tenant?->nombre)
+                                ->required()
+                                ->maxLength(255),
 
-                        TextInput::make('club_nombre_corto')
-                            ->label('Nombre corto / Siglas')
-                            ->default(fn () => auth()->user()?->tenant?->nombre_corto)
-                            ->required()
-                            ->maxLength(100),
+                            TextInput::make('club_nombre_corto')
+                                ->label('Nombre corto / Siglas')
+                                ->default(fn () => auth()->user()?->tenant?->nombre_corto)
+                                ->required()
+                                ->maxLength(100),
 
-                        Select::make('club_tipo')
-                            ->label('Tipo de club')
-                            ->options([
-                                'formativo' => 'Formativo',
-                                'amateur' => 'Amateur',
-                                'profesional' => 'Profesional',
-                            ])
-                            ->default(fn () => auth()->user()?->tenant?->tipo_club)
-                            ->required(),
+                            \Filament\Forms\Components\ColorPicker::make('primary_color')
+                                ->label('Color Principal del Aplicativo')
+                                ->helperText('Este color se usará en botones, iconos y menús para tu club.')
+                                ->default('#ef4444') // Rojo por defecto
+                                ->required(),
 
-                        FileUpload::make('club_escudo')
-                            ->label('Escudo del club')
-                            ->disk('public')
-                            ->directory('tenants/logos')
-                            ->image()
-                            ->maxSize(2048)
-                            ->helperText('PNG o JPG, máximo 2MB. Opcional.'),
-                    ])
-                    ->collapsible()
-                    ->collapsed(false),
+                            Select::make('club_tipo')
+                                ->label('Tipo de club')
+                                ->options([
+                                    'formativo' => 'Formativo',
+                                    'amateur' => 'Amateur',
+                                    'profesional' => 'Profesional',
+                                ])
+                                ->default(fn () => auth()->user()?->tenant?->tipo_club)
+                                ->required(),
 
-                // ── Step 2: First Team ─────────────────────
-                Section::make('Paso 2: Crea tu primer equipo')
-                    ->description('El primer equipo de tu club')
-                    ->schema([
-                        TextInput::make('equipo_nombre')
-                            ->label('Nombre del equipo')
-                            ->placeholder('Ej: Plantel Principal, Sub-17, etc.')
-                            ->required()
-                            ->maxLength(255),
+                            FileUpload::make('club_escudo')
+                                ->label('Escudo del club')
+                                ->disk('public')
+                                ->directory('tenants/logos')
+                                ->image()
+                                ->maxSize(10240), // Aumentado a 10MB
+                        ])->columns(2),
 
-                        Select::make('equipo_categoria')
-                            ->label('Categoría')
-                            ->options([
-                                'profesional' => 'Profesional',
-                                'amateur' => 'Amateur',
-                                'formativo' => 'Formativo',
-                            ])
-                            ->default('amateur')
-                            ->required(),
+                    // ── Step 2: First Team ─────────────────────
+                    \Filament\Schemas\Components\Wizard\Step::make('Primer Equipo')
+                        ->description('Crea el primer grupo de trabajo')
+                        ->icon('heroicon-o-users')
+                        ->schema([
+                            TextInput::make('equipo_nombre')
+                                ->label('Nombre del equipo')
+                                ->placeholder('Ej: Plantel Principal')
+                                ->required(),
 
-                        TextInput::make('equipo_ubicacion')
-                            ->label('Ubicación / Sede')
-                            ->placeholder('Ej: Cancha Municipal, Polideportivo Norte')
-                            ->required()
-                            ->maxLength(255),
+                            Select::make('equipo_categoria')
+                                ->label('Categoría')
+                                ->options([
+                                    'profesional' => 'Profesional',
+                                    'amateur' => 'Amateur',
+                                    'formativo' => 'Formativo',
+                                ])
+                                ->default('amateur')
+                                ->required(),
 
-                        Checkbox::make('equipo_terminos')
-                            ->label('Acepto los Términos y Condiciones de FitControl')
-                            ->required()
-                            ->inline(false),
-                    ])
-                    ->collapsible()
-                    ->collapsed(false),
+                            TextInput::make('equipo_ubicacion')
+                                ->label('Ubicación / Sede')
+                                ->required(),
+                        ])->columns(2),
 
-                // ── Step 3: Add Players ────────────────────
-                Section::make('Paso 3: Agrega jugadores')
-                    ->description('Inscribe al menos un jugador')
-                    ->schema([
-                        TextInput::make('jugador_nombre')
-                            ->label('Nombre del jugador')
-                            ->placeholder('Nombre completo')
-                            ->required()
-                            ->maxLength(255),
+                    // ── Step 3: First Player ────────────────────
+                    \Filament\Schemas\Components\Wizard\Step::make('Jugadores')
+                        ->description('Inscribe a tu primer deportista (Opcional)')
+                        ->icon('heroicon-o-user-plus')
+                        ->schema([
+                            TextInput::make('jugador_nombre')
+                                ->label('Nombre completo')
+                                ->placeholder('Ej: Juan Pérez'),
 
-                        TextInput::make('jugador_email')
-                            ->label('Correo electrónico')
-                            ->placeholder('correo@ejemplo.com')
-                            ->email()
-                            ->nullable(),
+                            TextInput::make('jugador_email')
+                                ->label('Correo (Opcional)')
+                                ->email(),
 
-                        Select::make('jugador_posicion')
-                            ->label('Posición')
-                            ->options([
-                                'Portero' => 'Portero',
-                                'Defensa' => 'Defensa',
-                                'Mediocampista' => 'Mediocampista',
-                                'Delantero' => 'Delantero',
-                            ])
-                            ->nullable(),
+                            Select::make('jugador_posicion')
+                                ->label('Posición')
+                                ->options([
+                                    'Portero' => 'Portero',
+                                    'Defensa' => 'Defensa',
+                                    'Mediocampista' => 'Mediocampista',
+                                    'Delantero' => 'Delantero',
+                                ]),
 
-                        TextInput::make('jugador_dorsal')
-                            ->label('Dorsal')
-                            ->numeric()
-                            ->minValue(1)
-                            ->maxValue(99)
-                            ->nullable(),
+                            TextInput::make('jugador_dorsal')
+                                ->label('Dorsal')
+                                ->numeric()
+                                ->minValue(1)
+                                ->maxValue(99),
+                        ])->columns(2),
 
-                        Select::make('jugador_pierna')
-                            ->label('Pierna hábil')
-                            ->options([
-                                'derecha' => 'Derecha',
-                                'izquierda' => 'Izquierda',
-                                'ambas' => 'Ambas',
-                            ])
-                            ->nullable(),
-                    ])
-                    ->collapsible()
-                    ->collapsed(false),
+                    // ── Step 4: Training ─────────────────
+                    \Filament\Schemas\Components\Wizard\Step::make('Planificación')
+                        ->description('Programa tu primer entrenamiento (Opcional)')
+                        ->icon('heroicon-o-calendar-days')
+                        ->schema([
+                            TextInput::make('entrenamiento_nombre')
+                                ->label('Nombre de la sesión'),
 
-                // ── Step 4: First Training ─────────────────
-                Section::make('Paso 4: Programa un entrenamiento')
-                    ->description('Tu primera sesión programada')
-                    ->schema([
-                        TextInput::make('entrenamiento_nombre')
-                            ->label('Nombre del entrenamiento')
-                            ->placeholder('Ej: Entrenamiento general, Pretemporada')
-                            ->required()
-                            ->maxLength(100),
+                            DatePicker::make('entrenamiento_fecha')
+                                ->label('Fecha')
+                                ->native(false),
 
-                        DatePicker::make('entrenamiento_fecha')
-                            ->label('Fecha')
-                            ->required()
-                            ->native(false)
-                            ->displayFormat('d/m/Y')
-                            ->minDate(now()),
+                            TimePicker::make('entrenamiento_hora')
+                                ->label('Hora')
+                                ->seconds(false),
 
-                        TimePicker::make('entrenamiento_hora')
-                            ->label('Hora')
-                            ->required()
-                            ->seconds(false),
-
-                        TextInput::make('entrenamiento_ubicacion')
-                            ->label('Lugar / Ubicación')
-                            ->placeholder('Ej: Cancha sintética Norte')
-                            ->required()
-                            ->maxLength(100),
-                    ])
-                    ->collapsible()
-                    ->collapsed(false),
+                            TextInput::make('entrenamiento_ubicacion')
+                                ->label('Lugar'),
+                        ])->columns(2),
+                ])
+                ->submitAction(new \Illuminate\Support\HtmlString('<button type="submit" class="fi-btn fi-btn-size-md relative grid-flow-col items-center justify-center font-semibold outline-none transition duration-75 focus-visible:ring-2 disabled:pointer-events-none disabled:opacity-70 rounded-lg fi-color-primary fi-btn-color-primary bg-primary-600 text-white shadow-sm hover:bg-primary-500 focus-visible:ring-primary-500/50 dark:bg-primary-500 dark:hover:bg-primary-400 dark:focus-visible:ring-primary-400/50 py-2 px-4 inline-grid">Finalizar Configuración</button>'))
             ])
             ->statePath('data');
     }
@@ -235,6 +206,9 @@ class PostRegisterOnboarding extends Page
                 'nombre' => $formData['club_nombre'] ?? $tenant->nombre,
                 'nombre_corto' => $formData['club_nombre_corto'] ?? $tenant->nombre_corto,
                 'tipo_club' => $formData['club_tipo'] ?? $tenant->tipo_club,
+                'colores_oficiales' => [
+                    'primary' => $formData['primary_color'] ?? '#ef4444',
+                ],
             ];
 
             if (!empty($formData['club_escudo'])) {
@@ -251,41 +225,45 @@ class PostRegisterOnboarding extends Page
                 'ubi_equipo' => $formData['equipo_ubicacion'] ?? '',
             ]);
 
-            // ── 3. Create player user + profile ────────────────
-            $jugadorEmail = $formData['jugador_email'] ?? null;
-            $jugadorUser = User::create([
-                'tenant_id' => $tenant->id,
-                'name' => $formData['jugador_nombre'],
-                'email' => $jugadorEmail ?? 'jugador-' . uniqid() . '@fitcontrol.temp',
-                'password' => Hash::make('fitcontrol123'),
-            ]);
-            $jugadorUser->assignRole('Jugador');
+            // ── 3. Create player user + profile (Optional) ──────
+            if (!empty($formData['jugador_nombre'])) {
+                $jugadorEmail = $formData['jugador_email'] ?? null;
+                $jugadorUser = User::create([
+                    'tenant_id' => $tenant->id,
+                    'name' => $formData['jugador_nombre'],
+                    'email' => $jugadorEmail ?? 'jugador-' . uniqid() . '@fitcontrol.temp',
+                    'password' => Hash::make('fitcontrol123'),
+                ]);
+                $jugadorUser->assignRole('Jugador');
 
-            JugadorPerfil::create([
-                'tenant_id' => $tenant->id,
-                'user_id' => $jugadorUser->id,
-                'posicion' => $formData['jugador_posicion'] ?? null,
-                'dorsal' => $formData['jugador_dorsal'] ?? null,
-                'pierna_habil' => $formData['jugador_pierna'] ?? null,
-            ]);
+                JugadorPerfil::create([
+                    'tenant_id' => $tenant->id,
+                    'user_id' => $jugadorUser->id,
+                    'posicion' => $formData['jugador_posicion'] ?? null,
+                    'dorsal' => $formData['jugador_dorsal'] ?? null,
+                    'pierna_habil' => $formData['jugador_pierna'] ?? null,
+                ]);
 
-            // Link player to team
-            EquipoUser::create([
-                'tenant_id' => $tenant->id,
-                'equipo_id' => $equipo->id,
-                'user_id' => $jugadorUser->id,
-                'fecha_inicio' => now()->toDateString(),
-            ]);
+                // Link player to team
+                EquipoUser::create([
+                    'tenant_id' => $tenant->id,
+                    'equipo_id' => $equipo->id,
+                    'user_id' => $jugadorUser->id,
+                    'fecha_inicio' => now()->toDateString(),
+                ]);
+            }
 
-            // ── 4. Create first training ───────────────────────
-            Entrenamiento::create([
-                'tenant_id' => $tenant->id,
-                'equipo_id' => $equipo->id,
-                'nombre' => $formData['entrenamiento_nombre'],
-                'fecha' => $formData['entrenamiento_fecha'],
-                'hora' => $formData['entrenamiento_hora'],
-                'ubicacion' => $formData['entrenamiento_ubicacion'],
-            ]);
+            // ── 4. Create first training (Optional) ────────────
+            if (!empty($formData['entrenamiento_nombre']) && !empty($formData['entrenamiento_fecha'])) {
+                Entrenamiento::create([
+                    'tenant_id' => $tenant->id,
+                    'equipo_id' => $equipo->id,
+                    'nombre' => $formData['entrenamiento_nombre'],
+                    'fecha' => $formData['entrenamiento_fecha'],
+                    'hora' => $formData['entrenamiento_hora'] ?? '08:00:00',
+                    'ubicacion' => $formData['entrenamiento_ubicacion'] ?? $formData['equipo_ubicacion'],
+                ]);
+            }
 
             // ── 5. Mark onboarding as completed ────────────────
             $tenant->update(['onboarding_completed' => true]);
@@ -294,7 +272,6 @@ class PostRegisterOnboarding extends Page
 
             Notification::make()
                 ->title('🎉 ¡Club configurado exitosamente!')
-                ->body('Ya tienes tu primer equipo, un jugador y un entrenamiento programado.')
                 ->success()
                 ->send();
 

@@ -4,7 +4,7 @@
 
         <div class="flex justify-start">
             <x-filament::button type="submit">
-                Guardar cambios
+                Guardar cambios del Administrador
             </x-filament::button>
         </div>
     </form>

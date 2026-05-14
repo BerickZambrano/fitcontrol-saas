@@ -37,9 +37,8 @@ class JugadoresNoAptos extends ApexChartWidget
                 'type' => 'donut',
             ],
             'colors' => [
-                '#2563eb',
-                '#3b82f6',
-                '#93c5fd',
+                auth()->user()->tenant?->colores_oficiales['primary'] ?? '#3b82f6', 
+                '#ef4444' // Rojo para No aptos
             ],
             'series' => [$data['aptos'], $data['no_aptos']],
             'labels' => ['Aptos', 'No aptos'],

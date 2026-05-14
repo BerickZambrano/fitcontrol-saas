@@ -8,8 +8,9 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Laravel\Scout\Searchable;
 use Spatie\Permission\Traits\HasRoles;
+use Filament\Models\Contracts\HasAvatar;
 
-class User extends Authenticatable
+class User extends Authenticatable implements HasAvatar
 {
     use Notifiable, HasRoles, Searchable, SoftDeletes;
 
@@ -32,6 +33,7 @@ class User extends Authenticatable
         'tenant_id',
         'name',
         'email',
+        'avatar_url',
         'password',
         'two_factor_type',
         'two_factor_otp',
@@ -128,6 +130,20 @@ class User extends Authenticatable
             ->join('');
     }
 
+    public function getProfilePhotoUrlAttribute()
+    {
+        if (empty($this->avatar_url)) {
+            return null;
+        }
+
+        return asset('storage/' . $this->avatar_url);
+    }
+
+    public function getFilamentAvatarUrl(): ?string
+    {
+        return $this->profile_photo_url;
+    }
+
     /**
      * Generate a new 2FA OTP code.
      */
@@ -156,5 +172,10 @@ class User extends Authenticatable
     public function hasTwoFactorEnabled(): bool
     {
         return $this->two_factor_type !== 'none';
+    }
+
+    public function jugadorPerfil()
+    {
+        return $this->hasOne(JugadorPerfil::class);
     }
 }

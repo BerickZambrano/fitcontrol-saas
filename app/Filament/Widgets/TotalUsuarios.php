@@ -66,9 +66,9 @@ class TotalUsuarios extends ApexChartWidget
             ],
 
             'colors' => [
-                '#2563eb',
-                '#3b82f6',
-                '#93c5fd',
+                auth()->user()->tenant?->colores_oficiales['primary'] ?? '#3b82f6', // Color principal
+                '#94a3b8', // Gris para variar
+                '#cbd5e1', // Gris claro
             ],
 
             'legend' => [

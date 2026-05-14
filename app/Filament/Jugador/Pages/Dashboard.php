@@ -3,6 +3,7 @@
 namespace App\Filament\Jugador\Pages;
 
 use Filament\Pages\Dashboard as BaseDashboard;
+use App\Filament\Jugador\Widgets\PlayerCardWidget;
 use App\Filament\Jugador\Widgets\ProximoCompromiso;
 use App\Filament\Jugador\Widgets\MisEstadisticas;
 use App\Filament\Jugador\Widgets\MiAsistencia;
@@ -34,6 +35,7 @@ class Dashboard extends BaseDashboard
     public function getWidgets(): array
     {
         return [
+            PlayerCardWidget::class,
             ProximoCompromiso::class,
             MisEstadisticas::class,
             MiAsistencia::class,

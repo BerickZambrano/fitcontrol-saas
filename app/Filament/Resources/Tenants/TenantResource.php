@@ -18,8 +18,8 @@ use UnitEnum;
 
 class TenantResource extends Resource
 {
-    use HasTenantGlobalSearch;
     protected static ?string $model = Tenant::class;
+    protected static bool $isScopedToTenant = false;
 
     protected static ?string $navigationLabel = 'Clubes';
     protected static ?string $modelLabel = 'Club';

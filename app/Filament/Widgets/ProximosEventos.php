@@ -44,7 +44,7 @@ class ProximosEventos extends Widget
                 'fecha' => $e->fecha,
                 'hora' => $e->hora,
                 'equipo' => $e->equipo?->nombre ?? '—',
-                'color' => '#2563eb',
+                'color' => auth()->user()->tenant?->colores_oficiales['primary'] ?? '#2563eb',
             ])->values()->all();
 
         // Partidos
@@ -61,7 +61,7 @@ class ProximosEventos extends Widget
                 'fecha' => $p->fecha,
                 'hora' => $p->hora ?? '—',
                 'equipo' => $p->torneo?->nombre ?? '—',
-                'color' => '#16a34a',
+                'color' => '#16a34a', // Mantener verde para partidos (éxito/trofeo)
             ])->values()->all();
 
         $eventos = collect(array_merge($entrenamientosData, $partidosData))

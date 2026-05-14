@@ -17,6 +17,7 @@ use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
+use Illuminate\Support\HtmlString;
 
 use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
 use Leandrocfe\FilamentApexCharts\FilamentApexChartsPlugin;
@@ -36,6 +37,14 @@ class JugadorPanelProvider extends PanelProvider
             ->colors([
                 'primary' => Color::Red,
             ])
+            ->renderHook(
+                'panels::head.end',
+                fn (): HtmlString => new HtmlString(
+                    auth()->check() && ($color = auth()->user()->tenant?->colores_oficiales['primary'] ?? null)
+                        ? "<style>:root { " . implode(' ', array_map(fn ($key, $value) => "--primary-{$key}: {$value};", array_keys(Color::hex($color)), Color::hex($color))) . " }</style>"
+                        : ''
+                )
+            )
             ->plugins([
                 FilamentApexChartsPlugin::make(),
             ])
@@ -44,21 +53,24 @@ class JugadorPanelProvider extends PanelProvider
             ->pages([
                 \App\Filament\Jugador\Pages\Dashboard::class,
                 \App\Filament\Jugador\Pages\PlayerProfile::class,
+                \App\Filament\Jugador\Pages\MiHistorial::class,
+                \App\Filament\Jugador\Pages\EscanearQR::class,
+            ])
+            ->userMenuItems([
+                'profile' => \Filament\Navigation\MenuItem::make()
+                    ->label('Mi Perfil')
+                    ->url(fn (): string => \App\Filament\Jugador\Pages\PlayerProfile::getUrl())
+                    ->icon('heroicon-o-user-circle'),
             ])
             ->databaseNotifications()
             ->databaseNotificationsPolling(30)
             ->discoverWidgets(in: app_path('Filament/Jugador/Widgets'), for: 'App\Filament\Jugador\Widgets')
             ->widgets([
+                \App\Filament\Jugador\Widgets\PlayerCardWidget::class,
                 \App\Filament\Jugador\Widgets\ProximoCompromiso::class,
                 \App\Filament\Jugador\Widgets\MisEstadisticas::class,
                 \App\Filament\Jugador\Widgets\MiAsistencia::class,
                 \App\Filament\Jugador\Widgets\MisNotificaciones::class,
-            ])
-            ->pages([
-                \App\Filament\Jugador\Pages\Dashboard::class,
-                \App\Filament\Jugador\Pages\PlayerProfile::class,
-                \App\Filament\Jugador\Pages\MiHistorial::class,
-                \App\Filament\Jugador\Pages\EscanearQR::class,
             ])
             ->middleware([
                 EncryptCookies::class,
@@ -70,6 +82,7 @@ class JugadorPanelProvider extends PanelProvider
                 SubstituteBindings::class,
                 DisableBladeIconComponents::class,
                 DispatchServingFilamentEvent::class,
+                \App\Http\Middleware\ApplyTenantColor::class,
             ])
             ->authMiddleware([
                 Authenticate::class,

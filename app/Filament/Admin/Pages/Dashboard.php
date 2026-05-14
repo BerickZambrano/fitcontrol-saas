@@ -4,6 +4,7 @@ namespace App\Filament\Admin\Pages;
 
 use Filament\Pages\Dashboard as BaseDashboard;
 use App\Filament\Widgets\AccionesRapidas;
+use App\Filament\Jugador\Widgets\PlayerCardWidget;
 use App\Filament\Widgets\ProximosEventos;
 use App\Filament\Widgets\AlertasActivas;
 use App\Filament\Widgets\TotalEquipos;
