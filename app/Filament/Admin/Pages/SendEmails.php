@@ -74,7 +74,7 @@ class SendEmails extends Page implements Forms\Contracts\HasForms
                     ->visible(fn (Get $get) => $get('mode') === 'individual')
                     ->default(fn () => [['email' => '', 'nombre' => '']])
                     ->addActionLabel('Agregar otro destinatario')
-                    ->visible(fn (Get $get) => $get('mode') === 'individual')
+                    ->maxItems(500)
                     ->required(fn (Get $get) => $get('mode') === 'individual'),
 
                 TextInput::make('subject')
@@ -84,6 +84,7 @@ class SendEmails extends Page implements Forms\Contracts\HasForms
                 Textarea::make('body')
                     ->label('Cuerpo del correo')
                     ->required()
+                    ->maxLength(10000)
                     ->rows(5)
                     ->placeholder('Escribe tu mensaje aquí...'),
             ])
