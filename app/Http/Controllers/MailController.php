@@ -63,11 +63,11 @@ class MailController extends Controller
     public function sendMultiple(Request $request)
     {
         $request->validate([
-            'subject'   => 'required|string',
-            'body'      => 'required|string',
-            'recipients' => 'required|array|min:1',
-            'recipients.*.email'  => 'required|email',
-            'recipients.*.nombre' => 'required|string',
+            'subject'            => 'required|string|max:255',
+            'body'               => 'required|string|max:10000',
+            'recipients'         => 'required|array|min:1|max:500',
+            'recipients.*.email' => 'required|email',
+            'recipients.*.nombre'=> 'required|string|max:255',
         ]);
 
         $subject = $request->input('subject');

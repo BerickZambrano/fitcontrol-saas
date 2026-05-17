@@ -1,10 +1,12 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use App\Models\Tenant;
 use Illuminate\Http\Request;
-use Inertia\Inertia;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use Inertia\Inertia;
 
 class OnboardingController extends Controller
 {
@@ -68,7 +70,7 @@ class OnboardingController extends Controller
         try {
             app(\App\Services\ApprovalService::class)->notifyAdmin($tenant);
         } catch (\Throwable $e) {
-            \Log::warning('No se pudo notificar al admin: ' . $e->getMessage());
+            Log::warning('No se pudo notificar al admin: ' . $e->getMessage());
         }
 
         return redirect()->route('onboarding.success');

@@ -41,6 +41,9 @@ RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
 # Copy Supervisor configuration
 COPY docker/supervisor.conf /etc/supervisor/conf.d/fitcontrol.conf
 
+# Fix Git dubious ownership issue inside container permanent
+RUN git config --global --add safe.directory /var/www/html
+
 # Expose ports for artisan serve and vite dev server
 EXPOSE 8000
 EXPOSE 5173

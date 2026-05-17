@@ -1,10 +1,13 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-
 use App\Http\Controllers\TenantRequestController;
-
 use App\Http\Controllers\AdminRegisterController;
+use App\Http\Controllers\MailController;
+use App\Http\Controllers\OnboardingController;
+use App\Http\Controllers\ReportController;
+use Illuminate\Support\Facades\Mail;
+use Inertia\Inertia;
 
 Route::get('/register-admin/{token}', [AdminRegisterController::class, 'show'])
     ->name('register.admin');
@@ -17,6 +20,7 @@ Route::get('/2fa/verify', \App\Livewire\Auth\TwoFactorVerify::class)
     ->name('2fa.verify');
 
 Route::get('/solicitar-acceso', [TenantRequestController::class, 'create'])->name('tenant.request');
+
 Route::post('/solicitar-acceso', [TenantRequestController::class, 'store'])
     ->middleware('throttle:tenant-request')
     ->name('tenant.request.store');
@@ -24,8 +28,6 @@ Route::post('/solicitar-acceso', [TenantRequestController::class, 'store'])
 Route::view('dashboard', 'dashboard')
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
-
-use Illuminate\Support\Facades\Mail;
 
 // Solo disponible en entorno local (desarrollo)
 if (app()->environment('local')) {
@@ -40,28 +42,15 @@ if (app()->environment('local')) {
 }
 
 
-    use Inertia\Inertia;
-use App\Http\Controllers\MailController;
-
 Route::get('/', function () {
     return Inertia::render('Landing');
 })->name('home');
 
-// Las rutas de API se han movido a routes/api.php
-
 
 // Reportes - Descargar con verificación de tenant ownership
-Route::get('/reportes/descargar/{report}', function (\App\Models\GeneratedReport $report) {
-    $user = auth()->user();
-
-    // Super admins can download any report; others only their tenant's
-    if (!$user->hasRole('super_admin') && $report->tenant_id !== $user->tenant_id) {
-        abort(403, 'No tienes permiso para descargar este reporte.');
-    }
-
-    $service = new \App\Services\ReportService();
-    return $service->descargar($report);
-})->middleware('auth')->name('reportes.descargar');
+Route::get('/reportes/descargar/{report}', [ReportController::class, 'download'])
+    ->middleware('auth')
+    ->name('reportes.descargar');
 
 require __DIR__.'/settings.php';
 
@@ -70,9 +59,7 @@ Route::fallback(function () {
 });
 
 
-
-#
-use App\Http\Controllers\OnboardingController;
+//Rutas del onboarding
 
 Route::get('/onboarding', [OnboardingController::class, 'index'])->name('onboarding.index');
 Route::post('/onboarding', [OnboardingController::class, 'store'])

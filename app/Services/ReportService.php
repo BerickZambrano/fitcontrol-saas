@@ -155,7 +155,6 @@ class ReportService
             ->first();
 
         $equipoNombre = Equipo::where('id', $equipoId)->value('nombre') ?? 'Equipo';
-        $equipoNombre = $equipoNombre ?? 'Equipo';
 
         if ($ext === 'pdf') {
             return $this->generatePerformancePdf($rows, $stats, $equipoNombre, $req, $reportId);
@@ -300,7 +299,6 @@ class ReportService
             ->get();
 
         $equipoNombre = Equipo::where('id', $equipoId)->value('nombre') ?? 'Equipo';
-        $equipoNombre = $equipoNombre ?? 'Equipo';
 
         if ($ext === 'pdf') {
             return $this->generateAttendancePdf($jugadores, $entrenamientos, $asistencias, $equipoNombre, $req, $reportId);
@@ -447,7 +445,6 @@ class ReportService
             ->get();
 
         $tenantNombre = Tenant::where('id', $tenantId)->value('nombre') ?? 'Club';
-        $tenantNombre = $tenantNombre ?? 'Club';
 
         if ($ext === 'pdf') {
             return $this->generateFinancialPdf($summary, $detail, $tenantNombre, $req, $reportId);
@@ -607,7 +604,6 @@ class ReportService
             ->get();
 
         $tenantNombre = Tenant::where('id', $tenantId)->value('nombre') ?? 'Club';
-        $tenantNombre = $tenantNombre ?? 'Club';
 
         if ($ext === 'pdf') {
             return $this->generateMedicalPdf($detail, $porTipo, $porGravedad, $porApto, $noAptos, $tenantNombre, $req, $reportId);
