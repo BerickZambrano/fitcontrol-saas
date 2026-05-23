@@ -24,6 +24,10 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        if (!app()->runningInConsole()) {
+            config(['app.url' => request()->getSchemeAndHttpHost()]);
+        }
+
         CreateAction::configureUsing(function (CreateAction $action) {
             $action->label('Nuevo');
         });

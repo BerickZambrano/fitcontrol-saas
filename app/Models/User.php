@@ -9,8 +9,10 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Laravel\Scout\Searchable;
 use Spatie\Permission\Traits\HasRoles;
 use Filament\Models\Contracts\HasAvatar;
+use Filament\Models\Contracts\FilamentUser;
+use Filament\Panel;
 
-class User extends Authenticatable implements HasAvatar
+class User extends Authenticatable implements HasAvatar, FilamentUser
 {
     use Notifiable, HasRoles, Searchable, SoftDeletes;
 
@@ -178,5 +180,22 @@ class User extends Authenticatable implements HasAvatar
     public function jugadorPerfil()
     {
         return $this->hasOne(JugadorPerfil::class);
+    }
+
+    public function canAccessPanel(Panel $panel): bool
+    {
+        if ($this->hasRole(['Administrador', 'super_admin'])) {
+            return true;
+        }
+
+        if ($panel->getId() === 'entrenador') {
+            return $this->hasRole('Entrenador');
+        }
+
+        if ($panel->getId() === 'jugador') {
+            return $this->hasRole('Jugador');
+        }
+
+        return false;
     }
 }

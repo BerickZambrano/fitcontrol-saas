@@ -31,6 +31,10 @@ class LoginResponse implements LoginResponseContract, FilamentLoginResponse
             return redirect('/admin');
         }
 
+        if ($user->hasRole('Entrenador')) {
+            return redirect('/entrenador');
+        }
+
         return redirect('/jugador');
     }
 }

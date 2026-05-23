@@ -1,17 +1,14 @@
 <?php
 
-namespace App\Filament\Jugador\Pages;
+namespace App\Filament\Entrenador\Pages;
 
 use Filament\Forms;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Pages\Page;
 use Illuminate\Support\Facades\Auth;
-use App\Enums\NavigationGroup;
-use UnitEnum;
-use BackedEnum;
 use Livewire\WithFileUploads;
 
-class PlayerProfile extends Page
+class CoachProfile extends Page
 {
     use InteractsWithForms;
     use WithFileUploads;
@@ -21,54 +18,25 @@ class PlayerProfile extends Page
     protected static bool $shouldRegisterNavigation = false;
     protected static ?string $title = 'Mi Perfil';
 
-    protected string $view = 'filament.pages.player-profile';
+    protected string $view = 'filament.pages.coach-profile';
 
     public $name;
     public $email;
     public $avatar_url;
     public $two_factor_enabled;
-    public $posicion;
-    public $dorsal;
-    public $altura;
-    public $peso;
-    public $pierna_habil;
 
-    // Inicializa el formulario
     protected function getFormSchema(): array
     {
         return [
             Forms\Components\TextInput::make('name')->label('Nombre')->required(),
             Forms\Components\TextInput::make('email')->label('Correo electrónico')->email()->required(),
             Forms\Components\FileUpload::make('avatar_url')
-                ->label('Foto de perfil (Ficha)')
+                ->label('Foto de perfil')
                 ->image()
                 ->avatar()
                 ->disk('public')
                 ->directory('avatars')
                 ->maxSize(1024),
-            
-            \Filament\Schemas\Components\Section::make('Información Deportiva (Ficha)')
-                ->description('Datos técnicos registrados por el entrenador o administrador')
-                ->schema([
-                    Forms\Components\TextInput::make('posicion')
-                        ->label('Posición')
-                        ->disabled(),
-                    Forms\Components\TextInput::make('dorsal')
-                        ->label('Dorsal (Número de Camiseta)')
-                        ->disabled(),
-                    Forms\Components\TextInput::make('altura')
-                        ->label('Altura')
-                        ->suffix('cm')
-                        ->disabled(),
-                    Forms\Components\TextInput::make('peso')
-                        ->label('Peso')
-                        ->suffix('kg')
-                        ->disabled(),
-                    Forms\Components\TextInput::make('pierna_habil')
-                        ->label('Pierna Hábil')
-                        ->disabled(),
-                ])->columns(2),
-
             \Filament\Schemas\Components\Section::make('Seguridad')
                 ->description('Configura la seguridad de tu cuenta')
                 ->schema([
@@ -85,19 +53,12 @@ class PlayerProfile extends Page
     public function mount(): void
     {
         $user = Auth::user();
-        $playerProfile = $user->jugadorPerfil;
         
-        // Inicializa el formulario con los datos actuales
         $this->form->fill([
             'name' => $user->name,
             'email' => $user->email,
             'avatar_url' => $user->avatar_url,
             'two_factor_enabled' => $user->two_factor_type === 'email',
-            'posicion' => $playerProfile?->posicion ? ucfirst($playerProfile->posicion) : 'No especificada',
-            'dorsal' => $playerProfile?->dorsal ?? 'No asignado',
-            'altura' => $playerProfile?->altura ? (float) ($playerProfile->altura < 3 ? $playerProfile->altura * 100 : $playerProfile->altura) : null,
-            'peso' => $playerProfile?->peso ? (float) $playerProfile->peso : null,
-            'pierna_habil' => $playerProfile?->pierna_habil ? ucfirst($playerProfile->pierna_habil) : 'No especificada',
         ]);
     }
 

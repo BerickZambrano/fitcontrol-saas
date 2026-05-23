@@ -32,27 +32,53 @@
     <div
         wire:ignore
         x-data="calendarComponent()"
-        x-init="init()"
         class="bg-white dark:bg-gray-900 dark:ring-1 dark:ring-white/10 rounded-xl shadow p-4"
     >
         <div id="calendar"></div>
 
-        <!-- MODAL REAL -->
+        <!-- MODAL DETALLADO ESTILIZADO -->
         <div
             x-show="open"
             x-cloak
             x-transition
-            class="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 backdrop-blur-sm"
+            class="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
         >
-            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-xl w-full max-w-md p-6 border dark:border-gray-700">
-                <h2 class="text-xl font-bold mb-2 dark:text-white" x-text="title"></h2>
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-md p-6 border dark:border-gray-700 mx-4 transform transition-all duration-300">
+                <div class="flex items-center gap-3 mb-4">
+                    <span class="w-3 h-3 rounded-full" :style="'background-color: ' + eventColor"></span>
+                    <span class="text-xs font-black uppercase tracking-widest text-gray-500 dark:text-gray-400" x-text="eventType"></span>
+                </div>
 
-                <p class="text-gray-600 dark:text-gray-300 mb-4" x-text="description"></p>
+                <h3 class="text-2xl font-black text-gray-900 dark:text-white leading-tight mb-4" x-text="eventTitle"></h3>
+
+                <div class="space-y-3 mb-6 text-sm text-gray-600 dark:text-gray-300">
+                    <div class="flex items-center gap-3">
+                        <svg class="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                        </svg>
+                        <span><strong>Hora:</strong> <span x-text="eventStart"></span></span>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <svg class="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
+                        </svg>
+                        <span><strong>Ubicación:</strong> <span x-text="eventLocation"></span></span>
+                    </div>
+                    <template x-if="eventExtra">
+                        <div class="flex items-center gap-3">
+                            <svg class="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 111.063.852l-.708 2.836a.75.75 0 001.063.852l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" />
+                            </svg>
+                            <span x-text="eventExtra"></span>
+                        </div>
+                    </template>
+                </div>
 
                 <div class="flex justify-end">
                     <button
                         @click="open = false"
-                        class="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700"
+                        class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 dark:bg-emerald-600 dark:hover:bg-emerald-700 text-white text-sm font-bold rounded-xl shadow-lg transition-colors duration-200"
                     >
                         Cerrar
                     </button>
@@ -68,8 +94,12 @@
             return {
                 calendar: null,
                 open: false,
-                title: '',
-                description: '',
+                eventTitle: '',
+                eventType: '',
+                eventStart: '',
+                eventLocation: '',
+                eventExtra: '',
+                eventColor: '',
 
                 init() {
                     const el = document.getElementById('calendar')
@@ -78,22 +108,26 @@
                         initialView: 'dayGridMonth',
                         locale: 'es',
                         selectable: true,
+                        displayEventTime: true,
+                        eventTimeFormat: {
+                            hour: 'numeric',
+                            minute: '2-digit',
+                            meridiem: 'short',
+                            hour12: true
+                        },
 
                         events: @json($this->getEvents()),
 
                         eventClick: (info) => {
                             info.jsEvent.preventDefault()
 
-                            this.title = info.event.title
-                            this.description =
-                                info.event.extendedProps.description ?? 'Sin descripción'
-                            this.open = true
-                        },
-
-                        dateClick: (info) => {
-                            this.title = 'Fecha seleccionada'
-                            this.description = info.dateStr
-                            this.open = true
+                            this.eventTitle = info.event.title;
+                            this.eventType = info.event.extendedProps.type;
+                            this.eventStart = info.event.extendedProps.time;
+                            this.eventLocation = info.event.extendedProps.location;
+                            this.eventExtra = info.event.extendedProps.extra;
+                            this.eventColor = info.event.backgroundColor;
+                            this.open = true;
                         }
                     })
 

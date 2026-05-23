@@ -20,18 +20,35 @@ class Calendario extends Page
 
     public function getEvents(): array
     {
-        $entrenamientos = Entrenamiento::all()->map(fn ($e) => [
-            'title' => 'Entrenamiento',
-            'start' => $e->fecha,
-            'description' => $e->nombre,
+        $tenantId = auth()->user()->tenant_id;
+        $isSuperAdmin = auth()->user()->hasRole('super_admin');
+
+        $entrenamientosQuery = Entrenamiento::query();
+        $partidosQuery = Partido::query();
+
+        if (!$isSuperAdmin) {
+            $entrenamientosQuery->where('tenant_id', $tenantId);
+            $partidosQuery->where('tenant_id', $tenantId);
+        }
+
+        $entrenamientos = $entrenamientosQuery->with('equipo')->get()->map(fn ($e) => [
+            'title' => $e->nombre,
+            'start' => $e->fecha . ($e->hora ? 'T' . $e->hora : ''),
             'color' => '#2563eb',
+            'type' => 'Entrenamiento',
+            'location' => $e->ubicacion ?? 'No especificada',
+            'time' => $e->hora ? date('g:i A', strtotime($e->hora)) : 'No especificada',
+            'extra' => 'Equipo: ' . ($e->equipo?->nombre ?? 'General'),
         ]);
 
-        $partidos = Partido::all()->map(fn ($p) => [
-            'title' => 'Partido',
-            'start' => $p->fecha,
-            'description' => $p->descripcion,
+        $partidos = $partidosQuery->with(['local', 'visitante', 'torneo'])->get()->map(fn ($p) => [
+            'title' => ($p->local?->nombre ?? 'Local') . ' vs ' . ($p->visitante?->nombre ?? 'Visitante'),
+            'start' => $p->fecha . ($p->hora ? 'T' . $p->hora : ''),
             'color' => '#16a34a',
+            'type' => 'Partido',
+            'location' => 'Estadio / Cancha asignada',
+            'time' => $p->hora ? date('g:i A', strtotime($p->hora)) : 'No especificada',
+            'extra' => ($p->torneo?->nombre ? 'Torneo: ' . $p->torneo->nombre : 'Partido amistoso') . ' - Resultado: ' . ($p->resultado ?? 'Pendiente'),
         ]);
 
         return $entrenamientos

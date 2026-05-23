@@ -6,10 +6,12 @@ use Filament\Forms;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Pages\Page;
 use Illuminate\Support\Facades\Auth;
+use Livewire\WithFileUploads;
 
 class AdminProfile extends Page
 {
     use InteractsWithForms;
+    use WithFileUploads;
 
     protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-user-circle';
     protected static ?string $title = 'Mi Perfil de Administrador';
@@ -81,7 +83,10 @@ class AdminProfile extends Page
         $user = Auth::user();
         $user->name = $data['name'];
         $user->email = $data['email'];
-        $user->avatar_url = $data['avatar_url'];
+        
+        $avatar = $data['avatar_url'];
+        $user->avatar_url = is_array($avatar) ? (reset($avatar) ?: null) : $avatar;
+
         $user->two_factor_type = ($data['two_factor_enabled'] ?? false) ? 'email' : 'none';
         $user->save();
 
