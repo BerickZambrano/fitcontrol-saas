@@ -22,8 +22,8 @@ class EquipoUserResource extends Resource
     use HasTenantGlobalSearch;
     protected static ?string $model = EquipoUser::class;
 
-      protected static ?string $navigationLabel = 'Jugadores por Equipo';
-    protected static ?string $modelLabel = 'Jugador en Equipo';
+      protected static ?string $navigationLabel = 'Miembros por Equipo';
+    protected static ?string $modelLabel = 'Miembro en Equipo';
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedUsers;
 

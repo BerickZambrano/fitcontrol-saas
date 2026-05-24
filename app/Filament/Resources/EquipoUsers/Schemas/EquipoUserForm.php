@@ -32,13 +32,13 @@ class EquipoUserForm
                 ),
 
             Forms\Components\Select::make('user_id')
-                ->label('Jugador')
+                ->label('Miembro (Jugador o Entrenador)')
                 ->required()
                 ->options(function () {
                     $query = User::query()
                         ->withoutGlobalScopes()
                         ->whereHas('roles', function ($q) {
-                            $q->where('name', 'Jugador');
+                            $q->whereIn('name', ['Jugador', 'Entrenador']);
                         });
 
                     if (!auth()->user()->hasRole('super_admin')) {
@@ -55,7 +55,7 @@ class EquipoUserForm
                     modifyQueryUsing: function (Builder $query) {
                         $query->withoutGlobalScopes()
                             ->whereHas('roles', function ($q) {
-                                $q->where('name', 'Jugador');
+                                $q->whereIn('name', ['Jugador', 'Entrenador']);
                             });
                         if (!auth()->user()->hasRole('super_admin')) {
                             $query->where('tenant_id', auth()->user()->tenant_id);

@@ -41,7 +41,7 @@ class EquipoUsersTable
                     ->searchable(),
 
                 Tables\Columns\TextColumn::make('jugador.name')
-                    ->label('Jugador')
+                    ->label('Miembro')
                     ->sortable()
                     ->searchable(),
 
@@ -67,7 +67,7 @@ class EquipoUsersTable
                 ->preload(),
 
             SelectFilter::make('jugador_id')
-                ->label('Jugador')
+                ->label('Miembro')
                 ->relationship('jugador', 'name')
                 ->searchable()
                 ->preload(),
@@ -93,7 +93,7 @@ class EquipoUsersTable
                 }),
 
             Filter::make('activos')
-                ->label('Solo jugadores activos')
+                ->label('Solo miembros activos')
                 ->query(fn ($query) => $query->whereNull('fecha_fin')),
 
         ])
