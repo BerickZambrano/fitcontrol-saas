@@ -2,7 +2,7 @@
 
 namespace App\Filament\Resources\AsistenciaEntrenamientos;
 
-use App\Filament\Resources\AsistenciaEntrenamientos\Pages\CreateAsistenciaEntrenamiento;
+use App\Filament\Resources\AsistenciaEntrenamientos\Pages\TomarAsistencia;
 use App\Filament\Resources\AsistenciaEntrenamientos\Pages\EditAsistenciaEntrenamiento;
 use App\Filament\Resources\AsistenciaEntrenamientos\Pages\ListAsistenciaEntrenamientos;
 use App\Filament\Resources\AsistenciaEntrenamientos\Schemas\AsistenciaEntrenamientoForm;
@@ -50,7 +50,7 @@ class AsistenciaEntrenamientoResource extends Resource
     {
         return [
             'index' => ListAsistenciaEntrenamientos::route('/'),
-            'create' => CreateAsistenciaEntrenamiento::route('/create'),
+            'create' => TomarAsistencia::route('/create'),
             'edit' => EditAsistenciaEntrenamiento::route('/{record}/edit'),
         ];
     }
