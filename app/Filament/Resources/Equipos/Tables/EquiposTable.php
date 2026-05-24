@@ -39,6 +39,7 @@ class EquiposTable
                 ImageColumn::make('logo_equipo')
                     ->label('Logo')
                     ->disk('public')   // Ajusta según tu storage
+                    ->checkFileExistence(false)
                     ->rounded(),
 
                 TextColumn::make('ubi_equipo')
