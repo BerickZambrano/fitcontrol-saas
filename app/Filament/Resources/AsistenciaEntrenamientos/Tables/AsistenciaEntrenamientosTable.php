@@ -8,7 +8,7 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Tables\Table;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Columns\ToggleColumn;
+use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Filters\SelectFilter;
 use AlperenErsoy\FilamentExport\Actions\FilamentExportHeaderAction;
 use AlperenErsoy\FilamentExport\Actions\FilamentExportBulkAction;
@@ -40,8 +40,19 @@ class AsistenciaEntrenamientosTable
                     ->searchable()
                     ->limit(30),
 
-                ToggleColumn::make('presente')
-                    ->label('Presente'),
+                IconColumn::make('presente')
+                    ->label('Presente')
+                    ->boolean()
+                    ->trueIcon('heroicon-m-check-circle')
+                    ->falseIcon('heroicon-m-x-circle')
+                    ->trueColor('success')
+                    ->falseColor('danger'),
+
+                // Columna para exportación con texto legible (oculta en pantalla)
+                TextColumn::make('presente_texto')
+                    ->label('Asistió')
+                    ->getStateUsing(fn ($record) => $record->presente ? 'Sí' : 'No')
+                    ->hidden(),  // oculta en la tabla pero incluida en el export
             ])
             ->filters([
     SelectFilter::make('presente')

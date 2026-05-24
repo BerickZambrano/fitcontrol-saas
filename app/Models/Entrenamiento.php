@@ -17,6 +17,7 @@ class Entrenamiento extends Model
         'hora',
         'ubicacion',
         'equipo_id',
+        'instalacion_id',
         'tenant_id',
     ];
 
@@ -53,6 +54,11 @@ class Entrenamiento extends Model
     public function equipo()
     {
         return $this->belongsTo(Equipo::class, 'equipo_id');
+    }
+
+    public function instalacion()
+    {
+        return $this->belongsTo(Instalacion::class, 'instalacion_id');
     }
 
     public function asistencias()

@@ -61,6 +61,11 @@ class EntrenadorPanelProvider extends PanelProvider
             ->discoverWidgets(in: app_path('Filament/Entrenador/Widgets'), for: 'App\Filament\Entrenador\Widgets')
             ->widgets([
                 \App\Filament\Entrenador\Widgets\CoachStatsWidget::class,
+                \App\Filament\Entrenador\Widgets\ProximosEntrenamientosWidget::class,
+                \App\Filament\Entrenador\Widgets\ProximosPartidosWidget::class,
+                \App\Filament\Entrenador\Widgets\AsistenciaMesWidget::class,
+                \App\Filament\Entrenador\Widgets\UltimasAsistenciasWidget::class,
+                \App\Filament\Entrenador\Widgets\JugadoresNoAptosWidget::class,
             ])
             ->middleware([
                 EncryptCookies::class,

@@ -4,6 +4,7 @@ namespace App\Filament\Resources\Partidos\Schemas;
 
 use App\Models\Equipo;
 use App\Models\Torneo;
+use App\Models\Instalacion;
 use Filament\Forms;
 use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
@@ -51,7 +52,21 @@ class PartidoForm
 
             Forms\Components\TextInput::make('resultado')
                 ->label('Resultado')
-                ->maxLength(255),
+                ->maxLength(255)
+                ->placeholder('Ej: 2-1'),
+
+            Forms\Components\Select::make('fase')
+                ->label('Fase del Torneo')
+                ->nullable()
+                ->placeholder('Sin fase asignada')
+                ->options([
+                    'grupo'      => 'Fase de Grupos',
+                    'octavos'    => 'Octavos de Final',
+                    'cuartos'    => 'Cuartos de Final',
+                    'semifinal'  => 'Semifinal',
+                    'final'      => 'Final',
+                    'amistoso'   => 'Amistoso',
+                ]),
 
             Forms\Components\Select::make('torneo_id')
                 ->label('Torneo')
@@ -65,6 +80,16 @@ class PartidoForm
                 })
                 ->searchable()
                 ->preload(),
+
+            Forms\Components\Select::make('instalacion_id')
+                ->label('Instalación')
+                ->options(function () {
+                    return Instalacion::query()->pluck('nombre', 'id');
+                })
+                ->searchable()
+                ->preload()
+                ->nullable()
+                ->placeholder('Sin instalación específica'),
 
 
             Forms\Components\Hidden::make('tenant_id')

@@ -18,7 +18,9 @@ class Partido extends Model
         'equipo_local_id',
         'equipo_visitante_id',
         'resultado',
+        'fase',
         'torneo_id',
+        'instalacion_id',
     ];
 
     /**
@@ -62,8 +64,13 @@ class Partido extends Model
     }
 
     public function torneo()
-{
-    return $this->belongsTo(Torneo::class);
-}
+    {
+        return $this->belongsTo(Torneo::class);
+    }
+
+    public function instalacion()
+    {
+        return $this->belongsTo(Instalacion::class, 'instalacion_id');
+    }
 
 }

@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Torneos;
 use App\Filament\Resources\Torneos\Pages\CreateTorneo;
 use App\Filament\Resources\Torneos\Pages\EditTorneo;
 use App\Filament\Resources\Torneos\Pages\ListTorneos;
+use App\Filament\Resources\Torneos\RelationManagers\PartidosRelationManager;
 use App\Filament\Resources\Torneos\Schemas\TorneoForm;
 use App\Filament\Resources\Torneos\Tables\TorneosTable;
 use App\Filament\Traits\HasTenantGlobalSearch;
@@ -44,7 +45,7 @@ class TorneoResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            PartidosRelationManager::class,
         ];
     }
 

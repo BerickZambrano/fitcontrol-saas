@@ -21,12 +21,17 @@ class EntrenamientosTable
     public static function configure(Table $table): Table
     {
         return $table
-            ->modifyQueryUsing(fn ($query) => $query->with('equipo'))
+            ->modifyQueryUsing(fn ($query) => $query->with(['equipo', 'instalacion']))
             ->columns([
                 TextColumn::make('nombre')->label('Nombre')->searchable()->sortable(),
                 TextColumn::make('fecha')->label('Fecha')->date()->sortable(),
                 TextColumn::make('hora')->label('Hora')->sortable(),
                 TextColumn::make('ubicacion')->label('Ubicación')->searchable(),
+                TextColumn::make('instalacion.nombre')
+                    ->label('Instalación')
+                    ->placeholder('—')
+                    ->searchable()
+                    ->sortable(),
                 TextColumn::make('equipo.nombre')->label('Equipo')->searchable()->sortable(),
             ])
             ->defaultSort('fecha', 'desc')

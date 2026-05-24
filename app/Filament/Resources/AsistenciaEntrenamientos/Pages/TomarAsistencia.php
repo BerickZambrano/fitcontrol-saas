@@ -195,5 +195,7 @@ class TomarAsistencia extends Page implements HasForms
             ->body('Los registros de asistencia se han guardado correctamente.')
             ->success()
             ->send();
+
+        $this->redirect(static::getResource()::getUrl('index'));
     }
 }

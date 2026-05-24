@@ -39,4 +39,14 @@ class Instalacion extends Model
     {
         return $this->belongsTo(Tenant::class);
     }
+
+    public function entrenamientos()
+    {
+        return $this->hasMany(Entrenamiento::class, 'instalacion_id');
+    }
+
+    public function partidos()
+    {
+        return $this->hasMany(Partido::class, 'instalacion_id');
+    }
 }

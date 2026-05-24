@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Entrenamientos\Schemas;
 
 use App\Models\Equipo;
+use App\Models\Instalacion;
 use Filament\Schemas\Schema;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\TimePicker;
@@ -46,8 +47,17 @@ class EntrenamientoForm
                     })
                     ->searchable()
                     ->preload()
-
                     ->required(),
+
+                Select::make('instalacion_id')
+                    ->label('Instalación')
+                    ->options(function () {
+                        return Instalacion::query()->pluck('nombre', 'id');
+                    })
+                    ->searchable()
+                    ->preload()
+                    ->nullable()
+                    ->placeholder('Sin instalación específica'),
 
                 Hidden::make('tenant_id'),
             ]);

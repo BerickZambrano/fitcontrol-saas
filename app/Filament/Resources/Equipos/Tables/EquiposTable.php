@@ -122,7 +122,76 @@ class EquiposTable
                     ->label('Exportar'),
             ])
 
-            ->recordActions([
+             ->recordActions([
+                \Filament\Actions\Action::make('enviar_aviso')
+                    ->label('Enviar aviso')
+                    ->icon('heroicon-o-megaphone')
+                    ->color('warning')
+                    ->visible(fn ($record) => 
+                        auth()->user()->hasRole(['Administrador', 'super_admin']) ||
+                        (auth()->user()->hasRole('Entrenador') && \App\Models\EquipoUser::where('equipo_id', $record->id)
+                            ->where('user_id', auth()->id())
+                            ->where(function ($query) {
+                                $query->whereNull('fecha_fin')
+                                      ->orWhere('fecha_fin', '>=', now()->toDateString());
+                            })
+                            ->exists())
+                    )
+                    ->form([
+                        \Filament\Forms\Components\TextInput::make('titulo')
+                            ->label('Título')
+                            ->required()
+                            ->maxLength(255),
+                        \Filament\Forms\Components\Textarea::make('mensaje')
+                            ->label('Mensaje')
+                            ->required()
+                            ->rows(4),
+                    ])
+                    ->action(function ($record, array $data) {
+                        $activePlayers = \App\Models\EquipoUser::where('equipo_id', $record->id)
+                            ->where(function ($query) {
+                                $query->whereNull('fecha_fin')
+                                      ->orWhere('fecha_fin', '>=', now()->toDateString());
+                            })
+                            ->with('jugador')
+                            ->get()
+                            ->map(fn ($equipoUser) => $equipoUser->jugador)
+                            ->filter(fn ($user) => $user && $user->hasRole('Jugador'));
+
+                        if ($activePlayers->isEmpty()) {
+                            \Filament\Notifications\Notification::make()
+                                ->title('Sin jugadores activos')
+                                ->body('El equipo no tiene jugadores activos asignados en este momento.')
+                                ->warning()
+                                ->send();
+                            return;
+                        }
+
+                        foreach ($activePlayers as $user) {
+                            // 1. Guardar en la tabla histórica custom
+                            \App\Models\Notificacion::create([
+                                'tenant_id' => $record->tenant_id,
+                                'user_id' => $user->id,
+                                'titulo' => $data['titulo'],
+                                'mensaje' => $data['mensaje'],
+                                'leida' => false,
+                            ]);
+
+                            // 2. Enviar a la campana nativa de Filament
+                            \Filament\Notifications\Notification::make()
+                                ->title($data['titulo'])
+                                ->body($data['mensaje'])
+                                ->icon('heroicon-o-megaphone')
+                                ->color('info')
+                                ->sendToDatabase($user);
+                        }
+
+                        \Filament\Notifications\Notification::make()
+                            ->title('Aviso enviado')
+                            ->body('El aviso ha sido enviado exitosamente a todos los jugadores activos del equipo.')
+                            ->success()
+                            ->send();
+                    }),
                 EditAction::make(),
                 DeleteAction::make(),
                 RestoreAction::make()
