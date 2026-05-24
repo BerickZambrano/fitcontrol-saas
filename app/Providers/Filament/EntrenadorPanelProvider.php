@@ -44,7 +44,7 @@ class EntrenadorPanelProvider extends PanelProvider
             ->plugins([
                 FilamentApexChartsPlugin::make(),
             ])
-            ->discoverResources(in: app_path('Filament/Entrenador/Resources'), for: 'App\Filament\Entrenador\Resources')
+            ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
             ->discoverPages(in: app_path('Filament/Entrenador/Pages'), for: 'App\Filament\Entrenador\Pages')
             ->pages([
                 \App\Filament\Entrenador\Pages\Dashboard::class,
