@@ -23,11 +23,17 @@ class CreatePartido extends CreateRecord
         $partido = $this->record;
 
         $jugadoresLocal = EquipoUser::where('equipo_id', $partido->equipo_local_id)
-            ->whereNull('fecha_fin')
+            ->where(function ($query) {
+                $query->whereNull('fecha_fin')
+                      ->orWhere('fecha_fin', '>=', now()->toDateString());
+            })
             ->get();
 
         $jugadoresVisitante = EquipoUser::where('equipo_id', $partido->equipo_visitante_id)
-            ->whereNull('fecha_fin')
+            ->where(function ($query) {
+                $query->whereNull('fecha_fin')
+                      ->orWhere('fecha_fin', '>=', now()->toDateString());
+            })
             ->get();
 
         foreach ($jugadoresLocal as $equipoUser) {

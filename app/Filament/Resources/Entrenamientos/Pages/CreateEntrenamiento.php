@@ -23,7 +23,10 @@ class CreateEntrenamiento extends CreateRecord
         $entrenamiento = $this->record;
 
         $jugadores = EquipoUser::where('equipo_id', $entrenamiento->equipo_id)
-            ->whereNull('fecha_fin')
+            ->where(function ($query) {
+                $query->whereNull('fecha_fin')
+                      ->orWhere('fecha_fin', '>=', now()->toDateString());
+            })
             ->get();
 
         foreach ($jugadores as $equipoUser) {

@@ -289,7 +289,10 @@ class ReportService
             ->select('users.id', 'users.name')
             ->join('equipo_user', 'equipo_user.user_id', '=', 'users.id')
             ->where('equipo_user.equipo_id', $equipoId)
-            ->whereNull('equipo_user.fecha_fin')
+            ->where(function ($query) {
+                $query->whereNull('equipo_user.fecha_fin')
+                      ->orWhere('equipo_user.fecha_fin', '>=', now()->toDateString());
+            })
             ->orderBy('users.name')
             ->get();
 

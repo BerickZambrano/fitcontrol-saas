@@ -18,7 +18,10 @@ class CoachStatsWidget extends Widget
         
         // Obtener equipos a su cargo
         $equiposIds = EquipoUser::where('user_id', $user->id)
-            ->whereNull('fecha_fin')
+            ->where(function ($query) {
+                $query->whereNull('fecha_fin')
+                      ->orWhere('fecha_fin', '>=', now()->toDateString());
+            })
             ->pluck('equipo_id');
 
         $totalEquipos = $equiposIds->count();
@@ -28,7 +31,10 @@ class CoachStatsWidget extends Widget
         if ($totalEquipos > 0) {
             $totalJugadores = EquipoUser::whereIn('equipo_id', $equiposIds)
                 ->where('user_id', '!=', $user->id) // Excluir al propio entrenador
-                ->whereNull('fecha_fin')
+                ->where(function ($query) {
+                    $query->whereNull('fecha_fin')
+                          ->orWhere('fecha_fin', '>=', now()->toDateString());
+                })
                 ->distinct('user_id')
                 ->count();
         }

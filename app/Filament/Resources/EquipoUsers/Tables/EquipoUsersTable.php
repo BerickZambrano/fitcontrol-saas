@@ -94,7 +94,10 @@ class EquipoUsersTable
 
             Filter::make('activos')
                 ->label('Solo miembros activos')
-                ->query(fn ($query) => $query->whereNull('fecha_fin')),
+                ->query(fn ($query) => $query->where(function ($q) {
+                    $q->whereNull('fecha_fin')
+                      ->orWhere('fecha_fin', '>=', now()->toDateString());
+                })),
 
         ])
              ->headerActions([
