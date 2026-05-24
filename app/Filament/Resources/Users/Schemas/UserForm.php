@@ -116,7 +116,13 @@ class UserForm
 
             Forms\Components\Select::make('roles')
                 ->label('Roles')
-                ->relationship('roles', 'name')
+                ->relationship(
+                    name: 'roles',
+                    titleAttribute: 'name',
+                    modifyQueryUsing: fn ($query) => auth()->user()->hasRole('super_admin') 
+                        ? $query 
+                        : $query->where('name', '!=', 'super_admin')
+                )
                 ->multiple()
                 ->preload()
                 ->required(),

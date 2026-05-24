@@ -43,7 +43,13 @@ class UsersTable
             ->filters([
                 SelectFilter::make('roles')
                     ->label('Rol')
-                    ->relationship('roles', 'name')
+                    ->relationship(
+                        name: 'roles',
+                        titleAttribute: 'name',
+                        modifyQueryUsing: fn ($query) => auth()->user()->hasRole('super_admin')
+                            ? $query
+                            : $query->where('name', '!=', 'super_admin')
+                    )
                     ->preload()
                     ->multiple(),
 
