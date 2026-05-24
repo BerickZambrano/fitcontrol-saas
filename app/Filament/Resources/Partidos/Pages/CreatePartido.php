@@ -58,7 +58,7 @@ class CreatePartido extends CreateRecord
                     ->body("📅 {$fecha} ⏰ {$hora}")
                     ->icon('heroicon-o-trophy')
                     ->color('primary')
-                    ->customData([
+                    ->viewData([
                         'type' => 'partido',
                         'partido_id' => $partido->id,
                         'equipo_id' => $partido->equipo_local_id,
@@ -75,7 +75,7 @@ class CreatePartido extends CreateRecord
                     ->body("📅 {$fecha} ⏰ {$hora}")
                     ->icon('heroicon-o-trophy')
                     ->color('primary')
-                    ->customData([
+                    ->viewData([
                         'type' => 'partido',
                         'partido_id' => $partido->id,
                         'equipo_id' => $partido->equipo_visitante_id,

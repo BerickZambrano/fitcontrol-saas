@@ -42,7 +42,7 @@ class CreateEntrenamiento extends CreateRecord
                     ->body("📅 {$fecha} ⏰ {$hora} 📍 {$ubicacion}")
                     ->icon('heroicon-o-calendar')
                     ->color('success')
-                    ->customData([
+                    ->viewData([
                         'type' => 'entrenamiento',
                         'entrenamiento_id' => $entrenamiento->id,
                         'equipo_id' => $entrenamiento->equipo_id,

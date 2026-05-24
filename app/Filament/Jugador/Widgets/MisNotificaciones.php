@@ -41,7 +41,7 @@ class MisNotificaciones extends Widget
                 'mensaje' => $data['body'] ?? $data['mensaje'] ?? '',
                 'leida' => $notif->read_at !== null,
                 'created_at' => $notif->created_at,
-                'tipo' => $data['type'] ?? $data['tipo'] ?? 'general',
+                'tipo' => $data['type'] ?? $data['tipo'] ?? $data['viewData']['type'] ?? $data['viewData']['tipo'] ?? 'general',
             ];
         }
 
