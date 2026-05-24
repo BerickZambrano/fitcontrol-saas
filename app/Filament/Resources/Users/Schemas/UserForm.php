@@ -52,13 +52,67 @@ class UserForm
 
             Forms\Components\Select::make('tenant_id')
                 ->label('Tenant')
+                ->relationship('tenant', 'nombre')
                 ->visible(fn () => $isSuperAdmin)
                 ->required($isSuperAdmin)
-                ->options(
-                    fn () => Tenant::pluck('nombre', 'id')
-                )
                 ->default(fn () => $isSuperAdmin ? null : auth()->user()->tenant_id)
-                ->disabled(fn () => !$isSuperAdmin),
+                ->disabled(fn () => !$isSuperAdmin)
+                ->createOptionForm([
+                    \Filament\Schemas\Components\Grid::make(2)
+                        ->schema([
+                            Forms\Components\TextInput::make('nombre')
+                                ->label('Nombre del Club')
+                                ->required()
+                                ->maxLength(255),
+                            Forms\Components\TextInput::make('nit')
+                                ->label('NIT')
+                                ->required()
+                                ->maxLength(50)
+                                ->unique(table: 'tenants', column: 'nit')
+                                ->validationMessages(['unique' => 'Este NIT ya está registrado.']),
+                            Forms\Components\Select::make('tipo_club')
+                                ->label('Tipo de Club')
+                                ->options(['formativo' => 'Formativo', 'amateur' => 'Amateur', 'profesional' => 'Profesional'])
+                                ->required(),
+                            Forms\Components\Select::make('estado')
+                                ->label('Estado')
+                                ->options(['activo' => 'Activo', 'suspendido' => 'Suspendido', 'pendiente' => 'Pendiente'])
+                                ->default('activo')
+                                ->required(),
+                            Forms\Components\TextInput::make('ciudad')
+                                ->label('Ciudad')
+                                ->required()
+                                ->maxLength(255),
+                            Forms\Components\TextInput::make('pais')
+                                ->label('País')
+                                ->required()
+                                ->maxLength(255),
+                            Forms\Components\TextInput::make('email_corporativo')
+                                ->label('Correo Corporativo')
+                                ->email()
+                                ->required()
+                                ->maxLength(255)
+                                ->unique(table: 'tenants', column: 'email_corporativo')
+                                ->validationMessages(['unique' => 'Este correo corporativo ya está en uso.']),
+                            Forms\Components\TextInput::make('encargado_nombre')
+                                ->label('Nombre del Encargado')
+                                ->required()
+                                ->maxLength(255),
+                        ]),
+                ])
+                ->createOptionUsing(function (array $data) {
+                    $tenant = \App\Models\Tenant::create([
+                        'nombre' => $data['nombre'],
+                        'nit' => $data['nit'],
+                        'tipo_club' => $data['tipo_club'],
+                        'estado' => $data['estado'],
+                        'ciudad' => $data['ciudad'],
+                        'pais' => $data['pais'],
+                        'email_corporativo' => $data['email_corporativo'],
+                        'encargado_nombre' => $data['encargado_nombre'],
+                    ]);
+                    return $tenant->id;
+                }),
 
             Forms\Components\Select::make('roles')
                 ->label('Roles')
