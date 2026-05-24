@@ -43,11 +43,12 @@ class NuevoEntrenamientoNotification extends Notification implements ShouldQueue
         $ubicacion = $this->entrenamiento->ubicacion ?? 'Sin ubicación';
 
         return [
+            'title' => 'Nuevo entrenamiento: ' . $this->entrenamiento->nombre,
+            'body' => "📅 {$fecha} ⏰ {$hora} 📍 {$ubicacion}",
+            'icon' => 'heroicon-o-calendar',
+            'type' => 'entrenamiento',
             'entrenamiento_id' => $this->entrenamiento->id,
             'equipo_id' => $this->entrenamiento->equipo_id,
-            'titulo' => 'Nuevo entrenamiento: ' . $this->entrenamiento->nombre,
-            'mensaje' => "📅 {$fecha} ⏰ {$hora} 📍 {$ubicacion}",
-            'tipo' => 'entrenamiento',
         ];
     }
 }

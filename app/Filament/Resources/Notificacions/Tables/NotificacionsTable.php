@@ -23,6 +23,11 @@ class NotificacionsTable
     {
         return $table
             ->columns([
+                TextColumn::make('usuario.name')
+                    ->label('Destinatario')
+                    ->searchable()
+                    ->sortable(),
+
                 TextColumn::make('titulo')
                     ->label('Título')
                     ->searchable()

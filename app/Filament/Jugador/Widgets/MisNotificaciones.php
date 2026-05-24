@@ -37,11 +37,11 @@ class MisNotificaciones extends Widget
         foreach ($dbNotifications as $notif) {
             $data = json_decode($notif->data, true) ?? [];
             $notifications[] = [
-                'titulo' => $data['titulo'] ?? 'Notificación',
-                'mensaje' => $data['mensaje'] ?? '',
+                'titulo' => $data['title'] ?? $data['titulo'] ?? 'Notificación',
+                'mensaje' => $data['body'] ?? $data['mensaje'] ?? '',
                 'leida' => $notif->read_at !== null,
                 'created_at' => $notif->created_at,
-                'tipo' => $data['tipo'] ?? 'general',
+                'tipo' => $data['type'] ?? $data['tipo'] ?? 'general',
             ];
         }
 

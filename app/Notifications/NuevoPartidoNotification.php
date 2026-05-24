@@ -50,12 +50,13 @@ class NuevoPartidoNotification extends Notification implements ShouldQueue
             : 'Equipo visitante';
 
         return [
+            'title' => 'Nuevo partido: ' . $equipoLocal . ' vs ' . $equipoVisitante,
+            'body' => "📅 {$fecha} ⏰ {$hora}",
+            'icon' => 'heroicon-o-trophy',
+            'type' => 'partido',
             'partido_id' => $this->partido->id,
             'equipo_local_id' => $this->partido->equipo_local_id,
             'equipo_visitante_id' => $this->partido->equipo_visitante_id,
-            'titulo' => 'Nuevo partido: ' . $equipoLocal . ' vs ' . $equipoVisitante,
-            'mensaje' => "📅 {$fecha} ⏰ {$hora}",
-            'tipo' => 'partido',
         ];
     }
 }
