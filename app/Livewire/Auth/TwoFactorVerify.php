@@ -61,6 +61,10 @@ class TwoFactorVerify extends Component
             return redirect('/admin');
         }
 
+        if ($user->hasRole('Entrenador')) {
+            return redirect('/entrenador');
+        }
+
         return redirect('/jugador');
     }
 
