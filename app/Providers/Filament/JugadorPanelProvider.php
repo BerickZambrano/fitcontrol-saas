@@ -54,7 +54,6 @@ class JugadorPanelProvider extends PanelProvider
                 \App\Filament\Jugador\Pages\Dashboard::class,
                 \App\Filament\Jugador\Pages\PlayerProfile::class,
                 \App\Filament\Jugador\Pages\MiHistorial::class,
-                \App\Filament\Jugador\Pages\EscanearQR::class,
             ])
             ->userMenuItems([
                 'profile' => \Filament\Navigation\MenuItem::make()
