@@ -1,28 +1,38 @@
-import React from "react";
-import Hero from "../src/containers/Hero";
-import HowWeOperate from "../src/containers/HowWeOperate";
-import HowWeWork from "../src/containers/HowWeWork";
-import Testimonials from "../src/containers/Testimonials";
-import PricingPlans from "../src/containers/PricingPlans";
-import ContactUs from "../src/containers/ContactUs";
-import Tips from "../src/containers/Tips";
-import Questions from "../src/containers/Questions";
-import Invitation from "../src/containers/Invitation";
-import Footer from "../src/containers/Footer";
+import React, { useState } from "react";
+import Navbar from "../src/landing/components/Navbar";
+import HeroSection from "../src/landing/components/HeroSection";
+import StatsBar from "../src/landing/components/StatsBar";
+import ProblemSection from "../src/landing/components/ProblemSection";
+import FeaturesSection from "../src/landing/components/FeaturesSection";
+import ScreenshotsSection from "../src/landing/components/ScreenshotsSection";
+import BenefitsSection from "../src/landing/components/BenefitsSection";
+import PricingSection from "../src/landing/components/PricingSection";
+import TestimonialsSection from "../src/landing/components/TestimonialsSection";
+import CTASection from "../src/landing/components/CTASection";
+import Footer from "../src/landing/components/Footer";
+import SplashOverlay from "../src/components/SplashOverlay";
 
 export default function Landing() {
+    const [splashState, setSplashState] = useState({ isVisible: false, targetUrl: "" });
+
+    const navigateWithSplash = (url) => {
+        setSplashState({ isVisible: true, targetUrl: url });
+    };
+
     return (
-        <React.Fragment>
-            <Hero />
-            <HowWeOperate />
-            <HowWeWork />
-            <Testimonials />
-            <PricingPlans />
-            <ContactUs />
-            <Tips />
-            <Questions />
-            <Invitation />
-            <Footer />
-        </React.Fragment>
+        <>
+            <Navbar navigateWithSplash={navigateWithSplash} />
+            <HeroSection navigateWithSplash={navigateWithSplash} />
+            <StatsBar />
+            <ProblemSection />
+            <FeaturesSection />
+            <ScreenshotsSection />
+            <BenefitsSection />
+            <PricingSection navigateWithSplash={navigateWithSplash} />
+            <TestimonialsSection />
+            <CTASection navigateWithSplash={navigateWithSplash} />
+            <Footer navigateWithSplash={navigateWithSplash} />
+            <SplashOverlay isVisible={splashState.isVisible} targetUrl={splashState.targetUrl} />
+        </>
     );
 }
