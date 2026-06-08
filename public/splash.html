@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,123 +12,45 @@
         }
 
         body {
-            background: transparent;
+            background: #0f172a;
             display: flex;
             align-items: center;
             justify-content: center;
             min-height: 100vh;
             overflow: hidden;
-            font-family: 'Segoe UI', system-ui, sans-serif;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
         }
 
-
-
-
-
-        .loader {
-            position: relative;
-            z-index: 10;
+        .loader-container {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 20px;
+            gap: 16px;
         }
 
-        .logo-container {
+        .loader-ring {
             position: relative;
-            width: 80px;
-            height: 80px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: transparent;
+            width: 64px;
+            height: 64px;
         }
 
-        .logo-container img {
-            width: 45px;
-            height: 45px;
-            object-fit: contain;
-            animation: pulse 2.5s ease-in-out infinite;
-            z-index: 10;
-        }
-
-        .logo-container:before,
-        .logo-container:after {
-            content: "";
-            display: block;
+        .spinner {
             position: absolute;
-            border-width: 4px;
-            border-style: solid;
+            inset: 0;
+            border: 2px solid rgba(255, 255, 255, 0.07);
+            border-top-color: #3b82f6;
             border-radius: 50%;
+            animation: spin 1s cubic-bezier(0.5, 0.1, 0.5, 0.9) infinite;
         }
 
-        .logo-container:before {
-            width: 80px;
-            height: 80px;
-            border-bottom-color: #3b82f6;
-            border-right-color: #3b82f6;
-            border-top-color: transparent;
-            border-left-color: transparent;
-            top: 0;
-            left: 0;
-            animation: spin 1s linear infinite;
-        }
-
-        .logo-container:after {
-            width: 50px;
-            height: 50px;
-            border-bottom-color: #93c5fd;
-            border-right-color: #93c5fd;
-            border-top-color: transparent;
-            border-left-color: transparent;
-            top: 15px;
-            left: 15px;
-            animation: spin 0.85s linear infinite reverse;
-        }
-
-        .brand {
-            color: rgba(59, 130, 246, 0.7);
-            font-size: 14px;
-            font-weight: 900;
-            text-transform: uppercase;
-            letter-spacing: -1px;
-            font-style: italic;
-        }
-
-        .brand span {
-            color: #3b82f6;
-        }
-
-        .click-area {
-            cursor: pointer;
-        }
-
-
-
-        .hint-text {
-            position: fixed;
-            bottom: 24px;
-            left: 0;
-            right: 0;
-            text-align: center;
-            z-index: 60;
-            pointer-events: none;
-        }
-
-        .hint-login {
-            color: rgba(148, 163, 184, 0.5);
-            font-size: 12px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-        }
-
-        .hint-onboarding {
-            color: rgba(59, 130, 246, 0.7);
-            font-size: 13px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 2px;
+        .logo {
+            position: absolute;
+            inset: 12px;
+            width: 40px;
+            height: 40px;
+            object-fit: contain;
+            opacity: 0.8;
+            animation: pulse 2s ease-in-out infinite;
         }
 
         @keyframes spin {
@@ -139,55 +60,33 @@
         }
 
         @keyframes pulse {
-
-            0%,
-            100% {
+            0%, 100% {
                 transform: scale(1);
-                opacity: 1;
+                opacity: 0.7;
             }
-
             50% {
                 transform: scale(1.05);
-                opacity: 0.8;
-            }
-        }
-
-        @keyframes loading {
-            0% {
-                transform: translateX(-100%);
-            }
-
-            100% {
-                transform: translateX(350%);
+                opacity: 0.95;
             }
         }
     </style>
 </head>
-
 <body>
-
-
-
-    <div class="loader">
-        <div class="logo-container">
-            <img src="/images/logo.png" alt="FitControl">
+    <div class="loader-container">
+        <div class="loader-ring">
+            <div class="spinner"></div>
+            <img class="logo" src="/images/logo.png" alt="FitControl">
         </div>
-        <div class="brand">Fit<span>Control</span></div>
     </div>
 
     <script>
-        // Read destination from URL parameter (?next=/some-url)
         const params = new URLSearchParams(window.location.search);
         const dest = params.get('next') || '/login';
         const targetUrl = dest.startsWith('/') ? dest : '/' + dest;
 
-        // Auto-redirect after loading animation — uses replace to skip splash in history
         setTimeout(() => {
             window.location.replace(targetUrl);
-        }, 2000);
-
-
+        }, 1200);
     </script>
 </body>
-
 </html>
