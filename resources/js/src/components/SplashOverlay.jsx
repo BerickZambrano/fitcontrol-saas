@@ -27,7 +27,7 @@ function SplashOverlay({ isVisible, targetUrl }) {
       style={{
         backdropFilter: "blur(24px)",
         WebkitBackdropFilter: "blur(24px)",
-        backgroundColor: "rgba(15, 23, 42, 0.5)",
+        backgroundColor: "transparent",
         opacity: fading ? 0 : 1,
         transition: "opacity 0.3s ease",
       }}

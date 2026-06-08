@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import "../assets/hamburgers.css";
 import nuevouser from "../assets/nuevouser.svg";
 import candado from "../assets/candado.svg";
+import SplashOverlay from "./SplashOverlay";
 
 function Navbar() {
   const [isNavActive, setIsNavActive] = useState(false);
@@ -11,8 +12,10 @@ function Navbar() {
     setIsNavActive(!isNavActive);
   };
 
+  const [splashState, setSplashState] = useState({ isVisible: false, targetUrl: "" });
+
   const navigateWithSplash = (url) => {
-    window.location.href = `/splash.html?next=${encodeURIComponent(url)}`;
+    setSplashState({ isVisible: true, targetUrl: url });
   };
 
   return (
@@ -96,6 +99,8 @@ function Navbar() {
           </ul>
         </div>
       )}
+      {/* Splash Overlay */}
+      <SplashOverlay isVisible={splashState.isVisible} targetUrl={splashState.targetUrl} />
     </div>
   );
 }
