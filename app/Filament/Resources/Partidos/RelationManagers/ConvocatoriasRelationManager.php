@@ -71,7 +71,33 @@ class ConvocatoriasRelationManager extends RelationManager
             ])
             ->headerActions([
                 \Filament\Actions\CreateAction::make()
-                    ->label('Convocar Jugador'),
+                    ->label('Convocar Jugador')
+                    ->after(function (\App\Models\Convocatoria $record) {
+                        $partido = $record->partido;
+                        if (!$partido) return;
+
+                        $fecha = $partido->fecha ? \Carbon\Carbon::parse($partido->fecha)->format('d/m/Y') : 'Sin fecha';
+                        $hora  = $partido->hora  ? \Carbon\Carbon::parse($partido->hora)->format('H:i')   : 'Sin hora';
+
+                        $equipoLocalNombre    = $partido->equipo_local_id
+                            ? \App\Models\Equipo::find($partido->equipo_local_id)?->nombre ?? 'Equipo local'
+                            : 'Equipo local';
+                        $equipoVisitanteNombre = $partido->equipo_visitante_id
+                            ? \App\Models\Equipo::find($partido->equipo_visitante_id)?->nombre ?? 'Equipo visitante'
+                            : 'Equipo visitante';
+
+                        $title = 'Partido: ' . $equipoLocalNombre . ' vs ' . $equipoVisitanteNombre;
+
+                        $jugador = \App\Models\User::find($record->jugador_id);
+                        if ($jugador) {
+                            \Filament\Notifications\Notification::make()
+                                ->title($title)
+                                ->body("📅 {$fecha} ⏰ {$hora}")
+                                ->icon('heroicon-o-trophy')
+                                ->color('primary')
+                                ->sendToDatabase($jugador);
+                        }
+                    }),
             ])
             ->actions([
                 \Filament\Actions\EditAction::make(),

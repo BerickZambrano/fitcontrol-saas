@@ -97,6 +97,7 @@ class TenantsTable
                     ->label('Aprobar')
                     ->icon('heroicon-m-check-circle')
                     ->color('success')
+                    ->iconButton()
                     ->visible(fn ($record) => $record->estado === 'pendiente')
                     ->requiresConfirmation()
                     ->modalHeading('Aprobar solicitud')
@@ -115,6 +116,7 @@ class TenantsTable
                     ->label('Rechazar')
                     ->icon('heroicon-m-x-circle')
                     ->color('danger')
+                    ->iconButton()
                     ->visible(fn ($record) => $record->estado === 'pendiente')
                     ->requiresConfirmation()
                     ->modalHeading('Rechazar solicitud')
@@ -124,6 +126,22 @@ class TenantsTable
                         $record->update(['estado' => 'rechazado']);
                         Mail::to($record->encargado_email)
                             ->queue(new TenantRejectedMail($record));
+                    }),
+
+                Action::make('toggleBloqueo')
+                    ->label(fn ($record) => $record->estado_pago === 'pendiente' ? 'Desbloquear' : 'Bloquear')
+                    ->icon(fn ($record) => $record->estado_pago === 'pendiente' ? 'heroicon-m-lock-closed' : 'heroicon-m-lock-open')
+                    ->color(fn ($record) => $record->estado_pago === 'pendiente' ? 'danger' : 'success')
+                    ->iconButton()
+                    ->requiresConfirmation()
+                    ->modalHeading(fn ($record) => $record->estado_pago === 'pendiente' ? 'Desbloquear Club' : 'Bloquear Club')
+                    ->modalDescription(fn ($record) => $record->estado_pago === 'pendiente' 
+                        ? '¿Estás seguro de que deseas desbloquear este club y habilitar todas sus funciones premium?' 
+                        : '¿Estás seguro de que deseas bloquear este club? Se le restringirá el acceso con el paywall.')
+                    ->modalSubmitActionLabel(fn ($record) => $record->estado_pago === 'pendiente' ? 'Sí, desbloquear' : 'Sí, bloquear')
+                    ->action(function ($record) {
+                        $nuevoEstado = $record->estado_pago === 'pendiente' ? 'pagado' : 'pendiente';
+                        $record->update(['estado_pago' => $nuevoEstado]);
                     }),
 
                 EditAction::make(),

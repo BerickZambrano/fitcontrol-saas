@@ -64,7 +64,24 @@ class TraspasoResource extends Resource
                             ->pluck('name', 'id');
                     })
                     ->searchable()
-                    ->required(),
+                    ->required()
+                    ->rules([
+                        function () {
+                            return function (string $attribute, $value, \Closure $fail) {
+                                $miEquipoId = auth()->user()->equipoUser?->equipo_id;
+                                $query = \App\Models\Traspaso::where('jugador_id', $value)
+                                    ->where('estado', 'pendiente');
+                                
+                                if ($miEquipoId) {
+                                    $query->where('equipo_destino_id', $miEquipoId);
+                                }
+
+                                if ($query->exists()) {
+                                    $fail('Ya tienes una solicitud de traspaso pendiente para este jugador.');
+                                }
+                            };
+                        },
+                    ]),
             ]);
     }
 

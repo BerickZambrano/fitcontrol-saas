@@ -44,7 +44,7 @@ class PartidoResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            RelationManagers\ConvocatoriasRelationManager::class,
         ];
     }
 

@@ -11,7 +11,17 @@ class JugadorPerfilForm
         return $schema
             ->components([
                 \Filament\Forms\Components\Select::make('user_id')
-                    ->relationship('user', 'name')
+                    ->relationship(
+                        'user',
+                        'name',
+                        modifyQueryUsing: function ($query) {
+                            $query->role('Jugador');
+                            if (!auth()->user()->hasRole('super_admin')) {
+                                $query->where('tenant_id', auth()->user()->tenant_id);
+                            }
+                            return $query;
+                        }
+                    )
                     ->label('Usuario vinculado')
                     ->searchable()
                     ->required()

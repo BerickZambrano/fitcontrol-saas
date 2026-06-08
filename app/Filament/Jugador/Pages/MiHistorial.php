@@ -28,7 +28,52 @@ class MiHistorial extends Page
             'partidos' => '⚽ Partidos',
             'pagos' => '💰 Pagos',
             'medico' => '🏥 Médico',
+            'traspasos' => '🔄 Trayectoria',
         ];
+    }
+
+    public function getEquipos(): array
+    {
+        $user = auth()->user();
+
+        return \App\Models\EquipoUser::query()
+            ->withoutGlobalScopes()
+            ->with(['equipo' => fn ($q) => $q->withoutGlobalScopes()])
+            ->where('user_id', $user->id)
+            ->orderBy('fecha_inicio', 'desc')
+            ->get()
+            ->map(function ($eu) {
+                return [
+                    'equipo' => $eu->equipo?->nombre ?? 'Equipo desconocido',
+                    'fecha_inicio' => $eu->fecha_inicio ?? '—',
+                    'fecha_fin' => $eu->fecha_fin ?? 'Actual',
+                ];
+            })
+            ->toArray();
+    }
+
+    public function getTraspasos(): array
+    {
+        $user = auth()->user();
+
+        return \App\Models\Traspaso::query()
+            ->withoutGlobalScopes()
+            ->with([
+                'equipoOrigen' => fn ($q) => $q->withoutGlobalScopes(),
+                'equipoDestino' => fn ($q) => $q->withoutGlobalScopes(),
+            ])
+            ->where('jugador_id', $user->id)
+            ->orderBy('created_at', 'desc')
+            ->get()
+            ->map(function ($t) {
+                return [
+                    'origen' => $t->equipoOrigen?->nombre ?? 'Sin equipo',
+                    'destino' => $t->equipoDestino?->nombre ?? 'Equipo desconocido',
+                    'estado' => $t->estado ?? 'pendiente',
+                    'fecha' => $t->created_at?->format('d/m/Y') ?? '—',
+                ];
+            })
+            ->toArray();
     }
 
     public function getPartidos(): array

@@ -28,6 +28,11 @@ class TenantForm
                     ->options(['activo' => 'Activo', 'suspendido' => 'Suspendido', 'pendiente' => 'Pendiente'])
                     ->default('pendiente')
                     ->required(),
+                Select::make('estado_pago')
+                    ->label('Estado de Pago')
+                    ->options(['pendiente' => 'Pendiente', 'pagado' => 'Pagado'])
+                    ->default('pagado')
+                    ->required(),
                 TextInput::make('nombre_corto')
                     ->label('Nombre Corto')
                     ->maxLength(50)
