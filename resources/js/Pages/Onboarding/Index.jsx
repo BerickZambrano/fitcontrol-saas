@@ -77,12 +77,6 @@ export default function OnboardingIndex() {
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
 
         <div className="relative z-10 p-12 max-w-xl">
-          <div className="flex items-center gap-3 mb-8">
-            <div className="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/20">
-              <span className="text-white font-bold text-2xl italic">FC</span>
-            </div>
-            <span className="text-white text-3xl font-black tracking-tighter uppercase italic">FitControl</span>
-          </div>
 
           <h2 className="text-5xl font-black text-white leading-tight mb-6 uppercase italic">
             El siguiente nivel <br />
@@ -98,11 +92,8 @@ export default function OnboardingIndex() {
       <div className="flex flex-col items-center justify-center py-12 px-6 bg-white overflow-y-auto">
         <div className="w-full max-w-md">
           {/* Mobile Branding */}
-          <div className="lg:hidden flex items-center gap-2 mb-12 justify-center">
-            <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-sm italic">FC</span>
-            </div>
-            <span className="text-gray-900 text-xl font-black tracking-tighter uppercase italic">FitControl</span>
+          <div className="lg:hidden flex items-center justify-center mb-12">
+            <img src="/images/logo.png" alt="FitControl" className="h-10 w-auto object-contain" />
           </div>
 
           <div className="mb-10">

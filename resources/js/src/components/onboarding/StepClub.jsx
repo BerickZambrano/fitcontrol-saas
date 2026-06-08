@@ -1,6 +1,43 @@
+import { useEffect, useState } from 'react'
+
 export default function StepClub({ data, onChange, onNext, errors }) {
+  const [cities, setCities] = useState([])
+  const [localError, setLocalError] = useState("")
+
+  useEffect(() => {
+    fetch('/colombia.json')
+      .then(res => res.json())
+      .then(json => {
+        const allCities = json.reduce((acc, current) => {
+          return acc.concat(current.ciudades)
+        }, [])
+        const uniqueCities = [...new Set(allCities)].sort((a, b) => a.localeCompare(b))
+        setCities(uniqueCities)
+      })
+      .catch(err => console.error('Error al cargar ciudades de Colombia:', err))
+  }, [])
+
+  const normalizeStr = (str) => 
+    str ? str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim() : "";
+
   const handleSubmit = (e) => {
     e.preventDefault()
+
+    if (cities.length > 0) {
+      const matchedCity = cities.find(
+        (city) => normalizeStr(city) === normalizeStr(data.ciudad)
+      )
+
+      if (!matchedCity) {
+        setLocalError("Debes elegir una ciudad válida de Colombia de la lista.")
+        return
+      } else {
+        // Auto-correct to official spelling
+        onChange({ ciudad: matchedCity })
+      }
+    }
+
+    setLocalError("")
     onNext()
   }
 
@@ -57,12 +94,22 @@ export default function StepClub({ data, onChange, onNext, errors }) {
             <label className="block text-xs font-black uppercase tracking-widest text-gray-400">Ciudad</label>
             <input
               type="text" required
+              list="colombia-cities"
               value={data.ciudad}
-              onChange={e => onChange({ ciudad: e.target.value })}
+              onChange={e => {
+                onChange({ ciudad: e.target.value })
+                if (localError) setLocalError("")
+              }}
               placeholder="Bogotá"
               className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 transition-all placeholder:text-gray-300"
             />
+            <datalist id="colombia-cities">
+              {cities.map(city => (
+                <option key={city} value={city} />
+              ))}
+            </datalist>
             {errors.ciudad && <p className="text-red-500 text-xs font-medium mt-1">{errors.ciudad}</p>}
+            {localError && <p className="text-red-500 text-xs font-medium mt-1">{localError}</p>}
           </div>
 
           <div className="space-y-1.5">

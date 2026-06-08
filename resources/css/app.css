@@ -219,3 +219,10 @@ select:focus[data-flux-control] {
     }
 }
 
+/* Ensure inputs inside white containers have dark text */
+.bg-white input,
+.bg-white select,
+.bg-white textarea {
+    color: #111827 !important;
+}
+
