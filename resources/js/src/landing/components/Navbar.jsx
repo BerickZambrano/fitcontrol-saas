@@ -26,25 +26,23 @@ const Navbar = ({ navigateWithSplash }) => {
     }
   };
 
-  const textClass = scrolled ? "text-foreground" : "text-hero-foreground";
-  const textMutedClass = scrolled
-    ? "text-muted-foreground hover:text-foreground"
-    : "text-hero-foreground/70 hover:text-hero-foreground";
+  const textClass = "text-white";
+  const textMutedClass = "text-white/70 hover:text-white";
 
   return (
     <nav
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         scrolled
-          ? "bg-background/90 backdrop-blur-md border-b border-border/40 shadow-sm"
+          ? "bg-black/60 backdrop-blur-md border-b border-white/10 shadow-lg"
           : "bg-transparent backdrop-blur-none border-b border-transparent"
       }`}
     >
-      <div className="container mx-auto flex items-center justify-between h-16 px-4">
-        <a href="#" className="flex items-center gap-2">
-          <img src="/images/logo.png" alt="FitControl" className="h-20 w-auto object-contain pt-2" />
+      <div className="container mx-auto flex items-center justify-between h-20 md:h-24 px-6 md:px-12 lg:px-20 transition-all duration-300">
+        <a href="#" className="flex items-center">
+          <img src="/images/logo.png" alt="FitControl" className="h-24 md:h-30 w-auto object-contain" />
         </a>
 
-        <div className="hidden md:flex items-center gap-8">
+        <div className="hidden md:flex items-center gap-14 lg:gap-20">
           {navLinks.map((l) => (
             <a
               key={l.href}
@@ -56,7 +54,7 @@ const Navbar = ({ navigateWithSplash }) => {
           ))}
         </div>
 
-        <div className="hidden md:flex items-center gap-3">
+        <div className="hidden md:flex items-center gap-4">
           <a
             href="/login"
             onClick={(e) => handleLink(e, "/login")}
@@ -66,7 +64,7 @@ const Navbar = ({ navigateWithSplash }) => {
           </a>
           <Button
             size="sm"
-            className="rounded-full px-5"
+            className="rounded-full px-5 bg-primary text-primary-foreground font-semibold hover:glow-neon hover:scale-[1.03] active:scale-[0.98] transition-all duration-300"
             onClick={(e) => handleLink(e, "/onboarding")}
           >
             Solicitar acceso
@@ -83,20 +81,14 @@ const Navbar = ({ navigateWithSplash }) => {
 
       {open && (
         <div
-          className={`md:hidden border-t px-4 pb-4 transition-colors ${
-            scrolled ? "bg-background border-border/40" : "bg-hero border-white/10"
-          }`}
+          className="md:hidden border-t px-4 pb-4 transition-all duration-300 bg-black/95 border-white/10"
         >
           {navLinks.map((l) => (
             <a
               key={l.href}
               href={l.href}
               onClick={() => setOpen(false)}
-              className={`block py-3 text-sm font-medium border-b transition-colors ${
-                scrolled
-                  ? "text-foreground/80 hover:text-foreground border-border/30"
-                  : "text-hero-foreground/80 hover:text-hero-foreground border-white/5"
-              }`}
+              className="block py-3 text-sm font-medium border-b border-white/5 transition-colors text-white/80 hover:text-white"
             >
               {l.label}
             </a>
@@ -109,9 +101,9 @@ const Navbar = ({ navigateWithSplash }) => {
             >
               <LogIn size={16} /> Iniciar sesión
             </a>
-            <Button
+             <Button
               size="sm"
-              className="rounded-full"
+              className="rounded-full bg-primary text-primary-foreground font-semibold hover:glow-neon transition-all duration-300"
               onClick={(e) => handleLink(e, "/onboarding")}
             >
               Solicitar acceso

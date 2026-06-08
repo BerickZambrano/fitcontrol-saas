@@ -2,7 +2,7 @@ const PLANES = [
   {
     id: 'mensual',
     nombre: 'Mensual',
-    precio: '$150.000',
+    precio: '$70.000',
     periodo: 'por mes',
     badge: null,
     features: ['Jugadores ilimitados', 'Reportes básicos', 'Soporte por email'],
@@ -10,7 +10,7 @@ const PLANES = [
   {
     id: 'anual',
     nombre: 'Anual',
-    precio: '$1.500.000',
+    precio: '$700.000',
     periodo: 'por año',
     badge: '2 meses gratis',
     features: ['Todo lo del mensual', 'Reportes avanzados', 'Soporte prioritario'],
@@ -89,7 +89,7 @@ export default function StepPlan({ data, onChange, onBack, onSubmit, loading, er
             
             <span className="text-gray-500">Plan:</span>
             <span className="font-bold text-blue-400">
-              {data.plan === 'mensual' ? 'Mensual — $150.000/mes' : 'Anual — $1.500.000/año'}
+              {data.plan === 'mensual' ? 'Mensual — $70.000/mes' : 'Anual — $700.000/año'}
             </span>
           </div>
         </div>

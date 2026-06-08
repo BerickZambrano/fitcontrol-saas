@@ -28,7 +28,7 @@ class SecurityHeaders
         // CSP dinámico: en local permitimos Vite dev server (puerto 5173 y subdominios)
         if (app()->environment('local')) {
             $csp = "default-src 'self'; " .
-                "script-src 'self' 'unsafe-inline' 'unsafe-eval' blob: https://cdn.jsdelivr.net http://localhost:* http://127.0.0.1:* ws://localhost:* ws://127.0.0.1:* http://*.localhost:*; " .
+                "script-src 'self' 'unsafe-inline' 'unsafe-eval' blob: https://cdn.jsdelivr.net https://cdn.tailwindcss.com http://localhost:* http://127.0.0.1:* ws://localhost:* ws://127.0.0.1:* http://*.localhost:*; " .
                 "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.bunny.net https://cdn.jsdelivr.net http://localhost:* http://127.0.0.1:* http://*.localhost:*; " .
                 "font-src 'self' data: https://fonts.gstatic.com https://fonts.bunny.net; " .
                 "img-src 'self' data: blob: https: http://localhost:* http://127.0.0.1:* http://*.localhost:*; " .
@@ -37,7 +37,7 @@ class SecurityHeaders
                 "frame-ancestors 'none';";
         } else {
             $csp = "default-src 'self'; " .
-                "script-src 'self' 'unsafe-inline' 'unsafe-eval' blob: https://cdn.jsdelivr.net; " .
+                "script-src 'self' 'unsafe-inline' 'unsafe-eval' blob: https://cdn.jsdelivr.net https://cdn.tailwindcss.com; " .
                 "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.bunny.net https://cdn.jsdelivr.net; " .
                 "font-src 'self' https://fonts.gstatic.com https://fonts.bunny.net; " .
                 "img-src 'self' data: blob: https:; " .

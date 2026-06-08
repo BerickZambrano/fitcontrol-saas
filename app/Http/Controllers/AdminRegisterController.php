@@ -23,7 +23,22 @@ class AdminRegisterController extends Controller
         $request->validate([
             'name'     => 'required',
             'email'    => 'required|email|unique:users,email',
-            'password' => 'required|min:8|confirmed',
+            'password' => [
+                'required',
+                'min:8',
+                'regex:/[A-Z]/',            // 1 Mayúscula
+                'regex:/[^A-Za-z0-9]/',     // 1 Carácter especial
+                'confirmed',
+            ],
+        ], [
+            'password.required'  => 'La contraseña es obligatoria.',
+            'password.min'       => 'La contraseña debe tener al menos 8 caracteres.',
+            'password.regex'     => 'La contraseña debe contener al menos una letra mayúscula y un carácter especial.',
+            'password.confirmed' => 'La confirmación de la contraseña no coincide.',
+            'email.required'     => 'El correo electrónico es obligatorio.',
+            'email.email'        => 'Debes ingresar un correo electrónico válido.',
+            'email.unique'       => 'Este correo electrónico ya está registrado en el sistema.',
+            'name.required'      => 'El nombre completo es obligatorio.',
         ]);
 
         // Prevent race condition: only one admin per tenant

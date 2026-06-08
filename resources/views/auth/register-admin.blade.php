@@ -160,6 +160,39 @@
                         <input type="password" name="password" required
                             placeholder="Mínimo 8 caracteres"
                             class="w-full px-4 py-3.5 rounded-xl border border-gray-200 bg-gray-50 text-gray-900 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-brand-600/20 focus:border-brand-600 focus:bg-white transition-all placeholder:text-gray-400 placeholder:font-normal placeholder:normal-case">
+                        
+                        {{-- Password Strength Indicator --}}
+                        <div class="mt-2.5">
+                            <div class="h-1.5 w-full bg-gray-100 rounded-full overflow-hidden">
+                                <div id="password-strength-bar" class="h-full w-0 bg-gray-300 transition-all duration-300"></div>
+                            </div>
+                            <div class="flex justify-between items-center mt-1.5">
+                                <span id="password-strength-text" class="text-xs font-bold text-gray-400">Introduce una contraseña</span>
+                                <span id="password-strength-pct" class="text-xs font-bold text-gray-400">0%</span>
+                            </div>
+                            
+                            {{-- Specific requirements checklist --}}
+                            <div class="mt-2.5 text-[11px] font-bold text-gray-400 flex flex-wrap gap-x-4 gap-y-1">
+                                <span id="req-length" class="flex items-center gap-1 transition-all duration-300">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
+                                    </svg>
+                                    Mínimo 8 caracteres
+                                </span>
+                                <span id="req-upper" class="flex items-center gap-1 transition-all duration-300">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
+                                    </svg>
+                                    1 Mayúscula
+                                </span>
+                                <span id="req-special" class="flex items-center gap-1 transition-all duration-300">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
+                                    </svg>
+                                    Carácter especial
+                                </span>
+                            </div>
+                        </div>
                     </div>
 
                     {{-- Confirm Password --}}
@@ -206,5 +239,71 @@
             </div>
         </div>
     </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const passwordInput = document.querySelector('input[name="password"]');
+            const strengthBar = document.getElementById('password-strength-bar');
+            const strengthText = document.getElementById('password-strength-text');
+            const strengthPct = document.getElementById('password-strength-pct');
+            
+            const reqLength = document.getElementById('req-length');
+            const reqUpper = document.getElementById('req-upper');
+            const reqSpecial = document.getElementById('req-special');
+
+            if (passwordInput && strengthBar && strengthText && strengthPct) {
+                passwordInput.addEventListener('input', function() {
+                    const val = passwordInput.value;
+                    let score = 0;
+                    
+                    if (val.length === 0) {
+                        strengthBar.style.width = '0%';
+                        strengthBar.className = 'h-full transition-all duration-300 bg-gray-300';
+                        strengthText.textContent = 'Introduce una contraseña';
+                        strengthText.className = 'text-xs font-bold text-gray-400';
+                        strengthPct.textContent = '0%';
+                        strengthPct.className = 'text-xs font-bold text-gray-400';
+                        
+                        reqLength.className = 'flex items-center gap-1 transition-all duration-300 text-gray-400';
+                        reqUpper.className = 'flex items-center gap-1 transition-all duration-300 text-gray-400';
+                        reqSpecial.className = 'flex items-center gap-1 transition-all duration-300 text-gray-400';
+                        return;
+                    }
+                    
+                    const hasLength = val.length >= 8;
+                    const hasUpper = /[A-Z]/.test(val);
+                    const hasSpecial = /[^A-Za-z0-9]/.test(val);
+                    
+                    if (hasLength) score++;
+                    if (hasUpper) score++;
+                    if (hasSpecial) score++;
+                    
+                    reqLength.className = 'flex items-center gap-1 transition-all duration-300 ' + (hasLength ? 'text-green-500' : 'text-gray-400');
+                    reqUpper.className = 'flex items-center gap-1 transition-all duration-300 ' + (hasUpper ? 'text-green-500' : 'text-gray-400');
+                    reqSpecial.className = 'flex items-center gap-1 transition-all duration-300 ' + (hasSpecial ? 'text-green-500' : 'text-gray-400');
+                    
+                    const percentage = Math.round((score / 3) * 100);
+                    strengthBar.style.width = percentage + '%';
+                    strengthPct.textContent = percentage + '%';
+                    
+                    if (score <= 1) {
+                        strengthBar.className = 'h-full transition-all duration-300 bg-red-500 shadow-sm shadow-red-500/20';
+                        strengthText.textContent = 'Fuerza: Débil';
+                        strengthText.className = 'text-xs font-bold text-red-500';
+                        strengthPct.className = 'text-xs font-bold text-red-500';
+                    } else if (score === 2) {
+                        strengthBar.className = 'h-full transition-all duration-300 bg-amber-500 shadow-sm shadow-amber-500/20';
+                        strengthText.textContent = 'Fuerza: Media';
+                        strengthText.className = 'text-xs font-bold text-amber-500';
+                        strengthPct.className = 'text-xs font-bold text-amber-500';
+                    } else {
+                        strengthBar.className = 'h-full transition-all duration-300 bg-green-500 shadow-sm shadow-green-500/20';
+                        strengthText.textContent = 'Fuerza: Fuerte';
+                        strengthText.className = 'text-xs font-bold text-green-500';
+                        strengthPct.className = 'text-xs font-bold text-green-500';
+                    }
+                });
+            }
+        });
+    </script>
 </body>
 </html>

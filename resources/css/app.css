@@ -37,6 +37,10 @@
 }
 
 @layer base {
+    body {
+        background-color: hsl(var(--background));
+        color: hsl(var(--foreground));
+    }
 
     *,
     ::after,
@@ -65,69 +69,69 @@ select:focus[data-flux-control] {
     @apply size-4;
 } */
 
-/* Custom variables for Landing Page (Lovable shadcn theme) */
+/* Custom variables for Landing Page (SaveBand-inspired premium dark theme) */
 :root {
-    --background: 210 20% 98%;
-    --foreground: 215 25% 12%;
+    --background: 224 71% 4%;
+    --foreground: 210 40% 98%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 215 25% 12%;
+    --card: 224 71% 6%;
+    --card-foreground: 210 40% 98%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 215 25% 12%;
+    --popover: 224 71% 6%;
+    --popover-foreground: 210 40% 98%;
 
-    --primary: 217 91% 50%;
-    --primary-foreground: 0 0% 100%;
+    --primary: 192 100% 50%;
+    --primary-foreground: 224 71% 4%;
 
-    --secondary: 210 40% 96%;
-    --secondary-foreground: 215 25% 12%;
+    --secondary: 224 71% 10%;
+    --secondary-foreground: 210 40% 98%;
 
-    --muted: 210 30% 95%;
-    --muted-foreground: 215 15% 47%;
+    --muted: 224 71% 10%;
+    --muted-foreground: 215 20% 65%;
 
-    --accent: 217 91% 95%;
-    --accent-foreground: 217 91% 35%;
+    --accent: 224 71% 12%;
+    --accent-foreground: 192 100% 50%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 214 32% 91%;
-    --input: 214 32% 91%;
-    --ring: 217 91% 50%;
+    --border: 224 71% 12%;
+    --input: 224 71% 12%;
+    --ring: 192 100% 50%;
 
     --radius: 0.75rem;
 
     /* Custom tokens */
-    --hero-bg: 215 28% 8%;
+    --hero-bg: 224 71% 4%;
     --hero-foreground: 210 40% 98%;
     --success: 152 69% 40%;
     --success-foreground: 0 0% 100%;
     --warning: 38 92% 50%;
     --warning-foreground: 0 0% 100%;
-    --surface: 210 20% 96%;
-    --surface-warm: 40 30% 96%;
+    --surface: 224 71% 5%;
+    --surface-warm: 224 71% 6%;
 }
 
 .dark {
-    --background: 215 28% 8%;
+    --background: 224 71% 4%;
     --foreground: 210 40% 98%;
-    --card: 215 25% 12%;
+    --card: 224 71% 6%;
     --card-foreground: 210 40% 98%;
-    --popover: 215 25% 12%;
+    --popover: 224 71% 6%;
     --popover-foreground: 210 40% 98%;
-    --primary: 217 91% 60%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 217 32% 17%;
+    --primary: 192 100% 50%;
+    --primary-foreground: 224 71% 4%;
+    --secondary: 224 71% 10%;
     --secondary-foreground: 210 40% 98%;
-    --muted: 217 32% 17%;
+    --muted: 224 71% 10%;
     --muted-foreground: 215 20% 65%;
-    --accent: 217 32% 17%;
-    --accent-foreground: 210 40% 98%;
-    --destructive: 0 63% 31%;
+    --accent: 224 71% 12%;
+    --accent-foreground: 192 100% 50%;
+    --destructive: 0 84% 60%;
     --destructive-foreground: 210 40% 98%;
-    --border: 217 32% 17%;
-    --input: 217 32% 17%;
-    --ring: 212 27% 84%;
+    --border: 224 71% 12%;
+    --input: 224 71% 12%;
+    --ring: 192 100% 50%;
 }
 
 @theme {
@@ -192,5 +196,26 @@ select:focus[data-flux-control] {
 
 @utility animate-float {
     animation: float 3s ease-in-out infinite;
+}
+
+@utility glow-neon {
+    box-shadow: 0 0 20px rgba(0, 240, 255, 0.45), 0 0 4px rgba(0, 240, 255, 0.25);
+}
+
+@utility text-glow-neon {
+    text-shadow: 0 0 15px rgba(0, 240, 255, 0.7), 0 0 4px rgba(0, 240, 255, 0.3);
+}
+
+@utility animate-swing-rotate {
+    animation: swing-rotate 10s ease-in-out infinite;
+}
+
+@keyframes swing-rotate {
+    0%, 100% {
+        transform: rotate(-90deg);
+    }
+    50% {
+        transform: rotate(90deg);
+    }
 }
 

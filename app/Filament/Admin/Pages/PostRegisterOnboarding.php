@@ -69,19 +69,22 @@ class PostRegisterOnboarding extends Page
                                 ->label('Nombre del club')
                                 ->default(fn () => auth()->user()?->tenant?->nombre)
                                 ->required()
+                                ->validationMessages(['required' => 'El nombre del club es obligatorio.'])
                                 ->maxLength(255),
 
                             TextInput::make('club_nombre_corto')
                                 ->label('Nombre corto / Siglas')
                                 ->default(fn () => auth()->user()?->tenant?->nombre_corto)
                                 ->required()
+                                ->validationMessages(['required' => 'El nombre corto es obligatorio.'])
                                 ->maxLength(100),
 
                             \Filament\Forms\Components\ColorPicker::make('primary_color')
                                 ->label('Color Principal del Aplicativo')
                                 ->helperText('Este color se usará en botones, iconos y menús para tu club.')
                                 ->default('#ef4444') // Rojo por defecto
-                                ->required(),
+                                ->required()
+                                ->validationMessages(['required' => 'El color principal es obligatorio.']),
 
                             Select::make('club_tipo')
                                 ->label('Tipo de club')
@@ -91,7 +94,8 @@ class PostRegisterOnboarding extends Page
                                     'profesional' => 'Profesional',
                                 ])
                                 ->default(fn () => auth()->user()?->tenant?->tipo_club)
-                                ->required(),
+                                ->required()
+                                ->validationMessages(['required' => 'El tipo de club es obligatorio.']),
 
                             FileUpload::make('club_escudo')
                                 ->label('Escudo del club')
@@ -109,7 +113,8 @@ class PostRegisterOnboarding extends Page
                             TextInput::make('equipo_nombre')
                                 ->label('Nombre del equipo')
                                 ->placeholder('Ej: Plantel Principal')
-                                ->required(),
+                                ->required()
+                                ->validationMessages(['required' => 'El nombre del equipo es obligatorio.']),
 
                             Select::make('equipo_categoria')
                                 ->label('Categoría')
@@ -119,11 +124,13 @@ class PostRegisterOnboarding extends Page
                                     'formativo' => 'Formativo',
                                 ])
                                 ->default('amateur')
-                                ->required(),
+                                ->required()
+                                ->validationMessages(['required' => 'La categoría es obligatoria.']),
 
                             TextInput::make('equipo_ubicacion')
                                 ->label('Ubicación / Sede')
-                                ->required(),
+                                ->required()
+                                ->validationMessages(['required' => 'La ubicación es obligatoria.']),
                         ])->columns(2),
 
                     // ── Step 3: First Player ────────────────────

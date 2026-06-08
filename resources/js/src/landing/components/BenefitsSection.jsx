@@ -9,10 +9,10 @@ const benefits = [
 ];
 
 const BenefitsSection = () => (
-  <section className="py-20 bg-background">
+  <section className="py-20 bg-slate-950 relative overflow-hidden">
     <div className="container mx-auto px-4">
       <ScrollReveal>
-        <h2 className="text-3xl md:text-4xl font-black text-center text-foreground">
+        <h2 className="text-3xl md:text-4xl font-black text-center text-white">
           ¿Por qué elegir FitControl?
         </h2>
       </ScrollReveal>
@@ -20,11 +20,11 @@ const BenefitsSection = () => (
         {benefits.map((b, i) => (
           <ScrollReveal key={b.title} delay={i * 120}>
             <div className="text-center group">
-              <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-4 group-hover:bg-primary/20 group-hover:scale-110 transition-all duration-300">
-                <b.icon size={28} className="text-primary" />
+              <div className="w-14 h-14 rounded-2xl bg-primary/5 border border-primary/15 flex items-center justify-center mx-auto mb-4 group-hover:bg-primary group-hover:border-primary transition-all duration-300 group-hover:scale-110 group-hover:shadow-[0_0_20px_rgba(0,240,255,0.4)]">
+                <b.icon size={28} className="text-primary group-hover:text-black transition-colors" />
               </div>
-              <h3 className="font-bold text-foreground text-lg">{b.title}</h3>
-              <p className="text-muted-foreground text-sm mt-2 leading-relaxed">{b.desc}</p>
+              <h3 className="font-bold text-white text-lg">{b.title}</h3>
+              <p className="text-white/60 text-sm mt-2 leading-relaxed">{b.desc}</p>
             </div>
           </ScrollReveal>
         ))}
