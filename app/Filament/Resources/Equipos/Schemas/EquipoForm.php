@@ -3,7 +3,7 @@
 namespace App\Filament\Resources\Equipos\Schemas;
 
 use Filament\Forms;
-use Filament\Forms\Components\Actions\Action;
+use Filament\Actions\Action;
 use Filament\Schemas\Schema;
 use Illuminate\Support\HtmlString;
 
@@ -45,11 +45,10 @@ class EquipoForm
                     ->default(fn () => auth()->user()->tenant_id),
 
                 Forms\Components\Checkbox::make('acepta_terminos')
-                    ->label('')
-                    ->helperText('Acepto los Términos y Condiciones')
-                    ->suffixAction(
+                    ->label('Acepto los Términos y Condiciones')
+                    ->hintAction(
                         Action::make('ver_terminos')
-                            ->label('Términos y Condiciones')
+                            ->label('Leer Términos')
                             ->icon('heroicon-o-document-text')
                             ->color('primary')
                             ->modalHeading('Términos y Condiciones')
@@ -82,7 +81,7 @@ class EquipoForm
                             '))
                             ->modalWidth('4xl')
                             ->modalSubmitAction(false)
-                            ->modalCancelAction(fn (Action $action) => $action->label('Cerrar')),
+                            ->modalCancelActionLabel('Cerrar'),
                     )
                     ->required()
                     ->validationMessages([

@@ -35,9 +35,13 @@ class MiHistorial extends Page
     {
         $user = auth()->user();
 
-        return Rendimiento::with('partido.torneo')
+        return Rendimiento::query()
+            ->withoutGlobalScopes()
+            ->with([
+                'partido' => fn ($q) => $q->withoutGlobalScopes(),
+                'partido.torneo' => fn ($q) => $q->withoutGlobalScopes(),
+            ])
             ->where('user_id', $user->id)
-            ->where('tenant_id', $user->tenant_id)
             ->orderBy('created_at', 'desc')
             ->limit(20)
             ->get()

@@ -3,53 +3,34 @@
 namespace App\Providers\Filament;
 
 use Filament\Http\Middleware\Authenticate;
-use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
-use Filament\Pages\Dashboard;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
-use Filament\Widgets\AccountWidget;
-use Filament\Widgets\FilamentInfoWidget;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
-use App\Filament\Widgets\TotalUsuarios;
-use App\Models\Entrenamiento;
-use App\Filament\Pages\Calendario;
-use App\Filament\Admin\Pages\Reportes\GenerarReporte;
-use Leandrocfe\FilamentApexCharts\FilamentApexChartsPlugin;
 use Illuminate\Support\HtmlString;
 
-class AdminPanelProvider extends PanelProvider
+class ArbitroPanelProvider extends PanelProvider
 {
     public function panel(Panel $panel): Panel
     {
         return $panel
-            ->default()
-            ->id('admin')
-            ->path('admin')
-            ->viteTheme('resources/css/filament/admin/theme.css')
-            ->brandName('FitControl')
+            ->id('arbitro')
+            ->path('arbitro')
+            ->viteTheme('resources/css/filament/jugador/theme.css') // we can reuse player theme or admin theme for now
+            ->brandName('FitControl - Árbitros')
             ->brandLogo(asset('images/logo.png'))
             ->brandLogoHeight('5rem')
             ->favicon(asset('images/logo.ico'))
-            ->userMenuItems([
-                'profile' => \Filament\Navigation\MenuItem::make()
-                    ->label('Mi Perfil')
-                    ->url(fn (): string => \App\Filament\Admin\Pages\AdminProfile::getUrl())
-                    ->icon('heroicon-o-user-circle'),
-            ])
-            ->plugins([
-                \Leandrocfe\FilamentApexCharts\FilamentApexChartsPlugin::make()
-            ])
             ->colors([
-                'primary' => Color::Blue,
+                'primary' => Color::Amber,
             ])
             ->databaseNotifications()
             ->databaseNotificationsPolling(30)
@@ -61,24 +42,14 @@ class AdminPanelProvider extends PanelProvider
                         : ''
                 )
             )
-            ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
-            ->discoverPages(in: app_path('Filament/Admin/Pages'), for: 'App\Filament\Admin\Pages')
+            ->discoverResources(in: app_path('Filament/Arbitro/Resources'), for: 'App\Filament\Arbitro\Resources')
+            ->discoverPages(in: app_path('Filament/Arbitro/Pages'), for: 'App\Filament\Arbitro\Pages')
             ->pages([
-                 \App\Filament\Admin\Pages\Dashboard::class,
-                 \App\Filament\Admin\Pages\Calendario::class,
-                 \App\Filament\Admin\Pages\Reportes\GenerarReporte::class,
-                 \App\Filament\Admin\Pages\Analiticas::class,
-                 \App\Filament\Admin\Pages\PostRegisterOnboarding::class,
-                 \App\Filament\Admin\Pages\SendEmails::class,
+                \Filament\Pages\Dashboard::class,
             ])
-           ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\Filament\Widgets')
+            ->discoverWidgets(in: app_path('Filament/Arbitro/Widgets'), for: 'App\Filament\Arbitro\Widgets')
             ->widgets([
-                \App\Filament\Widgets\AccionesRapidas::class,
-                \App\Filament\Widgets\ProximosEventos::class,
-                \App\Filament\Widgets\AlertasActivas::class,
             ])
-
-            
             ->middleware([
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,
@@ -90,16 +61,9 @@ class AdminPanelProvider extends PanelProvider
                 DisableBladeIconComponents::class,
                 DispatchServingFilamentEvent::class,
                 \App\Http\Middleware\ApplyTenantColor::class,
-                \App\Http\Middleware\CheckTenantPayment::class,
-            ])
-            ->plugins([
-                FilamentShieldPlugin::make(),
             ])
             ->authMiddleware([
                 Authenticate::class,
-                \App\Http\Middleware\RedirectIfOnboardingPending::class,
             ]);
-
     }
-    
 }

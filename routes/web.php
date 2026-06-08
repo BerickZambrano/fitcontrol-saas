@@ -6,8 +6,22 @@ use App\Http\Controllers\AdminRegisterController;
 use App\Http\Controllers\MailController;
 use App\Http\Controllers\OnboardingController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\PaywallController;
 use Illuminate\Support\Facades\Mail;
 use Inertia\Inertia;
+
+Route::middleware('web')->group(function () {
+    Route::get('/paywall', [PaywallController::class, 'index'])->name('paywall.index');
+    Route::post('/paywall/simulate-payment', [PaywallController::class, 'simulatePayment'])->name('paywall.simulate-payment');
+});
+
+Route::get('/debug-partidos', function() {
+    $equiposIds = [5, 6]; // just testing
+    return \App\Models\User::role('Jugador')
+        ->whereHas('equipoUser', function ($query) use ($equiposIds) {
+            $query->whereIn('equipo_id', $equiposIds);
+        })->get();
+});
 
 Route::get('/register-admin/{token}', [AdminRegisterController::class, 'show'])
     ->name('register.admin');

@@ -177,9 +177,18 @@ class User extends Authenticatable implements HasAvatar, FilamentUser
         return $this->two_factor_type !== 'none';
     }
 
-    public function jugadorPerfil()
+    /**
+     * Relación con sanciones del jugador.
+     */
+    public function sanciones()
     {
-        return $this->hasOne(JugadorPerfil::class);
+        return $this->hasMany(\App\Models\Sancion::class, 'jugador_id');
+    }
+
+
+    public function equipoUser()
+    {
+        return $this->hasOne(EquipoUser::class);
     }
 
     public function canAccessPanel(Panel $panel): bool
@@ -194,6 +203,10 @@ class User extends Authenticatable implements HasAvatar, FilamentUser
 
         if ($panel->getId() === 'jugador') {
             return $this->hasRole('Jugador');
+        }
+
+        if ($panel->getId() === 'arbitro') {
+            return $this->hasRole('Arbitro');
         }
 
         return false;

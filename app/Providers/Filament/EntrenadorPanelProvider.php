@@ -78,6 +78,7 @@ class EntrenadorPanelProvider extends PanelProvider
                 DisableBladeIconComponents::class,
                 DispatchServingFilamentEvent::class,
                 \App\Http\Middleware\ApplyTenantColor::class,
+                \App\Http\Middleware\CheckTenantPayment::class,
             ])
             ->authMiddleware([
                 Authenticate::class,

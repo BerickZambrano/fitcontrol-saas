@@ -24,6 +24,8 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        \App\Models\IncidenciaPartido::observe(\App\Observers\IncidenciaPartidoObserver::class);
+
         if (!app()->runningInConsole()) {
             config(['app.url' => request()->getSchemeAndHttpHost()]);
         }

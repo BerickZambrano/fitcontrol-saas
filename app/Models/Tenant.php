@@ -31,6 +31,7 @@ class Tenant extends Model
     'camara_comercio',      // ← nuevo
     'plan',                 // ← nuevo
     'rejection_reason',     // ← nuevo
+    'estado_pago',
 ];
 
     protected $casts = [

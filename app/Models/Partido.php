@@ -21,6 +21,9 @@ class Partido extends Model
         'fase',
         'torneo_id',
         'instalacion_id',
+        'arbitro_id',
+        'estado_arbitro',
+        'estado_partido',
     ];
 
     /**
@@ -73,4 +76,18 @@ class Partido extends Model
         return $this->belongsTo(Instalacion::class, 'instalacion_id');
     }
 
+    public function arbitro()
+    {
+        return $this->belongsTo(User::class, 'arbitro_id');
+    }
+
+    public function incidencias()
+    {
+        return $this->hasMany(IncidenciaPartido::class, 'partido_id');
+    }
+
+    public function convocatorias()
+    {
+        return $this->hasMany(Convocatoria::class, 'partido_id');
+    }
 }

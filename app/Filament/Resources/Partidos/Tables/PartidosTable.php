@@ -26,6 +26,7 @@ class PartidosTable
     {
         return $table
             ->modifyQueryUsing(fn ($query) => $query->with(['local', 'visitante', 'instalacion']))
+            ->recordClasses(fn (\App\Models\Partido $record): ?string => $record->estado_arbitro === 'rechazado' ? 'bg-red-50/50 dark:bg-red-950/10 border-l-4 border-red-500' : null)
             ->columns([
                 Tables\Columns\TextColumn::make('local.nombre')
                     ->label('Equipo Local')
@@ -79,6 +80,24 @@ class PartidosTable
                     ->placeholder('—')
                     ->searchable()
                     ->sortable(),
+
+                Tables\Columns\TextColumn::make('arbitro.name')
+                    ->label('Árbitro')
+                    ->placeholder('Sin asignar')
+                    ->description(fn (\App\Models\Partido $record): ?string => $record->arbitro_id ? match($record->estado_arbitro) {
+                        'pendiente' => '⏳ Pendiente',
+                        'aceptado' => '✅ Aceptado',
+                        'rechazado' => '❌ Rechazado',
+                        default => null,
+                    } : null)
+                    ->color(fn (\App\Models\Partido $record): ?string => $record->arbitro_id ? match($record->estado_arbitro) {
+                        'pendiente' => 'warning',
+                        'aceptado' => 'success',
+                        'rechazado' => 'danger',
+                        default => null,
+                    } : null)
+                    ->sortable()
+                    ->searchable(),
 
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Creado')
@@ -140,6 +159,47 @@ class PartidosTable
             ])
 
             ->recordActions([
+                \Filament\Actions\Action::make('reasignar_arbitro')
+                    ->label('Reasignar Árbitro')
+                    ->button()
+                    ->icon('heroicon-o-user-circle')
+                    ->color('warning')
+                    ->form([
+                        \Filament\Forms\Components\Select::make('arbitro_id')
+                            ->label('Seleccionar Árbitro')
+                            ->options(function () {
+                                return \App\Models\User::role('Arbitro')
+                                    ->pluck('name', 'id');
+                            })
+                            ->searchable()
+                            ->preload()
+                            ->required(),
+                    ])
+                    ->action(function (array $data, \App\Models\Partido $record): void {
+                        $record->update([
+                            'arbitro_id' => $data['arbitro_id'],
+                            'estado_arbitro' => 'pendiente',
+                        ]);
+
+                        // Notify new referee
+                        $arbitro = \App\Models\User::find($data['arbitro_id']);
+                        if ($arbitro) {
+                            $local = $record->local?->nombre ?? 'Equipo Local';
+                            $visitante = $record->visitante?->nombre ?? 'Equipo Visitante';
+                            $fecha = $record->fecha ? \Carbon\Carbon::parse($record->fecha)->format('d/m/Y') : 'Sin fecha';
+                            $hora = $record->hora ? \Carbon\Carbon::parse($record->hora)->format('H:i') : 'Sin hora';
+
+                            \Filament\Notifications\Notification::make()
+                                ->title('Asignación de Partido')
+                                ->body("Se te ha asignado un partido: {$local} vs {$visitante} (📅 {$fecha} ⏰ {$hora}). Por favor acéptalo o recházalo.")
+                                ->warning()
+                                ->icon('heroicon-o-flag')
+                                ->sendToDatabase($arbitro);
+                        }
+                    })
+                    ->visible(fn (\App\Models\Partido $record): bool => 
+                        $record->estado_arbitro === 'rechazado'
+                    ),
                 EditAction::make(),
                 DeleteAction::make(),
                 RestoreAction::make()
