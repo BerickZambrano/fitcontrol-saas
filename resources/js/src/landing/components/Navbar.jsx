@@ -41,12 +41,7 @@ const Navbar = ({ navigateWithSplash }) => {
     >
       <div className="container mx-auto flex items-center justify-between h-16 px-4">
         <a href="#" className="flex items-center gap-2">
-          <div className="w-9 h-9 rounded-lg bg-primary flex items-center justify-center">
-            <span className="text-primary-foreground font-black text-lg">F</span>
-          </div>
-          <span className={`font-bold text-xl tracking-tight transition-colors ${textClass}`}>
-            FitControl
-          </span>
+          <img src="/images/logo.png" alt="FitControl" className="h-20 w-auto object-contain pt-2" />
         </a>
 
         <div className="hidden md:flex items-center gap-8">
