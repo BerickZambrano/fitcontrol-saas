@@ -7,16 +7,36 @@ use Illuminate\Support\Facades\Auth;
 
 class PaywallController extends Controller
 {
+    private function getRedirectPath($user): string
+    {
+        if (!$user) {
+            return '/';
+        }
+        if ($user->hasRole(['super_admin', 'Administrador'])) {
+            return '/admin';
+        }
+        if ($user->hasRole('Entrenador')) {
+            return '/entrenador';
+        }
+        if ($user->hasRole('Jugador')) {
+            return '/jugador';
+        }
+        if ($user->hasRole('Arbitro')) {
+            return '/arbitro';
+        }
+        return '/';
+    }
+
     public function index()
     {
         $user = auth()->user();
         if (!$user) {
-            return redirect('/entrenador/login');
+            return redirect('/');
         }
 
         $tenant = $user->tenant;
         if (!$tenant || $tenant->estado_pago === 'pagado') {
-            return redirect('/entrenador'); 
+            return redirect($this->getRedirectPath($user)); 
         }
 
         return view('paywall', compact('tenant'));
@@ -24,10 +44,14 @@ class PaywallController extends Controller
 
     public function simulatePayment(Request $request)
     {
-        $tenant = auth()->user()->tenant;
-        if ($tenant) {
-            $tenant->update(['estado_pago' => 'pagado']);
+        $user = auth()->user();
+        if ($user) {
+            $tenant = $user->tenant;
+            if ($tenant) {
+                $tenant->update(['estado_pago' => 'pagado']);
+            }
+            return redirect($this->getRedirectPath($user))->with('success', 'Pago procesado exitosamente. Funciones desbloqueadas.');
         }
-        return redirect('/entrenador')->with('success', 'Pago procesado exitosamente. Funciones desbloqueadas.');
+        return redirect('/');
     }
 }

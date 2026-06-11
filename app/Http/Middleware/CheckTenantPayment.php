@@ -14,30 +14,28 @@ class CheckTenantPayment
         $user = auth()->user();
 
         if ($user && $user->tenant && $user->tenant->estado_pago === 'pendiente') {
-            if ($user->hasRole('Administrador') || $user->hasRole('Entrenador')) {
-                // Permitir solicitudes de logout, simulaciones de pago y peticiones Livewire de logout/pago
-                if ($request->routeIs('paywall.*') || $request->routeIs('filament.*.auth.logout') || $request->routeIs('livewire.*')) {
-                    return $response;
-                }
+            // Permitir solicitudes de logout, simulaciones de pago y peticiones Livewire de logout/pago
+            if ($request->routeIs('paywall.*') || $request->routeIs('filament.*.auth.logout') || $request->routeIs('livewire.*')) {
+                return $response;
+            }
 
-                // Si es un request HTML regular, le inyectamos el overlay con blur
-                if ($response instanceof \Illuminate\Http\Response || $response instanceof Response) {
-                    $contentType = $response->headers->get('Content-Type');
-                    if (str_contains($contentType, 'text/html')) {
-                        $content = $response->getContent();
+            // Si es un request HTML regular, le inyectamos el overlay con blur
+            if ($response instanceof \Illuminate\Http\Response || $response instanceof Response) {
+                $contentType = $response->headers->get('Content-Type');
+                if ($contentType && str_contains($contentType, 'text/html')) {
+                    $content = $response->getContent();
+                    
+                    try {
+                        $paywallHtml = view('paywall_overlay', ['tenant' => $user->tenant])->render();
                         
-                        try {
-                            $paywallHtml = view('paywall_overlay', ['tenant' => $user->tenant])->render();
-                            
-                            // Inyectar antes de </body>
-                            $pos = strripos($content, '</body>');
-                            if ($pos !== false) {
-                                $content = substr($content, 0, $pos) . $paywallHtml . substr($content, $pos);
-                                $response->setContent($content);
-                            }
-                        } catch (\Exception $e) {
-                            // En caso de error, dejamos pasar la respuesta original
+                        // Inyectar antes de </body>
+                        $pos = strripos($content, '</body>');
+                        if ($pos !== false) {
+                            $content = substr($content, 0, $pos) . $paywallHtml . substr($content, $pos);
+                            $response->setContent($content);
                         }
+                    } catch (\Exception $e) {
+                        // En caso de error, dejamos pasar la respuesta original
                     }
                 }
             }
