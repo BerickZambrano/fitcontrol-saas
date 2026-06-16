@@ -6,7 +6,12 @@
     "keywords": ["laravel", "framework"],
     "license": "MIT",
     "require": {
-        "php": "^8.2",
+        "php": "^8.3",
+        "ext-intl": "*",
+        "ext-zip": "*",
+        "ext-gd": "*",
+        "ext-exif": "*",
+        "ext-bcmath": "*",
         "algolia/algoliasearch-client-php": "^4.41",
         "alperenersoy/filament-export": "^4.0",
         "bezhansalleh/filament-shield": "^4.0",
