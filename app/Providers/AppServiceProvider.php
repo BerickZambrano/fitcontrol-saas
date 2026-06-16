@@ -26,6 +26,10 @@ class AppServiceProvider extends ServiceProvider
     {
         \App\Models\IncidenciaPartido::observe(\App\Observers\IncidenciaPartidoObserver::class);
 
+        if (config('app.env') === 'production') {
+            \Illuminate\Support\Facades\URL::forceScheme('https');
+        }
+
         if (!app()->runningInConsole()) {
             config(['app.url' => request()->getSchemeAndHttpHost()]);
         }
