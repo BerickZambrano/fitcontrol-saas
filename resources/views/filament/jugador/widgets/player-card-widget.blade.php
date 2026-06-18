@@ -49,7 +49,7 @@
             <div class="absolute bottom-2 left-2 right-2 h-12 bg-black/90 rounded-xl border border-[var(--primary-600)] flex items-center justify-around px-2">
                 <div class="text-center">
                     <p class="text-[8px] text-[var(--primary-400)] uppercase font-bold">ALT</p>
-                    <p class="text-sm font-black text-white leading-none">{{ $player?->altura ?? '--' }} <span class="text-[8px]">cm</span></p>
+                    <p class="text-sm font-black text-white leading-none">{{ $player?->altura ? (float) ($player->altura < 3 ? $player->altura * 100 : $player->altura) : '--' }} <span class="text-[8px]">cm</span></p>
                 </div>
                 <div class="w-px h-6 bg-[var(--primary-900)]"></div>
                 <div class="text-center">

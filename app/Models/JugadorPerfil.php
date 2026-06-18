@@ -12,6 +12,29 @@ class JugadorPerfil extends Model
 
     protected $table = 'jugador_perfiles';
 
+    protected static function booted()
+    {
+        parent::booted();
+
+        static::creating(function (JugadorPerfil $model) {
+            if ($model->user_id) {
+                $user = User::find($model->user_id);
+                if ($user && $user->tenant_id) {
+                    $model->tenant_id = $user->tenant_id;
+                }
+            }
+        });
+
+        static::updating(function (JugadorPerfil $model) {
+            if ($model->user_id) {
+                $user = User::find($model->user_id);
+                if ($user && $user->tenant_id) {
+                    $model->tenant_id = $user->tenant_id;
+                }
+            }
+        });
+    }
+
     protected $fillable = [
         'tenant_id',
         'user_id',

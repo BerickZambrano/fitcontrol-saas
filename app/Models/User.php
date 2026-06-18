@@ -191,6 +191,11 @@ class User extends Authenticatable implements HasAvatar, FilamentUser
         return $this->hasOne(EquipoUser::class);
     }
 
+    public function jugadorPerfil()
+    {
+        return $this->hasOne(JugadorPerfil::class);
+    }
+
     public function canAccessPanel(Panel $panel): bool
     {
         if ($this->hasRole(['Administrador', 'super_admin'])) {
