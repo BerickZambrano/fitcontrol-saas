@@ -35,4 +35,21 @@ return [
         ],
     ],
 
+    'wompi' => [
+        'public_key' => env('WOMPI_PUBLIC_KEY'),
+        'private_key' => env('WOMPI_PRIVATE_KEY'),
+        'integrity_secret' => env('WOMPI_INTEGRITY_SECRET'),
+        'events_secret' => env('WOMPI_EVENTS_SECRET'),
+        'plans' => [
+            'mensual' => [
+                'name' => 'Plan Mensual',
+                'amount_in_cents' => 7000000, // $70.000 COP
+            ],
+            'anual' => [
+                'name' => 'Plan Anual',
+                'amount_in_cents' => 70000000, // $700.000 COP
+            ],
+        ],
+    ],
+
 ];

@@ -12,6 +12,8 @@ use Inertia\Inertia;
 
 Route::middleware('web')->group(function () {
     Route::get('/paywall', [PaywallController::class, 'index'])->name('paywall.index');
+    Route::post('/paywall/prepare', [PaywallController::class, 'prepare'])->name('paywall.prepare');
+    Route::get('/paywall/callback', [PaywallController::class, 'callback'])->name('paywall.callback');
     Route::post('/paywall/simulate-payment', [PaywallController::class, 'simulatePayment'])->name('paywall.simulate-payment');
 });
 

@@ -20,6 +20,11 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'onboarding' => \App\Http\Middleware\RedirectIfOnboardingPending::class,
         ]);
+        $middleware->validateCsrfTokens(except: [
+            'api/wompi/webhook',
+            'wompi/webhook',
+            'paywall/prepare',
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

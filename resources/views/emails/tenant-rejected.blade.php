@@ -49,17 +49,6 @@
                                 {{ !empty($tenant->rejection_reason) ? 'Motivo: ' . $tenant->rejection_reason : '' }}
                             </p>
 
-                            <!-- Re-submit CTA -->
-                            <table role="presentation" cellpadding="0" cellspacing="0" width="100%">
-                                <tr>
-                                    <td align="center" style="padding-bottom: 24px;">
-                                        <a href="{{ route('tenant.request') }}"
-                                           style="display: inline-block; background-color: #2563eb; color: #ffffff; text-decoration: none; padding: 16px 48px; border-radius: 12px; font-size: 15px; font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);">
-                                            Enviar nueva solicitud
-                                        </a>
-                                    </td>
-                                </tr>
-                            </table>
 
                             <!-- Info note -->
                             <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f9fafb; border: 1px solid #e5e7eb; border-radius: 10px;">

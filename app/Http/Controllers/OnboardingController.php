@@ -24,14 +24,24 @@ class OnboardingController extends Controller
     {
         $request->validate([
             'nombre'            => 'required|string|max:255',
-            'nombre_corto'      => 'required|string|max:100',
-            'nit'               => 'required|string',
+            'nombre_corto'      => [
+                'required',
+                'string',
+                'max:100',
+                function ($attribute, $value, $fail) {
+                    $slug = Str::slug($value);
+                    if (\App\Models\Tenant::where('subdominio', $slug)->exists()) {
+                        $fail('Este nombre corto (siglas) ya está en uso por otro club.');
+                    }
+                }
+            ],
+            'nit'               => 'required|string|unique:tenants,nit',
             'telefono'          => 'required|string',
             'direccion'         => 'required|string',
             'ciudad'            => 'required|string',
             'pais'              => 'required|string',
             'encargado_nombre'  => 'required|string',
-            'email_corporativo' => 'required|email',
+            'email_corporativo' => 'required|email|unique:tenants,email_corporativo',
             'encargado_email'   => 'required|email',
             'encargado_telefono'=> 'required|string',
             'plan'              => 'required|in:mensual,anual',
@@ -41,6 +51,9 @@ class OnboardingController extends Controller
 
             'escudo_url'        => 'nullable|image|max:20480',
 
+        ], [
+            'nit.unique' => 'Este NIT ya se encuentra registrado.',
+            'email_corporativo.unique' => 'Este correo electrónico corporativo ya está registrado.',
         ]);
 
         $data = $request->only([
