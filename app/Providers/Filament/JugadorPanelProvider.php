@@ -33,7 +33,7 @@ class JugadorPanelProvider extends PanelProvider
             ->brandName('FitControl')
             ->brandLogo(asset('images/logo.png'))
             ->brandLogoHeight('5rem')
-            ->favicon(asset('images/logo.ico'))
+            ->favicon(asset('images/favicon.png'))
             ->colors([
                 'primary' => Color::Red,
             ])

@@ -28,7 +28,7 @@ class ArbitroPanelProvider extends PanelProvider
             ->brandName('FitControl - Árbitros')
             ->brandLogo(asset('images/logo.png'))
             ->brandLogoHeight('5rem')
-            ->favicon(asset('images/logo.ico'))
+            ->favicon(asset('images/favicon.png'))
             ->colors([
                 'primary' => Color::Amber,
             ])
