@@ -3,7 +3,7 @@
 ## 1. Visión General del Proyecto
 **FitControl** es una plataforma SaaS (Software as a Service) multi-tenant diseñada para la gestión integral de clubes deportivos, academias y equipos. Permite administrar todas las operaciones del club, desde la gestión de usuarios (jugadores, entrenadores, administradores) hasta la planificación de entrenamientos, partidos, historiales médicos, rendimiento y pagos.
 
-El proyecto está diseñado de forma modular, con paneles de control diferenciados según el rol del usuario, y cuenta con soporte para ser empaquetado como aplicación móvil mediante Capacitor.
+El proyecto está diseñado de forma modular, con paneles de control diferenciados según el rol del usuario.
 
 ## 2. Stack Tecnológico
 El proyecto utiliza un stack moderno basado en el ecosistema de Laravel y tecnologías de frontend reactivas:
@@ -20,9 +20,7 @@ El proyecto utiliza un stack moderno basado en el ecosistema de Laravel y tecnol
 - **Gráficos:** Filament Apex Charts v5.0.
 - **Empaquetador de Assets:** Vite v7.0 (con laravel-vite-plugin y @vitejs/plugin-react).
 
-### Móvil
-- **Framework Cross-Platform:** Capacitor v6 (@capacitor/core, @capacitor/android, @capacitor/app).
-- La aplicación web sirve como base para una app móvil nativa de Android, configurada para conectarse a la URL de la aplicación web (`capacitor.config.json`).
+
 
 ### Infraestructura y Desarrollo
 - **Contenedores:** Docker y Laravel Sail (`docker-compose.yml`, `Dockerfile`).
@@ -79,5 +77,4 @@ En el `package.json` y `composer.json` se definen comandos clave para el entorno
 ## 8. Notas Adicionales para Agentes IA
 - **Si vas a crear/modificar UI de Filament:** Ten en cuenta que el proyecto usa **Filament v4**. Asegúrate de generar los Resources/Pages en el provider correcto (`Admin`, `Entrenador` o `Jugador`).
 - **Si vas a tocar el Frontend Público:** La landing page y el onboarding están en **Inertia + React**.
-- **Móvil:** Cualquier cambio en CSS/JS debe ser compatible con la vista web de Capacitor en dispositivos Android.
 - **Multitenancy:** Siempre que crees un modelo nuevo, verifica si necesita pertenecer a un `Tenant` (usando un trait como `BelongsToTenant` o scope global) para mantener el aislamiento de datos.

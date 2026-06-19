@@ -14,7 +14,6 @@
   <a href="https://react.dev"><img src="https://img.shields.io/badge/React-2.0--61DAFB?style=for-the-badge&logo=react&logoColor=black" alt="React"></a>
   <a href="https://inertiajs.com"><img src="https://img.shields.io/badge/Inertia.js-v2.0--9553E6?style=for-the-badge&logo=inertia&logoColor=white" alt="Inertia.js"></a>
   <a href="https://tailwindcss.com"><img src="https://img.shields.io/badge/Tailwind_CSS-v4.2--38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white" alt="Tailwind CSS"></a>
-  <a href="https://capacitorjs.com"><img src="https://img.shields.io/badge/Capacitor-v6.0--119EFF?style=for-the-badge&logo=capacitor&logoColor=white" alt="Capacitor v6"></a>
   <a href="https://www.docker.com"><img src="https://img.shields.io/badge/Docker--2496ED?style=for-the-badge&logo=docker&logoColor=white" alt="Docker"></a>
 </p>
 
@@ -24,7 +23,7 @@
 
 **FitControl** es una plataforma SaaS (Software as a Service) multi-tenant diseñada para unificar todas las operaciones de un club o academia deportiva. Ofrece aislamiento lógico de datos por club (Tenant) y dispone de paneles especializados para cada tipo de rol del ecosistema deportivo (Administradores, Entrenadores, Jugadores y Árbitros). 
 
-El sistema está empaquetado para entornos web y cuenta con soporte móvil multiplataforma integrado a través de **Capacitor**.
+El sistema está empaquetado para entornos web.
 
 ---
 
@@ -58,7 +57,6 @@ El sistema está empaquetado para entornos web y cuenta con soporte móvil multi
 | **Frontend Público** | Inertia.js v2.0 + React (@inertiajs/react) |
 | **Diseño y Estilos** | Tailwind CSS v4.2 |
 | **Visualización Gráfica** | Filament Apex Charts v5.0 |
-| **Compilación Móvil** | Capacitor v6 (@capacitor/core, @capacitor/android) |
 | **Contenedores** | Docker & Laravel Sail |
 
 ---
@@ -152,29 +150,7 @@ Integrado mediante **Spatie Permission** y **Filament Shield**:
 
 ---
 
-## 📱 Compilación Móvil (Capacitor)
 
-El proyecto está configurado para exportar su frontend responsivo a una app móvil nativa de Android:
-
-1. **Compilar los archivos estáticos de React:**
-   ```bash
-   npm run build
-   ```
-
-2. **Sincronizar assets con Capacitor:**
-   ```bash
-   npx cap sync
-   ```
-
-3. **Abrir el proyecto en Android Studio:**
-   ```bash
-   npx cap open android
-   ```
-
-4. **Configuración de Host:**
-   Asegúrate de configurar la URL del servidor web en el archivo `capacitor.config.json` para conectarse remotamente o apuntar a tu localhost.
-
----
 
 ## 🧪 Ejecución de Pruebas
 
