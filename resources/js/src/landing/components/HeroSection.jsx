@@ -23,13 +23,13 @@ const HeroSection = ({ navigateWithSplash }) => {
     const startReverse = () => {
       video.pause();
       if (intervalId) clearInterval(intervalId);
-      
+
       intervalId = setInterval(() => {
         if (video.currentTime <= 0.4) {
           clearInterval(intervalId);
           intervalId = null;
           direction = 1;
-          video.play().catch(() => {});
+          video.play().catch(() => { });
         } else {
           video.currentTime = Math.max(0, video.currentTime - 0.05);
         }
@@ -124,7 +124,7 @@ const HeroSection = ({ navigateWithSplash }) => {
                 onClick={() => handleLink("/onboarding")}
                 className="rounded-full px-8 text-base font-semibold gap-2 bg-primary text-primary-foreground hover:glow-neon hover:scale-[1.03] active:scale-[0.98] transition-all duration-300"
               >
-                Probar gratis <ArrowRight size={18} />
+                Accede a Fitcontrol <ArrowRight size={18} />
               </Button>
               <Button
                 size="lg"
