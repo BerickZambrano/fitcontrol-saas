@@ -155,7 +155,40 @@ class PartidosTable
 
             ->headerActions([
                 FilamentExportHeaderAction::make('export')
-                    ->label('Exportar'),
+                    ->label('Exportar')
+                    ->fileName('Reporte_Partidos_' . now()->format('Ymd_His'))
+                    ->defaultPageOrientation('landscape')
+                    ->withColumns([
+                        Tables\Columns\TextColumn::make('local.nombre')->label('Equipo Local'),
+                        Tables\Columns\TextColumn::make('visitante.nombre')->label('Equipo Visitante'),
+                        Tables\Columns\TextColumn::make('fecha')->label('Fecha')->date('d/m/Y'),
+                        Tables\Columns\TextColumn::make('hora')->label('Hora'),
+                        Tables\Columns\TextColumn::make('resultado')->label('Resultado'),
+                        Tables\Columns\TextColumn::make('fase')
+                            ->label('Fase')
+                            ->formatStateUsing(fn ($state) => match ($state) {
+                                'grupo'     => 'Fase de Grupos',
+                                'octavos'   => 'Octavos',
+                                'cuartos'   => 'Cuartos',
+                                'semifinal' => 'Semifinal',
+                                'final'     => 'Final',
+                                'amistoso'  => 'Amistoso',
+                                default     => $state ?? '—',
+                            }),
+                        Tables\Columns\TextColumn::make('instalacion.nombre')->label('Instalación'),
+                        Tables\Columns\TextColumn::make('arbitro')
+                            ->label('Árbitro y Estado')
+                            ->getStateUsing(function (\App\Models\Partido $record) {
+                                if (!$record->arbitro_id) return 'Sin asignar';
+                                $estado = match($record->estado_arbitro) {
+                                    'pendiente' => 'Pendiente',
+                                    'aceptado' => 'Aceptado',
+                                    'rechazado' => 'Rechazado',
+                                    default => 'Desconocido',
+                                };
+                                return ($record->arbitro->name ?? 'Desconocido') . ' (' . $estado . ')';
+                            }),
+                    ]),
             ])
 
             ->recordActions([
@@ -211,7 +244,40 @@ class PartidosTable
             ->toolbarActions([
                 BulkActionGroup::make([
                     FilamentExportBulkAction::make('export')
-                        ->label('Exportar seleccionados'),
+                        ->label('Exportar seleccionados')
+                        ->fileName('Reporte_Partidos_Seleccionados_' . now()->format('Ymd_His'))
+                        ->defaultPageOrientation('landscape')
+                        ->withColumns([
+                            Tables\Columns\TextColumn::make('local.nombre')->label('Equipo Local'),
+                            Tables\Columns\TextColumn::make('visitante.nombre')->label('Equipo Visitante'),
+                            Tables\Columns\TextColumn::make('fecha')->label('Fecha')->date('d/m/Y'),
+                            Tables\Columns\TextColumn::make('hora')->label('Hora'),
+                            Tables\Columns\TextColumn::make('resultado')->label('Resultado'),
+                            Tables\Columns\TextColumn::make('fase')
+                                ->label('Fase')
+                                ->formatStateUsing(fn ($state) => match ($state) {
+                                    'grupo'     => 'Fase de Grupos',
+                                    'octavos'   => 'Octavos',
+                                    'cuartos'   => 'Cuartos',
+                                    'semifinal' => 'Semifinal',
+                                    'final'     => 'Final',
+                                    'amistoso'  => 'Amistoso',
+                                    default     => $state ?? '—',
+                                }),
+                            Tables\Columns\TextColumn::make('instalacion.nombre')->label('Instalación'),
+                            Tables\Columns\TextColumn::make('arbitro')
+                                ->label('Árbitro y Estado')
+                                ->getStateUsing(function (\App\Models\Partido $record) {
+                                    if (!$record->arbitro_id) return 'Sin asignar';
+                                    $estado = match($record->estado_arbitro) {
+                                        'pendiente' => 'Pendiente',
+                                        'aceptado' => 'Aceptado',
+                                        'rechazado' => 'Rechazado',
+                                        default => 'Desconocido',
+                                    };
+                                    return ($record->arbitro->name ?? 'Desconocido') . ' (' . $estado . ')';
+                                }),
+                        ]),
                     DeleteBulkAction::make(),
                     RestoreBulkAction::make()
                         ->label('Restaurar seleccionados'),
