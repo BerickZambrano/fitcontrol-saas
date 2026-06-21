@@ -15,6 +15,7 @@ use Filament\Actions\EditAction;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
+use Illuminate\Validation\Rules\Password;
 
 class ArbitroResource extends Resource
 {
@@ -62,6 +63,7 @@ class ArbitroResource extends Resource
                 ->label('Contraseña')
                 ->password()
                 ->revealable()
+                ->rule(Password::default())
                 ->confirmed()
                 ->minLength(8)
                 ->maxLength(255)

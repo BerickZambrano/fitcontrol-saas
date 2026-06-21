@@ -6,6 +6,7 @@ use Illuminate\Support\ServiceProvider;
 use Filament\Actions\CreateAction;
 use BezhanSalleh\FilamentShield\Facades\FilamentShield;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rules\Password;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -24,6 +25,12 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        Password::defaults(function () {
+            return Password::min(8)
+                ->mixedCase()
+                ->symbols();
+        });
+
         \App\Models\IncidenciaPartido::observe(\App\Observers\IncidenciaPartidoObserver::class);
 
         if (config('app.env') === 'production') {

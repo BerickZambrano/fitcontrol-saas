@@ -6,6 +6,7 @@ use Filament\Forms;
 use Filament\Schemas\Schema;
 use Illuminate\Support\Facades\Hash;
 use App\Models\Tenant;
+use Illuminate\Validation\Rules\Password;
 
 class UserForm
 {
@@ -34,6 +35,7 @@ class UserForm
                 ->label('Contraseña')
                 ->password()
                 ->revealable()
+                ->rule(Password::default())
                 ->confirmed()
                 ->minLength(8)
                 ->maxLength(255)

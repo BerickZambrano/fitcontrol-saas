@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\JugadorPerfils\Schemas;
 
 use Filament\Schemas\Schema;
+use Illuminate\Validation\Rules\Password;
 
 class JugadorPerfilForm
 {
@@ -47,6 +48,7 @@ class JugadorPerfilForm
                             ->label('Contraseña')
                             ->password()
                             ->revealable()
+                            ->rule(Password::default())
                             ->required()
                             ->maxLength(255),
                     ])
