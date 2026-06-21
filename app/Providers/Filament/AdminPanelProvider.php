@@ -61,6 +61,16 @@ class AdminPanelProvider extends PanelProvider
                         : ''
                 )
             )
+            ->renderHook(
+                'panels::body.end',
+                fn (): HtmlString => new HtmlString('
+                    <div class="fixed bottom-0 right-0 p-4 w-full flex justify-end z-50 pointer-events-none">
+                        <a href="/terminos-y-condiciones" target="_blank" class="pointer-events-auto text-xs text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:underline bg-white/80 dark:bg-gray-900/80 px-2 py-1 rounded backdrop-blur-sm">
+                            Términos y Condiciones
+                        </a>
+                    </div>
+                ')
+            )
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
             ->discoverPages(in: app_path('Filament/Admin/Pages'), for: 'App\Filament\Admin\Pages')
             ->pages([

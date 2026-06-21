@@ -103,6 +103,12 @@ class PostRegisterOnboarding extends Page
                                 ->directory('tenants/logos')
                                 ->image()
                                 ->maxSize(10240), // Aumentado a 10MB
+                                
+                            Checkbox::make('terms')
+                                ->label(fn () => new \Illuminate\Support\HtmlString('Acepto los <a href="/terminos-y-condiciones" target="_blank" class="text-primary-600 font-bold hover:underline">Términos y Condiciones</a> y confirmo tener autorización para registrar los datos del club.'))
+                                ->accepted()
+                                ->required()
+                                ->columnSpanFull(),
                         ])->columns(2),
 
                     // ── Step 2: First Team ─────────────────────

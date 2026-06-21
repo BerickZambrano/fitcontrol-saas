@@ -5,183 +5,78 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>404 - Página no encontrada | FitControl</title>
     <link rel="icon" type="image/x-icon" href="{{ asset('images/logo.ico') }}">
-    @vite(['resources/css/app.css'])
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+        
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #0d7cd2 0%, #1e40af 100%);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            font-family: 'Inter', sans-serif;
         }
 
-        .error-container {
-            text-align: center;
-            padding: 3rem;
-            max-width: 600px;
+        @keyframes blob {
+            0% { transform: translate(0px, 0px) scale(1); }
+            33% { transform: translate(30px, -50px) scale(1.1); }
+            66% { transform: translate(-20px, 20px) scale(0.9); }
+            100% { transform: translate(0px, 0px) scale(1); }
         }
-
-        .error-code {
-            font-size: 10rem;
-            font-weight: 800;
-            color: rgba(255, 255, 255, 0.15);
-            line-height: 1;
-            margin-bottom: -1rem;
-            position: relative;
+        .animate-blob {
+            animation: blob 7s infinite;
         }
-
-        .error-code::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 200px;
-            height: 4px;
-            background: rgba(255, 255, 255, 0.3);
-            border-radius: 2px;
+        .animation-delay-2000 {
+            animation-delay: 2s;
         }
-
-        .error-title {
-            font-size: 2rem;
-            font-weight: 600;
-            color: white;
-            margin-bottom: 1rem;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-
-        .error-message {
-            font-size: 1.125rem;
-            color: rgba(255, 255, 255, 0.85);
-            margin-bottom: 2rem;
-            line-height: 1.6;
-        }
-
-        .error-icon {
-            width: 120px;
-            height: 120px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 2rem;
-            backdrop-filter: blur(10px);
-            border: 2px solid rgba(255, 255, 255, 0.2);
-        }
-
-        .error-icon svg {
-            width: 60px;
-            height: 60px;
-            color: rgba(255, 255, 255, 0.9);
-        }
-
-        .btn-home {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.875rem 2rem;
-            background: white;
-            color: #0d7cd2;
-            font-weight: 600;
-            font-size: 1rem;
-            border-radius: 0.75rem;
-            text-decoration: none;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-        }
-
-        .btn-home:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
-            background: #f8fafc;
-        }
-
-        .btn-home svg {
-            width: 20px;
-            height: 20px;
-        }
-
-        .decorative-dots {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            top: 0;
-            left: 0;
-            pointer-events: none;
-            overflow: hidden;
-        }
-
-        .dot {
-            position: absolute;
-            width: 8px;
-            height: 8px;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 50%;
-        }
-
-        .dot:nth-child(1) { top: 10%; left: 10%; }
-        .dot:nth-child(2) { top: 20%; right: 15%; width: 12px; height: 12px; }
-        .dot:nth-child(3) { bottom: 25%; left: 20%; width: 6px; height: 6px; }
-        .dot:nth-child(4) { bottom: 15%; right: 25%; width: 10px; height: 10px; }
-        .dot:nth-child(5) { top: 40%; left: 5%; width: 6px; height: 6px; }
-        .dot:nth-child(6) { top: 60%; right: 8%; width: 8px; height: 8px; }
-
-        @media (max-width: 640px) {
-            .error-code {
-                font-size: 7rem;
-            }
-            .error-title {
-                font-size: 1.5rem;
-            }
-            .error-message {
-                font-size: 1rem;
-            }
-            .error-container {
-                padding: 2rem;
-            }
+        .animation-delay-4000 {
+            animation-delay: 4s;
         }
     </style>
 </head>
-<body>
-    <div class="decorative-dots">
-        <div class="dot"></div>
-        <div class="dot"></div>
-        <div class="dot"></div>
-        <div class="dot"></div>
-        <div class="dot"></div>
-        <div class="dot"></div>
+<body class="bg-slate-50 antialiased min-h-screen flex flex-col justify-center items-center overflow-hidden relative">
+    
+    <!-- Background decorative blurs -->
+    <div class="absolute top-0 left-0 w-full h-full overflow-hidden z-0 pointer-events-none">
+        <div class="absolute top-[-10%] left-[-10%] w-96 h-96 bg-blue-300 rounded-full mix-blend-multiply filter blur-[100px] opacity-40 animate-blob"></div>
+        <div class="absolute top-[20%] right-[-10%] w-96 h-96 bg-cyan-300 rounded-full mix-blend-multiply filter blur-[100px] opacity-40 animate-blob animation-delay-2000"></div>
+        <div class="absolute bottom-[-20%] left-[20%] w-96 h-96 bg-indigo-300 rounded-full mix-blend-multiply filter blur-[100px] opacity-40 animate-blob animation-delay-4000"></div>
     </div>
 
-    <div class="error-container">
-        <div class="error-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M9.879 7.519c1.171-1.025 3.072-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 5.25h.008v.008H12v-.008Z" />
-            </svg>
+    <!-- Main Content -->
+    <div class="relative z-10 text-center px-6 md:px-12 w-full max-w-4xl mx-auto">
+        
+        <div class="mb-10 flex justify-center">
+            <img src="{{ asset('images/logo.png') }}" alt="FitControl" class="h-14 md:h-16 w-auto object-contain drop-shadow-sm">
         </div>
 
-        <div class="error-code">404</div>
-
-        <h1 class="error-title">Página no encontrada</h1>
-
-        <p class="error-message">
-            Lo sentimos, la página que estás buscando no existe o ha sido movida.
-            Pero no te preocupes, puedes volver al inicio y seguir usando FitControl.
+        <div class="relative inline-block mb-4">
+            <h1 class="text-[8rem] md:text-[12rem] font-extrabold text-transparent bg-clip-text bg-gradient-to-br from-blue-700 to-cyan-500 leading-none tracking-tighter select-none drop-shadow-sm">
+                404
+            </h1>
+        </div>
+        
+        <h2 class="mt-2 text-3xl md:text-5xl font-bold text-slate-900 tracking-tight">
+            ¡Fuera de lugar!
+        </h2>
+        
+        <p class="mt-6 text-lg text-slate-600 max-w-2xl mx-auto leading-relaxed">
+            Parece que te has salido del campo de juego. La página que buscas no existe, ha sido movida o ya no está disponible.
         </p>
 
-        <a href="{{ url('/admin') }}" class="btn-home">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
-            </svg>
-            Volver al inicio
-        </a>
+        <div class="mt-12 flex flex-col sm:flex-row gap-4 justify-center items-center">
+            <a href="{{ url('/') }}" class="group relative inline-flex items-center justify-center px-8 py-3.5 text-base font-semibold text-white transition-all duration-300 bg-blue-600 border border-transparent rounded-2xl shadow-lg shadow-blue-500/30 hover:bg-blue-700 hover:shadow-blue-600/40 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-600 w-full sm:w-auto">
+                <svg class="w-5 h-5 mr-2 -ml-1 transition-transform group-hover:-translate-x-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                </svg>
+                Volver a la cancha
+            </a>
+            
+            <a href="javascript:history.back()" class="inline-flex items-center justify-center px-8 py-3.5 text-base font-semibold text-slate-700 transition-all duration-300 bg-white border border-slate-200 rounded-2xl shadow-sm hover:bg-slate-50 hover:text-slate-900 hover:border-slate-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-200 w-full sm:w-auto">
+                Regresar a la anterior
+            </a>
+        </div>
     </div>
+    
+    <div class="absolute bottom-8 w-full text-center text-sm text-slate-400 font-medium z-10 tracking-wide">
+        &copy; {{ date('Y') }} FitControl. Todos los derechos reservados.
+    </div>
+
 </body>
 </html>

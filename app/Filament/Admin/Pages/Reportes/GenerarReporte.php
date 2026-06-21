@@ -38,23 +38,6 @@ class GenerarReporte extends Page implements HasForms
 
     public function form(Schema $form): Schema
     {
-        $tenantId = Auth::user()->tenant_id;
-
-        // Si es super_admin, puede ver todos los tenants
-        $equipos = [];
-        if ($tenantId) {
-            $equipos = Equipo::where('tenant_id', $tenantId)
-                ->orderBy('nombre')
-                ->pluck('nombre', 'id')
-                ->toArray();
-        } else {
-            // super_admin: todos los equipos
-            $equipos = Equipo::orderBy('nombre')
-                ->get()
-                ->mapWithKeys(fn($e) => [$e->id => "{$e->nombre} ({$e->tenant->nombre})"])
-                ->toArray();
-        }
-
         return $form
             ->schema([
                 Select::make('report_type')
@@ -64,13 +47,6 @@ class GenerarReporte extends Page implements HasForms
                     ->live()
                     ->default('performance'),
 
-                Select::make('equipo_id')
-                    ->label('Equipo')
-                    ->options($equipos)
-                    ->searchable()
-                    ->required()
-                    ->helperText('Selecciona el equipo para el reporte'),
-
                 Select::make('tenant_id')
                     ->label('Club / Tenant')
                     ->options(fn() => Auth::user()->hasRole('super_admin')
@@ -79,15 +55,38 @@ class GenerarReporte extends Page implements HasForms
                     ->visible(fn() => Auth::user()->hasRole('super_admin'))
                     ->searchable()
                     ->live()
-                    ->afterStateUpdated(function ($state, callable $set) use ($equipos) {
-                        if ($state) {
-                            $equiposTenant = Equipo::where('tenant_id', $state)
+                    ->afterStateUpdated(fn (callable $set) => $set('equipo_id', null)),
+
+                Select::make('equipo_id')
+                    ->label('Equipo')
+                    ->options(function (callable $get) {
+                        $isSuperAdmin = Auth::user()->hasRole('super_admin');
+                        
+                        // Si es super_admin y seleccionó un tenant, filtrar equipos de ese tenant
+                        if ($isSuperAdmin && $get('tenant_id')) {
+                            return Equipo::where('tenant_id', $get('tenant_id'))
                                 ->orderBy('nombre')
                                 ->pluck('nombre', 'id')
                                 ->toArray();
-                            $set('equipo_options', $equiposTenant);
                         }
-                    }),
+                        
+                        // Si es super_admin y no ha seleccionado tenant, mostrar todos
+                        if ($isSuperAdmin) {
+                            return Equipo::orderBy('nombre')
+                                ->get()
+                                ->mapWithKeys(fn($e) => [$e->id => "{$e->nombre} (" . ($e->tenant->nombre ?? 'Sin club') . ")"])
+                                ->toArray();
+                        }
+
+                        // Si es administrador normal, solo mostrar los de su tenant (asignado automáticamente)
+                        return Equipo::where('tenant_id', Auth::user()->tenant_id)
+                            ->orderBy('nombre')
+                            ->pluck('nombre', 'id')
+                            ->toArray();
+                    })
+                    ->searchable()
+                    ->required()
+                    ->helperText('Selecciona el equipo para el reporte'),
 
                 DatePicker::make('fecha_desde')
                     ->label('Desde')

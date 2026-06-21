@@ -43,8 +43,9 @@ class ReportService
         $tenantId = Auth::user()->tenant_id ?? null;
         $userId = Auth::id();
 
-        if (!$tenantId && Auth::user()->hasRole('super_admin')) {
-            $tenantId = $params['tenant_id'] ?? null;
+        // Si es super_admin y envió un tenant_id desde el formulario, usar ese
+        if (Auth::user()->hasRole('super_admin') && !empty($params['tenant_id'])) {
+            $tenantId = $params['tenant_id'];
         }
 
         $params['tenant_id'] = $tenantId;

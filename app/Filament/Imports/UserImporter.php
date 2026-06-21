@@ -27,6 +27,12 @@ class UserImporter extends Importer
                 ->label('Contraseña')
                 ->requiredMapping()
                 ->rules(['required', 'max:255']),
+            ImportColumn::make('rol')
+                ->label('Rol del Usuario')
+                ->rules(['nullable', 'string'])
+                ->fillRecordUsing(function ($record, $state) {
+                    // Prevenir que intente guardar en la DB directamente.
+                }),
             ImportColumn::make('tenant_id')
                 ->label('ID del Tenant (Opcional)')
                 ->numeric()
@@ -46,6 +52,20 @@ class UserImporter extends Importer
     {
         if (isset($this->data['password']) && !empty($this->data['password'])) {
             $this->record->password = Hash::make($this->data['password']);
+        }
+        
+        // Auto-asignar el tenant_id del usuario que está importando
+        $tenantId = filament()->getTenant()?->id ?? auth()->user()?->tenant_id;
+        if ($tenantId) {
+            $this->record->tenant_id = $tenantId;
+        }
+    }
+
+    protected function afterSave(): void
+    {
+        // Asignar el rol al usuario después de guardarlo
+        if (isset($this->data['rol']) && !empty($this->data['rol'])) {
+            $this->record->assignRole($this->data['rol']);
         }
     }
 

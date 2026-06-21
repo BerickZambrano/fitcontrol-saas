@@ -88,17 +88,22 @@ Route::get('/admin/tenants/{tenant}/document/{field}', [App\Http\Controllers\Adm
     ->middleware(['auth'])
     ->name('admin.tenants.document.show');
 
-Route::fallback(function () {
-    return response()->view('errors.404', [], 404);
-});
-
-
 //Rutas del onboarding
-
 Route::get('/onboarding', [OnboardingController::class, 'index'])->name('onboarding.index');
 Route::post('/onboarding', [OnboardingController::class, 'store'])
     ->middleware('throttle:onboarding')
     ->name('onboarding.store');
 Route::get('/onboarding/success', [OnboardingController::class, 'success'])->name('onboarding.success');
 
+Route::get('/terminos-y-condiciones', function () {
+    return view('terminos');
+})->name('terminos');
+
+Route::get('/terminos', function () {
+    return view('terminos');
+});
+
+Route::fallback(function () {
+    return response()->view('errors.404', [], 404);
+});
 

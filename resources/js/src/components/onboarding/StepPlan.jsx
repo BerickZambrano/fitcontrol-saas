@@ -97,7 +97,7 @@ export default function StepPlan({ data, onChange, onBack, onSubmit, loading, er
 
       <p className="text-[10px] text-gray-400 text-center px-4 leading-relaxed uppercase tracking-wider font-bold">
         Al hacer clic en "Enviar solicitud" aceptas nuestros{' '}
-        <a href="/terminos" className="text-blue-600 hover:underline">términos y condiciones</a>
+        <a href="/terminos" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">términos y condiciones</a>
       </p>
 
       <div className="flex gap-4">

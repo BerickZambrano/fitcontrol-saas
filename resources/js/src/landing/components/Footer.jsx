@@ -69,7 +69,13 @@ const Footer = ({ navigateWithSplash }) => {
 
         <div className="border-t border-white/5 mt-12 pt-6 flex flex-col md:flex-row justify-between items-center">
           <p className="text-white/40 text-sm">© 2026 FitControl. Todos los derechos reservados.</p>
-          <p className="text-white/40 text-sm mt-2 md:mt-0">Hecho para clubes deportivos.</p>
+          <div className="flex items-center gap-4 mt-2 md:mt-0">
+            <a href="/terminos" target="_blank" rel="noopener noreferrer" className="text-white/40 hover:text-white text-sm transition-colors">
+              Términos y Condiciones
+            </a>
+            <span className="text-white/20 hidden md:inline">•</span>
+            <p className="text-white/40 text-sm">Hecho para clubes deportivos.</p>
+          </div>
         </div>
       </div>
     </footer>

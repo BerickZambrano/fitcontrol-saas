@@ -44,6 +44,14 @@ class TorneoImporter extends Importer
         ]);
     }
 
+    protected function beforeSave(): void
+    {
+        $tenantId = filament()->getTenant()?->id ?? auth()->user()?->tenant_id;
+        if ($tenantId) {
+            $this->record->tenant_id = $tenantId;
+        }
+    }
+
     public static function getCompletedNotificationBody(Import $import): string
     {
         $body = 'Se importaron ' . number_format($import->successful_rows) . ' ' . str('torneo')->plural($import->successful_rows) . '.';
