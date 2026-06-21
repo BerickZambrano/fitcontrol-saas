@@ -49,7 +49,6 @@
                     El usuario se compromete a no utilizar la plataforma para fines ilícitos, envío de spam, o carga de contenido malicioso. FitControl se reserva el derecho de suspender cualquier cuenta que viole estas normativas o ponga en riesgo la seguridad de otros usuarios en el entorno multi-tenant.
                 </p>
             </section>
-
         
         </div>
     </div>
