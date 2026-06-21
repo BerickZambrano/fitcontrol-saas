@@ -154,6 +154,10 @@ class PartidosTable
             ])
 
             ->headerActions([
+                \Filament\Actions\ImportAction::make('import')
+                    ->label('Importar CSV')
+                    ->icon('heroicon-o-arrow-up-tray')
+                    ->importer(\App\Filament\Imports\PartidoImporter::class),
                 FilamentExportHeaderAction::make('export')
                     ->label('Exportar')
                     ->fileName('Reporte_Partidos_' . now()->format('Ymd_His'))

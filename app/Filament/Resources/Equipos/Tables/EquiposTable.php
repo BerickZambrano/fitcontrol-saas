@@ -118,6 +118,10 @@ class EquiposTable
         ])
 
              ->headerActions([
+                \Filament\Actions\ImportAction::make('import')
+                    ->label('Importar CSV')
+                    ->icon('heroicon-o-arrow-up-tray')
+                    ->importer(\App\Filament\Imports\EquipoImporter::class),
                 FilamentExportHeaderAction::make('export')
                     ->label('Exportar'),
             ])

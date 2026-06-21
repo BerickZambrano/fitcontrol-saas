@@ -71,6 +71,10 @@ class UsersTable
                     ->falseLabel('Sin eliminar'),
             ])
             ->headerActions([
+                \Filament\Actions\ImportAction::make('import')
+                    ->label('Importar CSV')
+                    ->icon('heroicon-o-arrow-up-tray')
+                    ->importer(\App\Filament\Imports\UserImporter::class),
                 FilamentExportHeaderAction::make('export')
                     ->label('Exportar'),
             ])
