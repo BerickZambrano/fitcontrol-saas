@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Navbar from "../src/landing/components/Navbar";
 import HeroSection from "../src/landing/components/HeroSection";
 import StatsBar from "../src/landing/components/StatsBar";
@@ -18,6 +18,15 @@ export default function Landing() {
     const navigateWithSplash = (url) => {
         setSplashState({ isVisible: true, targetUrl: url });
     };
+
+    useEffect(() => {
+        const handlePageShow = () => {
+            setSplashState({ isVisible: false, targetUrl: "" });
+        };
+
+        window.addEventListener("pageshow", handlePageShow);
+        return () => window.removeEventListener("pageshow", handlePageShow);
+    }, []);
 
     return (
         <>

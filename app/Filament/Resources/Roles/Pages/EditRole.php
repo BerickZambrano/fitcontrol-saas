@@ -52,4 +52,9 @@ class EditRole extends EditRecord
         // @phpstan-ignore-next-line
         $this->record->syncPermissions($permissionModels);
     }
+
+    protected function getRedirectUrl(): string
+    {
+        return $this->getResource()::getUrl('index');
+    }
 }

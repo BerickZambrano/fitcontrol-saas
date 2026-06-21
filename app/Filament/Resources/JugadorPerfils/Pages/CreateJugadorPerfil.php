@@ -8,4 +8,9 @@ use Filament\Resources\Pages\CreateRecord;
 class CreateJugadorPerfil extends CreateRecord
 {
     protected static string $resource = JugadorPerfilResource::class;
+
+    protected function getRedirectUrl(): string
+    {
+        return $this->getResource()::getUrl('index');
+    }
 }

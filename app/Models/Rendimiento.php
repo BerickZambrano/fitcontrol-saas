@@ -20,6 +20,7 @@ class Rendimiento extends Model
         'asistencias',
         'tarjetas_amarillas',
         'tarjetas_rojas',
+        'evaluacion',
     ];
 
     protected $casts = [
@@ -28,6 +29,7 @@ class Rendimiento extends Model
         'asistencias' => 'integer',
         'tarjetas_amarillas' => 'integer',
         'tarjetas_rojas' => 'integer',
+        'evaluacion' => 'float',
     ];
 
     /**

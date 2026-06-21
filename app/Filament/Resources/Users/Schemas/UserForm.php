@@ -33,6 +33,7 @@ class UserForm
             Forms\Components\TextInput::make('password')
                 ->label('Contraseña')
                 ->password()
+                ->revealable()
                 ->confirmed()
                 ->minLength(8)
                 ->maxLength(255)
@@ -48,6 +49,7 @@ class UserForm
             Forms\Components\TextInput::make('password_confirmation')
                 ->label('Confirmar contraseña')
                 ->password()
+                ->revealable()
                 ->dehydrated(false),
 
             Forms\Components\Select::make('tenant_id')

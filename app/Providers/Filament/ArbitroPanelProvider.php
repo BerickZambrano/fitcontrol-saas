@@ -32,6 +32,12 @@ class ArbitroPanelProvider extends PanelProvider
             ->colors([
                 'primary' => Color::Amber,
             ])
+            ->userMenuItems([
+                'profile' => \Filament\Navigation\MenuItem::make()
+                    ->label('Mi Perfil')
+                    ->url(fn (): string => \App\Filament\Arbitro\Pages\RefereeProfile::getUrl())
+                    ->icon('heroicon-o-user-circle'),
+            ])
             ->databaseNotifications()
             ->databaseNotificationsPolling(30)
             ->renderHook(
@@ -46,6 +52,7 @@ class ArbitroPanelProvider extends PanelProvider
             ->discoverPages(in: app_path('Filament/Arbitro/Pages'), for: 'App\Filament\Arbitro\Pages')
             ->pages([
                 \Filament\Pages\Dashboard::class,
+                \App\Filament\Arbitro\Pages\RefereeProfile::class,
             ])
             ->discoverWidgets(in: app_path('Filament/Arbitro/Widgets'), for: 'App\Filament\Arbitro\Widgets')
             ->widgets([

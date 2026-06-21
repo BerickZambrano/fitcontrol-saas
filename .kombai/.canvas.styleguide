@@ -1,0 +1,62 @@
+{
+  "guides": [
+    {
+      "name": "pacman-arcade-inspiration",
+      "tokens": {
+        "colors": {
+          "pac": "#FFE800",
+          "primary": "#2A3FE5",
+          "secondary": "#F4B9B0",
+          "warning": "#D97706",
+          "danger": "#DC2626",
+          "success": "#10B981",
+          "surface": "#000000",
+          "surface-well": "rgba(255,255,255,0.05)",
+          "on-surface": "#FFFFFF",
+          "on-surface-muted": "rgba(255,255,255,0.6)"
+        },
+        "typography": {
+          "display": {
+            "family": "\"Press Start 2P\", cursive",
+            "size": "72px",
+            "url": ""
+          },
+          "heading": {
+            "family": "\"Press Start 2P\", cursive",
+            "size": "36px",
+            "url": ""
+          },
+          "label-pixel": {
+            "family": "\"Press Start 2P\", cursive",
+            "size": "11px",
+            "url": ""
+          },
+          "body": {
+            "family": "\"Space Mono\", monospace",
+            "size": "18px",
+            "url": ""
+          },
+          "body-fine": {
+            "family": "\"Space Mono\", monospace",
+            "size": "10px",
+            "url": ""
+          }
+        },
+        "spacing": {
+          "md": "32px",
+          "lg": "48px",
+          "xl": "96px",
+          "xxl": "192px"
+        },
+        "radius": {
+          "none": "0px",
+          "full": "9999px"
+        }
+      },
+      "designInstructions": "## Token Instructions\n\n- `pac` -> Pac-Man yellow; primary CTA, pellets and logo only\n- `primary` / `secondary` / `warning` / `danger` -> one ghost hue each (Inky/Pinky/Clyde/Blinky); tag a single module, plan and its dotted border, never blended\n- `success` -> secure/READY status and the green ticker\n- `surface` -> pure-black CRT canvas everywhere; `surface-well` for faint inner wells\n- `display` / `heading` / `label-pixel` -> Press Start 2P, uppercase, for all headings, nav and badges\n- `body` -> Space Mono, also uppercase\n- `radius.none` -> square dotted-border boxes with 8px corner pips\n- `radius.full` -> only Pac-Man, pellets, ghost eyes and status dots\n- spacing -> base 4px, arcade-roomy sections (py-24 -> py-48)\n\n\n# Pac-Man Arcade — \"GHOSTWALL\"\n\n> Design spec — version alpha. Source: static HTML (`pacman-arcade.html`); tokens read from `:root` and component CSS. Fictional arcade-themed firewall product; described factually.\n\n## Overview\n\nAn **8-bit arcade cabinet** UI that themes a network firewall as a Pac-Man maze (\"hunt down malicious packets\"). The screen is pure black `{colors.surface}` `#000000` with a CRT scanline overlay. Color comes from the **arcade ghost palette** — Pac yellow `{colors.pac}` `#FFE800`, blue `{colors.primary}` `#2A3FE5`, pink `{colors.secondary}` `#F4B9B0`, orange `{colors.warning}` `#D97706`, red `{colors.danger}` `#DC2626`, green `{colors.success}` `#10B981` — each hue owning a role (a ghost, a plan, a status). Every container is a **4px dotted border** with square **corner-marker pips**. Type is the pixel font **Press Start 2P** (headings, labels, all uppercase) over **Space Mono** body. Signatures: **chomping** Pac-Man dots, **floating CSS ghost** shapes whose pupils **track the cursor**, dotted **pellet trails**, a **power-pellet toggle** that recolors the whole dashboard blue, a green **drift ticker**, and a scroll-progress Pac-Man eating the footer rule.\n\n## Colors\n\n**Arcade palette.** No single voltage — Pac yellow `{colors.pac}` is the primary CTA/pellet/logo color; the four ghost hues (`{colors.danger}` Blinky, `{colors.secondary}` Pinky, `{colors.primary}` Inky, `{colors.warning}` Clyde) each tag a module/plan and its dotted border; `{colors.success}` green signals secure/READY status and the ticker. Discipline: one hue per ghost/section/status — colors never blend.\n\n**Surface.** Black `{colors.surface}` everywhere; faint white wells (`{colors.surface-well}`); white text `{colors.on-surface}` (60% muted).\n\n## Typography\n\n**Press Start 2P** pixel font for all headings, nav, badges and plan headers (uppercase, blocky); **Space Mono** for body and fine print (also uppercase).\n\n| Token       | Family        | Size | Usage                         |\n| ----------- | ------------- | ---- | ----------------------------- |\n| display     | Press Start 2P| 72px | Hero (\"HUNT DOWN MALICIOUS…\") |\n| heading     | Press Start 2P| 36px | Section titles                |\n| label-pixel | Press Start 2P| 11px | Nav, badges, plan headers     |\n| body        | Space Mono    | 18px | Body copy (uppercase)         |\n| body-fine   | Space Mono    | 10px | Fine print, stats             |\n\n## Layout\n\nBase 4px, arcade-roomy sections (`py-24`→`py-48`). A sticky dotted nav (chomping Pac logo + \"INSERT COIN\"); a centered hero over a faint dotted maze grid; a **dashboard** (7/5 split: a maze \"network map\" with ghosts/pellets + a countermeasures panel with the power toggle); a 4-up **ghost module** grid (rotated cards that straighten on hover); a green **drift ticker**; a 3-up **pricing** row with a scaled orange featured plan; and a footer with a scroll-progress Pac-Man rail.\n\n## Elevation & Depth\n\nFlat 8-bit — depth is **neon glow**, not shadow: pellets/CTAs/ghosts carry colored glows (`0 0 10–20px`), the CRT `::after` scanline gradient and a `scanline-overlay` sit above everything. Cards are rotated and snap straight on hover rather than lifting.\n\n## Shapes\n\nSquare dotted-border boxes (`{rounded.none}`) with 8px corner pips define the maze aesthetic; Pac-Man, pellets, ghost eyes and status dots are the only `{rounded.full}` elements (ghosts are rounded-top capsules).\n\n## Components\n\n- **box-dotted** — 4px dotted border (colored per section) with square corner-marker pips.\n- **button-primary** — Pac-yellow fill, black pixel label, dotted border, yellow glow, press-down.\n- **button-outline** — section-colored dotted border + matching text, tinted hover.\n- **ghost** — CSS rounded-top body in a palette hue, white eyes with cursor-tracking pupils, float + glow.\n- **toggle-power** — flips the dashboard into `.power-on` (blue bg, white ghost bodies, yellow pupils).\n- **ticker** — green dotted-bordered band of Press Start phrases + Pac dots, drifting left.\n- **pricing-featured** — orange \"2P CO-OP\" plan, scaled up with a blinking \"BEST VALUE\" tag.\n\n## Motion\n\nPervasive arcade motion: **chomp** (`0.3s steps(2)`), **float** ghosts (`2.5s`), **blink** (`0.8s steps`), **drift** ticker (`30s linear`), **pulse-pellet** (`1s`); plus JS interactivity — ghost pupils track the mouse via `atan2`, the power toggle recolors the dashboard, and a footer Pac-Man advances with scroll progress.\n\n## Iconography\n\nNo icon library — ghosts and Pac-Man are **pure CSS pixel shapes**; social links are pixel-letter glyphs (TW/GH) in dotted boxes. Each ghost/section owns one palette hue.\n\n## Do's and Don'ts\n\n- **Do** keep the pure-black CRT screen with the scanline overlay.\n- **Do** assign exactly one palette hue per ghost, plan, status and its dotted border.\n- **Do** use 4px dotted borders + corner pips on every container.\n- **Do** set headings/labels in Press Start 2P and body in uppercase Space Mono.\n- **Do** lean on neon glow + chomp/float/blink animations for life.\n- **Don't** use solid borders, rounded boxes, or drop shadows in place of dotted borders + glow.\n- **Don't** mix two ghost colors in one element.\n- **Don't** abandon the pixel font for headings — it carries the 8-bit identity.\n\n## Known Gaps\n\n- Values read from the implementation's resolved `:root`. `--color-fg-muted` is referenced but undefined in source (hero subtext falls back). Copy/stats are sample content; CSS transitions are globally disabled in the capture so animation timings reflect authored intent.\n",
+      "id": "style_c1444612bfdb",
+      "created": "2026-06-20T04:05:54.577Z",
+      "modified": "2026-06-20T04:05:54.577Z"
+    }
+  ]
+}

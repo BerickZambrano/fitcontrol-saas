@@ -46,6 +46,7 @@ class JugadorPerfilForm
                         \Filament\Forms\Components\TextInput::make('password')
                             ->label('Contraseña')
                             ->password()
+                            ->revealable()
                             ->required()
                             ->maxLength(255),
                     ])

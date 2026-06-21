@@ -1,19 +1,19 @@
 <?php
 
-namespace App\Filament\Arbitro\Resources\PartidoResource\Pages;
+namespace App\Filament\Resources\ArbitroResource\Pages;
 
-use App\Filament\Arbitro\Resources\PartidoResource;
+use App\Filament\Resources\ArbitroResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 
-class EditPartido extends EditRecord
+class EditArbitro extends EditRecord
 {
-    protected static string $resource = PartidoResource::class;
+    protected static string $resource = ArbitroResource::class;
 
     protected function getHeaderActions(): array
     {
         return [
-            //
+            Actions\DeleteAction::make(),
         ];
     }
 

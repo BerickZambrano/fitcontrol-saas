@@ -41,9 +41,23 @@ Route::post('/solicitar-acceso', [TenantRequestController::class, 'store'])
     ->middleware('throttle:tenant-request')
     ->name('tenant.request.store');
 
-Route::view('dashboard', 'dashboard')
-    ->middleware(['auth', 'verified'])
-    ->name('dashboard');
+Route::get('dashboard', function () {
+    $user = auth()->user();
+
+    if ($user->hasRole(['Administrador', 'super_admin'])) {
+        return redirect('/admin');
+    }
+
+    if ($user->hasRole('Entrenador')) {
+        return redirect('/entrenador');
+    }
+
+    if ($user->hasRole('Arbitro')) {
+        return redirect('/arbitro');
+    }
+
+    return redirect('/jugador');
+})->middleware(['auth', 'verified'])->name('dashboard');
 
 // Solo disponible en entorno local (desarrollo)
 if (app()->environment('local')) {
@@ -69,6 +83,10 @@ Route::get('/reportes/descargar/{report}', [ReportController::class, 'download']
     ->name('reportes.descargar');
 
 require __DIR__.'/settings.php';
+
+Route::get('/admin/tenants/{tenant}/document/{field}', [App\Http\Controllers\Admin\TenantDocumentController::class, 'show'])
+    ->middleware(['auth'])
+    ->name('admin.tenants.document.show');
 
 Route::fallback(function () {
     return response()->view('errors.404', [], 404);

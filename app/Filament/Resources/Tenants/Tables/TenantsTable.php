@@ -9,6 +9,7 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Table;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
@@ -40,8 +41,11 @@ class TenantsTable
                     ->label('Tipo de Club')
                     ->badge(),
                 TextColumn::make('escudo_url')
-                    ->label('URL del Escudo')
-                    ->searchable(),
+                    ->label('Escudo')
+                    ->formatStateUsing(fn ($state) => $state ? '🖼️ Ver Escudo' : 'Sin escudo')
+                    ->color('primary')
+                    ->url(fn ($record) => $record->escudo_url ? \Illuminate\Support\Facades\Storage::disk('public')->url($record->escudo_url) : null)
+                    ->openUrlInNewTab(),
                 TextColumn::make('direccion')
                     ->label('Dirección')
                     ->searchable(),
@@ -71,10 +75,16 @@ class TenantsTable
                     ->searchable(),
                 TextColumn::make('rut_document')
                     ->label('Documento RUT')
-                    ->searchable(),
+                    ->formatStateUsing(fn ($state) => $state ? '📄 Ver RUT' : 'Sin documento')
+                    ->color('primary')
+                    ->url(fn ($record) => $record->rut_document ? route('admin.tenants.document.show', ['tenant' => $record->id, 'field' => 'rut_document']) : null)
+                    ->openUrlInNewTab(),
                 TextColumn::make('camara_comercio')
                     ->label('Cámara de Comercio')
-                    ->searchable(),
+                    ->formatStateUsing(fn ($state) => $state ? '📄 Ver Cámara' : 'Sin documento')
+                    ->color('primary')
+                    ->url(fn ($record) => $record->camara_comercio ? route('admin.tenants.document.show', ['tenant' => $record->id, 'field' => 'camara_comercio']) : null)
+                    ->openUrlInNewTab(),
                 TextColumn::make('plan')
                     ->label('Plan')
                     ->badge(),
