@@ -56,6 +56,10 @@ Route::get('dashboard', function () {
         return redirect('/arbitro');
     }
 
+    if ($user->hasRole('Medico')) {
+        return redirect('/medico');
+    }
+
     return redirect('/jugador');
 })->middleware(['auth', 'verified'])->name('dashboard');
 

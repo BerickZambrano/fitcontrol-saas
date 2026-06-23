@@ -23,6 +23,11 @@ class TraspasoResource extends Resource
     protected static ?string $modelLabel = 'Traspaso';
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-arrows-right-left';
 
+    public static function canViewAny(): bool
+    {
+        return !auth()->user()->hasRole('Medico');
+    }
+
     public static function getEloquentQuery(): Builder
     {
         $query = parent::getEloquentQuery();

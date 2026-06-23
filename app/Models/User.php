@@ -11,10 +11,13 @@ use Spatie\Permission\Traits\HasRoles;
 use Filament\Models\Contracts\HasAvatar;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Laravel\Fortify\TwoFactorAuthenticatable;
+use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable implements HasAvatar, FilamentUser
 {
-    use Notifiable, HasRoles, Searchable, SoftDeletes;
+    use Notifiable, HasRoles, Searchable, SoftDeletes, HasFactory, TwoFactorAuthenticatable, HasApiTokens;
 
     /**
      * Bootstrap the model and its event listeners.
@@ -208,6 +211,10 @@ class User extends Authenticatable implements HasAvatar, FilamentUser
 
         if ($panel->getId() === 'jugador') {
             return $this->hasRole('Jugador');
+        }
+
+        if ($panel->getId() === 'medico') {
+            return $this->hasRole('Medico');
         }
 
         if ($panel->getId() === 'arbitro') {
