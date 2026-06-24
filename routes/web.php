@@ -107,6 +107,28 @@ Route::get('/terminos', function () {
     return view('terminos');
 });
 
+// Fallback route to serve public files if the public/storage symlink is missing or broken in production
+Route::get('/storage/{path}', function (string $path) {
+    if (str_contains($path, '..')) {
+        abort(404);
+    }
+
+    $fullPath = storage_path('app/public/' . $path);
+
+    if (!file_exists($fullPath)) {
+        abort(404);
+    }
+
+    $realPublicPath = realpath(storage_path('app/public'));
+    $realFullPath = realpath($fullPath);
+
+    if (!$realFullPath || !str_starts_with($realFullPath, $realPublicPath)) {
+        abort(404);
+    }
+
+    return response()->file($realFullPath);
+})->where('path', '.*');
+
 Route::fallback(function () {
     return response()->view('errors.404', [], 404);
 });
