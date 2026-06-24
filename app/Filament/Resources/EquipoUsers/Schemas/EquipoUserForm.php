@@ -62,7 +62,40 @@ class EquipoUserForm
                         }
                         return $query;
                     }
-                ),
+                )
+                ->live()
+                ->rules([
+                    function ($get, $record) {
+                        return function (string $attribute, $value, \Closure $fail) use ($get, $record) {
+                            if (!$value) {
+                                return;
+                            }
+
+                            // 1. Check if the user is a Player (has the 'Jugador' role)
+                            $user = User::withoutGlobalScopes()->find($value);
+                            if (!$user || !$user->hasRole('Jugador')) {
+                                return;
+                            }
+
+                            // 2. Check if they already belong to an active team (fecha_fin is null or >= today)
+                            // If editing, we exclude the current record ID.
+                            $query = \App\Models\EquipoUser::withoutGlobalScopes()
+                                ->where('user_id', $value)
+                                ->where(function ($q) {
+                                    $q->whereNull('fecha_fin')
+                                      ->orWhere('fecha_fin', '>=', now()->toDateString());
+                                });
+
+                            if ($record) {
+                                $query->where('id', '!=', $record->id);
+                            }
+
+                            if ($query->exists()) {
+                                $fail('El jugador ya posee un equipo asignado. Solicite un traspaso si desea cambiarlo.');
+                            }
+                        };
+                    }
+                ]),
 
             Forms\Components\DatePicker::make('fecha_inicio')
                 ->label('Fecha de Inicio')

@@ -46,7 +46,7 @@
         >
             <div 
                 @click.stop
-                style="background-color: #1f2937 !important; border: 1px solid rgba(255, 255, 255, 0.15) !important; border-radius: 1.25rem !important; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5) !important; width: 100% !important; max-width: 28rem !important; padding: 2rem !important; display: flex !important; flex-direction: column !important; gap: 1.25rem !important; color: #ffffff !important; font-family: system-ui, -apple-system, sans-serif !important;"
+                style="position: absolute !important; top: 50% !important; left: 50% !important; transform: translate(-50%, -50%) !important; background-color: #1f2937 !important; border: 1px solid rgba(255, 255, 255, 0.15) !important; border-radius: 1.25rem !important; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5) !important; width: calc(100% - 3rem) !important; max-width: 28rem !important; padding: 2rem !important; display: flex !important; flex-direction: column !important; gap: 1.25rem !important; color: #ffffff !important; font-family: system-ui, -apple-system, sans-serif !important;"
             >
                 <div style="display: flex !important; align-items: center !important; gap: 0.75rem !important;">
                     <span style="width: 0.75rem !important; height: 0.75rem !important; border-radius: 50% !important; display: inline-block !important; flex-shrink: 0 !important;" :style="'background-color: ' + eventColor"></span>
