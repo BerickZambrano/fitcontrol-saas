@@ -36,15 +36,14 @@ class JugadoresNoAptosWidget extends Widget
             return collect();
         }
 
-        // Obtener IDs de los jugadores asignados a esos equipos
         $jugadoresIds = EquipoUser::whereIn('equipo_id', $equiposIds)
             ->where('user_id', '!=', $user->id) // Excluir al entrenador
             ->where(function ($query) {
                 $query->whereNull('fecha_fin')
                       ->orWhere('fecha_fin', '>=', now()->toDateString());
             })
-            ->pluck('user_id')
-            ->distinct();
+            ->distinct()
+            ->pluck('user_id');
 
         if ($jugadoresIds->isEmpty()) {
             return collect();

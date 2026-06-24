@@ -3,7 +3,7 @@
         $lesionados = $this->getJugadoresNoAptos();
     @endphp
 
-    <div class="bg-white dark:bg-gray-900 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-800 p-6 flex flex-col gap-4">
+    <div class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm dark:border-white/10 dark:bg-white/5 flex flex-col gap-4">
         <div class="flex items-center justify-between border-b border-gray-100 dark:border-gray-800 pb-3">
             <h3 class="text-lg font-bold tracking-tight text-gray-900 dark:text-white flex items-center gap-2">
                 <span>🏥</span> Jugadores de Baja / No Aptos

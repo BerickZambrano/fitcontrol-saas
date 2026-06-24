@@ -35,13 +35,24 @@ class JugadoresNoAptos extends ApexChartWidget
         return [
             'chart' => [
                 'type' => 'donut',
+                'height' => 200,
+            ],
+            'series' => [$data['aptos'], $data['no_aptos']],
+            'labels' => ['Aptos', 'No aptos'],
+            'legend' => [
+                'position' => 'bottom',
             ],
             'colors' => [
                 auth()->user()->tenant?->colores_oficiales['primary'] ?? '#3b82f6', 
                 '#ef4444' // Rojo para No aptos
             ],
-            'series' => [$data['aptos'], $data['no_aptos']],
-            'labels' => ['Aptos', 'No aptos'],
+            'plotOptions' => [
+                'pie' => [
+                    'donut' => [
+                        'size' => '65%',
+                    ],
+                ],
+            ],
         ];
     }
 }
