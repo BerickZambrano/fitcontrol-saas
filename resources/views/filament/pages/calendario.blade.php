@@ -41,37 +41,37 @@
             x-show="open"
             x-cloak
             x-transition
-            class="fixed inset-0 z-50 flex items-center justify-center p-4"
-            style="position: fixed; top: 0; right: 0; bottom: 0; left: 0; z-index: 50; display: flex; align-items: center; justify-content: center; background-color: rgba(0, 0, 0, 0.6); backdrop-filter: blur(4px); padding: 1rem;"
+            @click="open = false"
+            style="position: fixed !important; top: 0 !important; right: 0 !important; bottom: 0 !important; left: 0 !important; z-index: 9999 !important; display: flex !important; align-items: center !important; justify-content: center !important; background-color: rgba(0, 0, 0, 0.75) !important; backdrop-filter: blur(8px) !important; -webkit-backdrop-filter: blur(8px) !important; padding: 1.5rem !important;"
         >
             <div 
-                class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border dark:border-gray-700 transform transition-all duration-300"
-                style="width: 100%; max-width: 28rem; padding: 1.5rem; margin-left: 1rem; margin-right: 1rem;"
+                @click.stop
+                style="background-color: #1f2937 !important; border: 1px solid rgba(255, 255, 255, 0.15) !important; border-radius: 1.25rem !important; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5) !important; width: 100% !important; max-width: 28rem !important; padding: 2rem !important; display: flex !important; flex-direction: column !important; gap: 1.25rem !important; color: #ffffff !important; font-family: system-ui, -apple-system, sans-serif !important;"
             >
-                <div class="flex items-center gap-3 mb-4">
-                    <span class="w-3 h-3 rounded-full" :style="'background-color: ' + eventColor"></span>
-                    <span class="text-xs font-black uppercase tracking-widest text-gray-500 dark:text-gray-400" x-text="eventType"></span>
+                <div style="display: flex !important; align-items: center !important; gap: 0.75rem !important;">
+                    <span style="width: 0.75rem !important; height: 0.75rem !important; border-radius: 50% !important; display: inline-block !important; flex-shrink: 0 !important;" :style="'background-color: ' + eventColor"></span>
+                    <span style="font-size: 0.75rem !important; font-weight: 800 !important; text-transform: uppercase !important; letter-spacing: 0.1em !important; color: #9ca3af !important;" x-text="eventType"></span>
                 </div>
 
-                <h3 class="text-2xl font-black text-gray-900 dark:text-white leading-tight mb-4" x-text="eventTitle"></h3>
+                <h3 style="font-size: 1.5rem !important; font-weight: 800 !important; line-height: 1.25 !important; margin: 0 !important; color: #ffffff !important;" x-text="eventTitle"></h3>
 
-                <div class="space-y-3 mb-6 text-sm text-gray-600 dark:text-gray-300">
-                    <div class="flex items-center gap-3">
-                        <svg class="text-gray-400" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width: 1.25rem; height: 1.25rem; flex-shrink: 0;">
+                <div style="display: flex !important; flex-direction: column !important; gap: 1rem !important;">
+                    <div style="display: flex !important; align-items: center !important; gap: 0.75rem !important; font-size: 0.95rem !important; color: #d1d5db !important;">
+                        <svg style="color: #9ca3af !important; width: 1.25rem !important; height: 1.25rem !important; flex-shrink: 0 !important;" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
                         </svg>
-                        <span><strong>Hora:</strong> <span x-text="eventStart"></span></span>
+                        <span><strong style="color: #ffffff !important; font-weight: 600 !important;">Hora:</strong> <span x-text="eventStart"></span></span>
                     </div>
-                    <div class="flex items-center gap-3">
-                        <svg class="text-gray-400" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width: 1.25rem; height: 1.25rem; flex-shrink: 0;">
+                    <div style="display: flex !important; align-items: center !important; gap: 0.75rem !important; font-size: 0.95rem !important; color: #d1d5db !important;">
+                        <svg style="color: #9ca3af !important; width: 1.25rem !important; height: 1.25rem !important; flex-shrink: 0 !important;" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
                             <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
                         </svg>
-                        <span><strong>Ubicación:</strong> <span x-text="eventLocation"></span></span>
+                        <span><strong style="color: #ffffff !important; font-weight: 600 !important;">Ubicación:</strong> <span x-text="eventLocation"></span></span>
                     </div>
                     <template x-if="eventExtra">
-                        <div class="flex items-center gap-3">
-                            <svg class="text-gray-400" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width: 1.25rem; height: 1.25rem; flex-shrink: 0;">
+                        <div style="display: flex !important; align-items: center !important; gap: 0.75rem !important; font-size: 0.95rem !important; color: #d1d5db !important;">
+                            <svg style="color: #9ca3af !important; width: 1.25rem !important; height: 1.25rem !important; flex-shrink: 0 !important;" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 111.063.852l-.708 2.836a.75.75 0 001.063.852l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" />
                             </svg>
                             <span x-text="eventExtra"></span>
@@ -79,10 +79,12 @@
                     </template>
                 </div>
 
-                <div class="flex justify-end">
+                <div style="display: flex !important; justify-content: flex-end !important; border-top: 1px solid rgba(255, 255, 255, 0.1) !important; padding-top: 1.25rem !important; margin-top: 0.5rem !important;">
                     <button
                         @click="open = false"
-                        class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 dark:bg-emerald-600 dark:hover:bg-emerald-700 text-white text-sm font-bold rounded-xl shadow-lg transition-colors duration-200"
+                        onmouseover="this.style.backgroundColor='#059669'"
+                        onmouseout="this.style.backgroundColor='#10b981'"
+                        style="background-color: #10b981 !important; color: #ffffff !important; font-weight: 700 !important; font-size: 0.875rem !important; padding: 0.625rem 1.25rem !important; border-radius: 0.75rem !important; border: none !important; cursor: pointer !important; transition: all 0.2s ease-in-out !important; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;"
                     >
                         Cerrar
                     </button>
