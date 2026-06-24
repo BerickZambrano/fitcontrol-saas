@@ -40,12 +40,16 @@ class MedicoPanelProvider extends PanelProvider
                 )
             )
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
+            ->discoverPages(in: app_path('Filament/Medico/Pages'), for: 'App\Filament\Medico\Pages')
             ->pages([
                 \Filament\Pages\Dashboard::class,
+                \App\Filament\Medico\Pages\MedicoProfile::class,
+                \App\Filament\Admin\Pages\Calendario::class,
             ])
             ->widgets([
                 \App\Filament\Resources\HistorialMedicos\Widgets\HistorialMedicosStats::class,
                 \App\Filament\Widgets\JugadoresNoAptos::class,
+                \App\Filament\Entrenador\Widgets\JugadoresNoAptosWidget::class,
             ])
             ->plugins([
                 \Leandrocfe\FilamentApexCharts\FilamentApexChartsPlugin::make(),
@@ -53,7 +57,7 @@ class MedicoPanelProvider extends PanelProvider
             ->userMenuItems([
                 'profile' => \Filament\Navigation\MenuItem::make()
                     ->label('Mi Perfil')
-                    ->url(fn (): string => '/medico') // Placeholder para el perfil del médico si no hay uno custom
+                    ->url(fn (): string => \App\Filament\Medico\Pages\MedicoProfile::getUrl())
                     ->icon('heroicon-o-user-circle'),
             ])
             ->databaseNotifications()

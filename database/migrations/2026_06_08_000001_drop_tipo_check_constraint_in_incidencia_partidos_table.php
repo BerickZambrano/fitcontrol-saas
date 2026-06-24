@@ -7,7 +7,9 @@ return new class extends Migration
 {
     public function up(): void
     {
-        DB::statement('ALTER TABLE incidencia_partidos DROP CONSTRAINT IF EXISTS incidencia_partidos_tipo_check;');
+        if (DB::getDriverName() === 'pgsql') {
+            DB::statement('ALTER TABLE incidencia_partidos DROP CONSTRAINT IF EXISTS incidencia_partidos_tipo_check;');
+        }
     }
 
     public function down(): void

@@ -53,9 +53,11 @@ class ArbitroPanelProvider extends PanelProvider
             ->pages([
                 \Filament\Pages\Dashboard::class,
                 \App\Filament\Arbitro\Pages\RefereeProfile::class,
+                \App\Filament\Admin\Pages\Calendario::class,
             ])
             ->discoverWidgets(in: app_path('Filament/Arbitro/Widgets'), for: 'App\Filament\Arbitro\Widgets')
             ->widgets([
+                \App\Filament\Arbitro\Widgets\ArbitroStatsOverview::class,
             ])
             ->middleware([
                 EncryptCookies::class,

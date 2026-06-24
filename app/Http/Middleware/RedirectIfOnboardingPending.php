@@ -29,8 +29,9 @@ class RedirectIfOnboardingPending
 
             // Check if we're already on the onboarding page
             $isOnboardingPage = str_contains($currentRoute ?? '', 'post-register-onboarding');
+            $isLogoutRoute = str_contains($currentRoute ?? '', 'logout') || $request->routeIs('filament.*.auth.logout');
 
-            if (!$isOnboardingPage) {
+            if (!$isOnboardingPage && !$isLogoutRoute) {
                 return redirect()->route('filament.admin.pages.post-register-onboarding');
             }
         }

@@ -17,7 +17,10 @@ class ProximoCompromiso extends Widget
 
     protected static ?int $sort = 1;
 
-    protected int|string|array $columnSpan = 'full';
+    protected int | string | array $columnSpan = [
+        'md' => 4,
+        'lg' => 4,
+    ];
 
     public function getNextEvent(): ?array
     {

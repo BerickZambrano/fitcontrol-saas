@@ -49,6 +49,7 @@ class EntrenadorPanelProvider extends PanelProvider
             ->pages([
                 \App\Filament\Entrenador\Pages\Dashboard::class,
                 \App\Filament\Entrenador\Pages\CoachProfile::class,
+                \App\Filament\Admin\Pages\Calendario::class,
             ])
             ->userMenuItems([
                 'profile' => \Filament\Navigation\MenuItem::make()

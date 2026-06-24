@@ -21,7 +21,7 @@ class JugadoresNoAptosWidget extends Widget
     {
         $user = Auth::user();
 
-        if ($user->hasRole(['super_admin', 'Administrador'])) {
+        if ($user->hasRole(['super_admin', 'Administrador', 'Medico'])) {
             $equiposIds = Equipo::pluck('id');
         } else {
             $equiposIds = EquipoUser::where('user_id', $user->id)

@@ -24,6 +24,12 @@ return Application::configure(basePath: dirname(__DIR__))
             'api/wompi/webhook',
             'wompi/webhook',
             'paywall/prepare',
+            'logout',
+            'admin/logout',
+            'entrenador/logout',
+            'jugador/logout',
+            'medico/logout',
+            'arbitro/logout',
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

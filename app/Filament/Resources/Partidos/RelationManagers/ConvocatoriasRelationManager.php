@@ -21,15 +21,42 @@ class ConvocatoriasRelationManager extends RelationManager
                 Forms\Components\Select::make('jugador_id')
                     ->label('Jugador')
                     ->options(function ($livewire) {
-                        $partido = $livewire->getOwnerRecord();
-                        // Filtrar los que tienen sancion
-                        $jugadoresConSancion = \App\Models\Sancion::where('estado', 'activa')->pluck('jugador_id');
                         $entrenador = auth()->user();
-                        
-                        return User::role('Jugador')
+                        $jugadoresConSancion = \App\Models\Sancion::where('estado', 'activa')->pluck('jugador_id')->toArray();
+                        $jugadoresLesionados = \App\Models\HistorialMedico::where('apto', false)
+                            ->where(function($q) {
+                                $q->whereNull('fecha_fin')->orWhere('fecha_fin', '>=', now()->toDateString());
+                            })->pluck('user_id')->toArray();
+
+                        $usuarios = User::role('Jugador')
                             ->where('tenant_id', $entrenador->tenant_id)
-                            ->whereNotIn('id', $jugadoresConSancion)
-                            ->pluck('name', 'id');
+                            ->get();
+
+                        $options = [];
+                        foreach($usuarios as $user) {
+                            if (in_array($user->id, $jugadoresConSancion)) {
+                                $options[$user->id] = "<span style='color: red; text-decoration: line-through;'>{$user->name} (Sancionado)</span>";
+                            } elseif (in_array($user->id, $jugadoresLesionados)) {
+                                $options[$user->id] = "<span style='color: red; font-weight: bold;'>{$user->name} (Lesionado)</span>";
+                            } else {
+                                $options[$user->id] = $user->name;
+                            }
+                        }
+                        
+                        return $options;
+                    })
+                    ->allowHtml()
+                    ->disableOptionWhen(function (string $value) {
+                        static $noElegibles = null;
+                        if ($noElegibles === null) {
+                            $sancionados = \App\Models\Sancion::where('estado', 'activa')->pluck('jugador_id')->toArray();
+                            $lesionados = \App\Models\HistorialMedico::where('apto', false)
+                                ->where(function($q) {
+                                    $q->whereNull('fecha_fin')->orWhere('fecha_fin', '>=', now()->toDateString());
+                                })->pluck('user_id')->toArray();
+                            $noElegibles = array_merge($sancionados, $lesionados);
+                        }
+                        return in_array($value, $noElegibles);
                     })
                     ->searchable()
                     ->required()

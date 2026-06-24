@@ -10,12 +10,30 @@ class CheckTenantPayment
 {
     public function handle(Request $request, Closure $next): Response
     {
+        $userBefore = auth()->user();
         $response = $next($request);
-        $user = auth()->user();
+        $userAfter = auth()->user();
+
+        if ($userBefore || $userAfter) {
+            \Illuminate\Support\Facades\Log::debug('CheckTenantPayment debug:', [
+                'url' => $request->fullUrl(),
+                'method' => $request->method(),
+                'route_name' => $request->route() ? $request->route()->getName() : null,
+                'user_before_id' => $userBefore ? $userBefore->id : null,
+                'user_after_id' => $userAfter ? $userAfter->id : null,
+                'status_code' => $response->getStatusCode(),
+            ]);
+        }
+
+        $user = $userAfter;
 
         if ($user && $user->tenant && $user->tenant->estado_pago === 'pendiente') {
             // Permitir solicitudes de logout, simulaciones de pago y peticiones Livewire de logout/pago
-            if ($request->routeIs('paywall.*') || $request->routeIs('filament.*.auth.logout') || $request->routeIs('livewire.*')) {
+            if ($request->routeIs('paywall.*') || 
+                $request->routeIs('filament.*.auth.logout') || 
+                $request->routeIs('logout') || 
+                str_contains($request->getPathInfo(), 'logout') || 
+                $request->routeIs('livewire.*')) {
                 return $response;
             }
 

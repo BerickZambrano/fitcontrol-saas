@@ -74,7 +74,15 @@ class HistorialMedicosTable
             ->filters([
                 SelectFilter::make('usuario_id')
                     ->label('Jugador')
-                    ->relationship('usuario', 'name')
+                    ->relationship('usuario', 'name', function ($query) {
+                        $query->where(function ($q) {
+                            $q->role('Jugador')
+                              ->orWhereHas('jugadorPerfil');
+                        });
+                        if (!auth()->user()->hasRole('super_admin')) {
+                            $query->where('tenant_id', auth()->user()->tenant_id);
+                        }
+                    })
                     ->searchable()
                     ->preload(),
 

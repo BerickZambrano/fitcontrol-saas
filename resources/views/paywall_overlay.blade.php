@@ -272,27 +272,20 @@
             </form>
         @endif
 
-        @php
-            $panelId = 'entrenador';
-            try {
-                if (function_exists('filament') && filament()->getCurrentPanel()) {
-                    $panelId = filament()->getCurrentPanel()->getId();
-                }
-            } catch (\Exception $e) {}
-        @endphp
-
-        <form action="{{ route('filament.' . $panelId . '.auth.logout') }}" method="POST" style="margin-top: 20px;">
+        <form id="logout-form-overlay" action="{{ filament()->getLogoutUrl() }}" method="POST" style="display: none;">
             @csrf
-            <button type="submit" style="
-                background: none;
-                border: none;
-                color: #94a3b8;
-                font-size: 14px;
-                cursor: pointer;
-                text-decoration: underline;
-            ">
-                Cerrar sesión
-            </button>
         </form>
+        <a href="#" onclick="event.preventDefault(); document.getElementById('logout-form-overlay').submit();" style="
+            background: none;
+            border: none;
+            color: #94a3b8;
+            font-size: 14px;
+            cursor: pointer;
+            text-decoration: underline;
+            margin-top: 20px;
+            display: inline-block;
+        ">
+            Cerrar sesión
+        </a>
     </div>
 </div>

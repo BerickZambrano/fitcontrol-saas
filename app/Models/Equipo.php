@@ -6,10 +6,11 @@ use Illuminate\Database\Eloquent\Model;
 use App\Models\Traits\BelongsToTenant;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Laravel\Scout\Searchable;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Equipo extends Model
 {
-    use BelongsToTenant, Searchable, SoftDeletes;
+    use BelongsToTenant, Searchable, SoftDeletes, HasFactory;
 
     protected $fillable = [
         'tenant_id',

@@ -26,7 +26,12 @@ class HistorialMedicoForm
                         Select::make('user_id')
                             ->label('Jugador')
                             ->options(function () {
-                                $query = User::query()->withoutGlobalScopes();
+                                $query = User::query()
+                                    ->withoutGlobalScopes()
+                                    ->where(function ($q) {
+                                        $q->role('Jugador')
+                                          ->orWhereHas('jugadorPerfil');
+                                    });
                                 if (!auth()->user()->hasRole('super_admin')) {
                                     $query->where('tenant_id', auth()->user()->tenant_id);
                                 }
@@ -34,7 +39,6 @@ class HistorialMedicoForm
                             })
                             ->searchable()
                             ->preload()
-
                             ->required(),
 
                         Select::make('tipo_lesion')

@@ -65,21 +65,12 @@
                     Verificar Estado del Pago
                 </a>
 
-                @php
-                    $panelId = 'entrenador';
-                    try {
-                        if (function_exists('filament') && filament()->getCurrentPanel()) {
-                            $panelId = filament()->getCurrentPanel()->getId();
-                        }
-                    } catch (\Exception $e) {}
-                @endphp
-
-                <form action="{{ route('filament.' . $panelId . '.auth.logout') }}" method="POST" class="inline-block w-full text-center mt-2">
+                <form id="logout-form-status" action="{{ filament()->getLogoutUrl() }}" method="POST" style="display: none;">
                     @csrf
-                    <button type="submit" class="text-slate-400 hover:text-slate-200 text-sm underline transition duration-150">
-                        Cerrar sesión e intentar más tarde
-                    </button>
                 </form>
+                <a href="#" onclick="event.preventDefault(); document.getElementById('logout-form-status').submit();" class="text-slate-400 hover:text-slate-200 text-sm underline transition duration-150 inline-block w-full text-center mt-2 cursor-pointer">
+                    Cerrar sesión e intentar más tarde
+                </a>
             </div>
         </div>
     </div>
