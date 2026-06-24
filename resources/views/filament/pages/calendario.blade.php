@@ -111,6 +111,7 @@
                     const el = document.getElementById('calendar')
 
                     this.calendar = new FullCalendar.Calendar(el, {
+                        timeZone: 'UTC', // Evita desfases por zona horaria del navegador
                         initialView: 'dayGridMonth',
                         locale: 'es',
                         selectable: true,

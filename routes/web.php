@@ -129,6 +129,58 @@ Route::get('/storage/{path}', function (string $path) {
     return response()->file($realFullPath);
 })->where('path', '.*');
 
+// Ruta de diagnóstico temporal para ver por qué fallan los documentos en producción
+Route::get('/admin/debug-tenant/{tenant}', function (App\Models\Tenant $tenant) {
+    if (!auth()->check() || !auth()->user()->hasRole('super_admin')) {
+        return 'No autorizado';
+    }
+
+    $results = [
+        'tenant_id' => $tenant->id,
+        'nombre' => $tenant->nombre,
+        'rut_document_db' => $tenant->rut_document,
+        'camara_comercio_db' => $tenant->camara_comercio,
+        'local_disk_root' => config('filesystems.disks.local.root'),
+        'checks' => []
+    ];
+
+    foreach (['rut_document', 'camara_comercio'] as $field) {
+        $path = $tenant->getAttribute($field);
+        if (!$path) {
+            $results['checks'][$field] = 'No definido en Base de Datos';
+            continue;
+        }
+
+        $disk = Storage::disk('local');
+        $existsDisk = $disk->exists($path);
+        
+        $oldPath = storage_path('app/' . $path);
+        $existsOld = file_exists($oldPath);
+        
+        $privatePath = storage_path('app/private/' . $path);
+        $existsPrivate = file_exists($privatePath);
+
+        $results['checks'][$field] = [
+            'path_in_db' => $path,
+            'exists_via_storage_disk' => $existsDisk,
+            'exists_in_storage_app' => $existsOld,
+            'exists_in_storage_app_private' => $existsPrivate,
+            'permissions_storage_app' => $existsOld ? substr(sprintf('%o', fileperms($oldPath)), -4) : null,
+            'permissions_storage_app_private' => $existsPrivate ? substr(sprintf('%o', fileperms($privatePath)), -4) : null,
+        ];
+    }
+    
+    // Verificar si el controlador modificado ya está activo en producción
+    try {
+        $ref = new ReflectionClass(App\Http\Controllers\Admin\TenantDocumentController::class);
+        $results['controller_source_modified'] = str_contains(file_get_contents($ref->getFileName()), 'Fallback 1');
+    } catch (\Throwable $e) {
+        $results['controller_check_error'] = $e->getMessage();
+    }
+
+    return response()->json($results, 200, [], JSON_PRETTY_PRINT);
+})->middleware(['auth']);
+
 Route::fallback(function () {
     return response()->view('errors.404', [], 404);
 });

@@ -33,7 +33,8 @@ class Calendario extends Page
 
         $entrenamientos = $entrenamientosQuery->with('equipo')->get()->toBase()->map(fn ($e) => [
             'title' => $e->nombre,
-            'start' => $e->fecha . ($e->hora ? 'T' . $e->hora : ''),
+            'start' => date('Y-m-d', strtotime($e->fecha)) . ($e->hora ? 'T' . $e->hora : ''),
+            'allDay' => !$e->hora,
             'color' => '#2563eb',
             'type' => 'Entrenamiento',
             'location' => $e->ubicacion ?? 'No especificada',
@@ -43,7 +44,8 @@ class Calendario extends Page
 
         $partidos = $partidosQuery->with(['local', 'visitante', 'torneo'])->get()->toBase()->map(fn ($p) => [
             'title' => ($p->local?->nombre ?? 'Local') . ' vs ' . ($p->visitante?->nombre ?? 'Visitante'),
-            'start' => $p->fecha . ($p->hora ? 'T' . $p->hora : ''),
+            'start' => date('Y-m-d', strtotime($p->fecha)) . ($p->hora ? 'T' . $p->hora : ''),
+            'allDay' => !$p->hora,
             'color' => '#16a34a',
             'type' => 'Partido',
             'location' => 'Estadio / Cancha asignada',
