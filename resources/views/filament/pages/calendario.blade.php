@@ -41,9 +41,13 @@
             x-show="open"
             x-cloak
             x-transition
-            class="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
+            class="fixed inset-0 z-50 flex items-center justify-center p-4"
+            style="position: fixed; top: 0; right: 0; bottom: 0; left: 0; z-index: 50; display: flex; align-items: center; justify-content: center; background-color: rgba(0, 0, 0, 0.6); backdrop-filter: blur(4px); padding: 1rem;"
         >
-            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-md p-6 border dark:border-gray-700 mx-4 transform transition-all duration-300">
+            <div 
+                class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border dark:border-gray-700 transform transition-all duration-300"
+                style="width: 100%; max-width: 28rem; padding: 1.5rem; margin-left: 1rem; margin-right: 1rem;"
+            >
                 <div class="flex items-center gap-3 mb-4">
                     <span class="w-3 h-3 rounded-full" :style="'background-color: ' + eventColor"></span>
                     <span class="text-xs font-black uppercase tracking-widest text-gray-500 dark:text-gray-400" x-text="eventType"></span>
@@ -53,13 +57,13 @@
 
                 <div class="space-y-3 mb-6 text-sm text-gray-600 dark:text-gray-300">
                     <div class="flex items-center gap-3">
-                        <svg class="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                        <svg class="text-gray-400" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width: 1.25rem; height: 1.25rem; flex-shrink: 0;">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
                         </svg>
                         <span><strong>Hora:</strong> <span x-text="eventStart"></span></span>
                     </div>
                     <div class="flex items-center gap-3">
-                        <svg class="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                        <svg class="text-gray-400" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width: 1.25rem; height: 1.25rem; flex-shrink: 0;">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
                             <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
                         </svg>
@@ -67,7 +71,7 @@
                     </div>
                     <template x-if="eventExtra">
                         <div class="flex items-center gap-3">
-                            <svg class="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                            <svg class="text-gray-400" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" style="width: 1.25rem; height: 1.25rem; flex-shrink: 0;">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 111.063.852l-.708 2.836a.75.75 0 001.063.852l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" />
                             </svg>
                             <span x-text="eventExtra"></span>
