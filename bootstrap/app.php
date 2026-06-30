@@ -16,7 +16,10 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->append(\App\Http\Middleware\ResolveTenantBySubdomain::class);
         $middleware->statefulApi();
         $middleware->append(\App\Http\Middleware\SecurityHeaders::class);
-        $middleware->web(\App\Http\Middleware\HandleInertiaRequests::class);
+        $middleware->web([
+            \App\Http\Middleware\HandleInertiaRequests::class,
+            \App\Http\Middleware\SessionLifecycleMiddleware::class,
+        ]);
         $middleware->alias([
             'onboarding' => \App\Http\Middleware\RedirectIfOnboardingPending::class,
         ]);
