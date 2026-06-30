@@ -84,6 +84,7 @@ class JugadorPanelProvider extends PanelProvider
                 DispatchServingFilamentEvent::class,
                 \App\Http\Middleware\ApplyTenantColor::class,
                 \App\Http\Middleware\CheckTenantPayment::class,
+                \App\Http\Middleware\SessionLifecycleMiddleware::class,
             ])
             ->authMiddleware([
                 Authenticate::class,
